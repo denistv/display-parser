@@ -1,6 +1,6 @@
 package domain
 
-type ModelDocument struct {
+type DocumentEntity struct {
 	URL  string `db:"url"`
 	Body string `db:"body"`
 }

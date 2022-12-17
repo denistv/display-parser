@@ -12,12 +12,12 @@ import (
 type InsertDataset struct {
 	dialect      SQLDialect
 	clauses      exp.InsertClauses
-	isPrepared   bool
+	isPrepared   prepared
 	queryFactory exec.QueryFactory
 	err          error
 }
 
-var errUnsupportedIntoType = errors.New("unsupported table type, a string or identifier expression is required")
+var ErrUnsupportedIntoType = errors.New("unsupported table type, a string or identifier expression is required")
 
 // used internally by database to create a database with a specific adapter
 func newInsertDataset(d string, queryFactory exec.QueryFactory) *InsertDataset {
@@ -39,12 +39,12 @@ func Insert(table interface{}) *InsertDataset {
 // prepared: If true the dataset WILL NOT interpolate the parameters.
 func (id *InsertDataset) Prepared(prepared bool) *InsertDataset {
 	ret := id.copy(id.clauses)
-	ret.isPrepared = prepared
+	ret.isPrepared = preparedFromBool(prepared)
 	return ret
 }
 
 func (id *InsertDataset) IsPrepared() bool {
-	return id.isPrepared
+	return id.isPrepared.Bool()
 }
 
 // Sets the adapter used to serialize values and create the SQL statement
@@ -124,7 +124,7 @@ func (id *InsertDataset) Into(into interface{}) *InsertDataset {
 	case string:
 		return id.copy(id.clauses.SetInto(exp.ParseIdentifier(t)))
 	default:
-		panic(errUnsupportedIntoType)
+		panic(ErrUnsupportedIntoType)
 	}
 }
 
@@ -242,7 +242,12 @@ func (id *InsertDataset) AppendSQL(b sb.SQLBuilder) {
 }
 
 func (id *InsertDataset) GetAs() exp.IdentifierExpression {
-	return nil
+	return id.clauses.Alias()
+}
+
+// Sets the alias for this dataset. This is typically used when using a Dataset as MySQL upsert
+func (id *InsertDataset) As(alias string) *InsertDataset {
+	return id.copy(id.clauses.SetAlias(T(alias)))
 }
 
 func (id *InsertDataset) ReturnsColumns() bool {
@@ -257,7 +262,7 @@ func (id *InsertDataset) Executor() exec.QueryExecutor {
 }
 
 func (id *InsertDataset) insertSQLBuilder() sb.SQLBuilder {
-	buf := sb.NewSQLBuilder(id.isPrepared)
+	buf := sb.NewSQLBuilder(id.isPrepared.Bool())
 	if id.err != nil {
 		return buf.SetError(id.err)
 	}

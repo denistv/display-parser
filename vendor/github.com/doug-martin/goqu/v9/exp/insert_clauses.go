@@ -28,6 +28,10 @@ type (
 		HasRows() bool
 		SetRows(rows []interface{}) InsertClauses
 
+		HasAlias() bool
+		Alias() IdentifierExpression
+		SetAlias(ie IdentifierExpression) InsertClauses
+
 		Vals() [][]interface{}
 		HasVals() bool
 		SetVals(vals [][]interface{}) InsertClauses
@@ -41,6 +45,7 @@ type (
 		cols         ColumnListExpression
 		into         Expression
 		returning    ColumnListExpression
+		alias        IdentifierExpression
 		rows         []interface{}
 		values       [][]interface{}
 		from         AppendableExpression
@@ -62,6 +67,7 @@ func (ic *insertClauses) clone() *insertClauses {
 		cols:         ic.cols,
 		into:         ic.into,
 		returning:    ic.returning,
+		alias:        ic.alias,
 		rows:         ic.rows,
 		values:       ic.values,
 		from:         ic.from,
@@ -72,6 +78,7 @@ func (ic *insertClauses) clone() *insertClauses {
 func (ic *insertClauses) CommonTables() []CommonTableExpression {
 	return ic.commonTables
 }
+
 func (ic *insertClauses) CommonTablesAppend(cte CommonTableExpression) InsertClauses {
 	ret := ic.clone()
 	ret.commonTables = append(ret.commonTables, cte)
@@ -101,6 +108,7 @@ func (ic *insertClauses) SetCols(cl ColumnListExpression) InsertClauses {
 func (ic *insertClauses) Into() Expression {
 	return ic.into
 }
+
 func (ic *insertClauses) SetInto(into Expression) InsertClauses {
 	ret := ic.clone()
 	ret.into = into
@@ -113,6 +121,20 @@ func (ic *insertClauses) Returning() ColumnListExpression {
 
 func (ic *insertClauses) HasReturning() bool {
 	return ic.returning != nil && !ic.returning.IsEmpty()
+}
+
+func (ic *insertClauses) HasAlias() bool {
+	return ic.alias != nil
+}
+
+func (ic *insertClauses) Alias() IdentifierExpression {
+	return ic.alias
+}
+
+func (ic *insertClauses) SetAlias(ie IdentifierExpression) InsertClauses {
+	ret := ic.clone()
+	ret.alias = ie
+	return ret
 }
 
 func (ic *insertClauses) SetReturning(cl ColumnListExpression) InsertClauses {
@@ -164,9 +186,9 @@ func (ic *insertClauses) SetVals(vals [][]interface{}) InsertClauses {
 }
 
 func (ic *insertClauses) ValsAppend(vals [][]interface{}) InsertClauses {
-	newVals := make([][]interface{}, len(ic.values))
-	copy(newVals, ic.values)
 	ret := ic.clone()
+	newVals := make([][]interface{}, 0, len(ic.values)+len(vals))
+	newVals = append(newVals, ic.values...)
 	newVals = append(newVals, vals...)
 	ret.values = newVals
 	return ret
@@ -175,6 +197,7 @@ func (ic *insertClauses) ValsAppend(vals [][]interface{}) InsertClauses {
 func (ic *insertClauses) OnConflict() ConflictExpression {
 	return ic.conflict
 }
+
 func (ic *insertClauses) SetOnConflict(expression ConflictExpression) InsertClauses {
 	ret := ic.clone()
 	ret.conflict = expression

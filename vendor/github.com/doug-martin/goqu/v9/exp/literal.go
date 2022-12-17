@@ -40,7 +40,7 @@ func (l literal) Args() []interface{} {
 }
 
 func (l literal) Expression() Expression                           { return l }
-func (l literal) As(val interface{}) AliasedExpression             { return aliased(l, val) }
+func (l literal) As(val interface{}) AliasedExpression             { return NewAliasExpression(l, val) }
 func (l literal) Eq(val interface{}) BooleanExpression             { return eq(l, val) }
 func (l literal) Neq(val interface{}) BooleanExpression            { return neq(l, val) }
 func (l literal) Gt(val interface{}) BooleanExpression             { return gt(l, val) }
@@ -69,3 +69,12 @@ func (l literal) IsTrue() BooleanExpression                        { return is(l
 func (l literal) IsNotTrue() BooleanExpression                     { return isNot(l, true) }
 func (l literal) IsFalse() BooleanExpression                       { return is(l, false) }
 func (l literal) IsNotFalse() BooleanExpression                    { return isNot(l, false) }
+
+func (l literal) BitwiseInversion() BitwiseExpression                { return bitwiseInversion(l) }
+func (l literal) BitwiseOr(val interface{}) BitwiseExpression        { return bitwiseOr(l, val) }
+func (l literal) BitwiseAnd(val interface{}) BitwiseExpression       { return bitwiseAnd(l, val) }
+func (l literal) BitwiseXor(val interface{}) BitwiseExpression       { return bitwiseXor(l, val) }
+func (l literal) BitwiseLeftShift(val interface{}) BitwiseExpression { return bitwiseLeftShift(l, val) }
+func (l literal) BitwiseRightShift(val interface{}) BitwiseExpression {
+	return bitwiseRightShift(l, val)
+}

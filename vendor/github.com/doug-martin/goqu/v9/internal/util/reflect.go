@@ -78,15 +78,33 @@ func IsEmptyValue(v reflect.Value) bool {
 		return v.IsNil()
 	case reflect.Invalid:
 		return true
+	default:
+		return false
 	}
-	return false
 }
 
-var structMapCache = make(map[interface{}]ColumnMap)
-var structMapCacheLock = sync.Mutex{}
+var (
+	structMapCache     = make(map[interface{}]ColumnMap)
+	structMapCacheLock = sync.Mutex{}
+)
 
-var defaultColumnRenameFunction = strings.ToLower
-var columnRenameFunction = defaultColumnRenameFunction
+var (
+	DefaultColumnRenameFunction = strings.ToLower
+	columnRenameFunction        = DefaultColumnRenameFunction
+	ignoreUntaggedFields        = false
+)
+
+func SetIgnoreUntaggedFields(ignore bool) {
+	// If the value here is changing, reset the struct map cache
+	if ignore != ignoreUntaggedFields {
+		ignoreUntaggedFields = ignore
+
+		structMapCacheLock.Lock()
+		defer structMapCacheLock.Unlock()
+
+		structMapCache = make(map[interface{}]ColumnMap)
+	}
+}
 
 func SetColumnRenameFunction(newFunction func(string) string) {
 	columnRenameFunction = newFunction
@@ -166,6 +184,7 @@ func SafeSetFieldByIndex(v reflect.Value, fieldIndex []int, src interface{}) (re
 			SafeSetFieldByIndex(reflect.Indirect(s), fieldIndex[1:], src)
 		case reflect.Struct:
 			SafeSetFieldByIndex(f, fieldIndex[1:], src)
+		default: // use the original value
 		}
 	}
 	return v

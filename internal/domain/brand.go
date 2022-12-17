@@ -1,6 +1,6 @@
 package domain
 
-type Brand struct {
+type BrandEntity struct {
 	ID   int64
 	Name string
 	Href string

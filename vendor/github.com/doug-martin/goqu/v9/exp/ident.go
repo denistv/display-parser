@@ -12,12 +12,17 @@ type (
 	}
 )
 
+var (
+	tableAndColumnParts                 = 2
+	schemaTableAndColumnIdentifierParts = 3
+)
+
 func ParseIdentifier(ident string) IdentifierExpression {
 	parts := strings.Split(ident, ".")
 	switch len(parts) {
-	case 2:
+	case tableAndColumnParts:
 		return NewIdentifierExpression("", parts[0], parts[1])
-	case 3:
+	case schemaTableAndColumnIdentifierParts:
 		return NewIdentifierExpression(parts[0], parts[1], parts[2])
 	}
 	return NewIdentifierExpression("", "", ident)
@@ -123,16 +128,16 @@ func (i identifier) As(val interface{}) AliasedExpression {
 	if v, ok := val.(string); ok {
 		ident := ParseIdentifier(v)
 		if i.col != nil && i.col != "" {
-			return aliased(i, ident)
+			return NewAliasExpression(i, ident)
 		}
 		aliasCol := ident.GetCol()
 		if i.table != "" {
-			return aliased(i, NewIdentifierExpression("", aliasCol.(string), nil))
+			return NewAliasExpression(i, NewIdentifierExpression("", aliasCol.(string), nil))
 		} else if i.schema != "" {
-			return aliased(i, NewIdentifierExpression(aliasCol.(string), "", nil))
+			return NewAliasExpression(i, NewIdentifierExpression(aliasCol.(string), "", nil))
 		}
 	}
-	return aliased(i, val)
+	return NewAliasExpression(i, val)
 }
 
 // Returns a BooleanExpression for equality (e.g "my_col" = 1)
@@ -154,6 +159,28 @@ func (i identifier) Lt(val interface{}) BooleanExpression { return lt(i, val) }
 // Returns a BooleanExpression for checking that a identifier is less than or equal to another value
 // (e.g "my_col" <= 1)
 func (i identifier) Lte(val interface{}) BooleanExpression { return lte(i, val) }
+
+// Returns a BooleanExpression for bit inversion (e.g ~ "my_col")
+func (i identifier) BitwiseInversion() BitwiseExpression { return bitwiseInversion(i) }
+
+// Returns a BooleanExpression for bit OR (e.g "my_col" | 1)
+func (i identifier) BitwiseOr(val interface{}) BitwiseExpression { return bitwiseOr(i, val) }
+
+// Returns a BooleanExpression for bit AND (e.g "my_col" & 1)
+func (i identifier) BitwiseAnd(val interface{}) BitwiseExpression { return bitwiseAnd(i, val) }
+
+// Returns a BooleanExpression for bit XOR (e.g "my_col" ^ 1)
+func (i identifier) BitwiseXor(val interface{}) BitwiseExpression { return bitwiseXor(i, val) }
+
+// Returns a BooleanExpression for bit LEFT shift (e.g "my_col" << 1)
+func (i identifier) BitwiseLeftShift(val interface{}) BitwiseExpression {
+	return bitwiseLeftShift(i, val)
+}
+
+// Returns a BooleanExpression for bit RIGHT shift (e.g "my_col" >> 1)
+func (i identifier) BitwiseRightShift(val interface{}) BitwiseExpression {
+	return bitwiseRightShift(i, val)
+}
 
 // Returns a BooleanExpression for checking that a identifier is in a list of values or  (e.g "my_col" > 1)
 func (i identifier) In(vals ...interface{}) BooleanExpression         { return in(i, vals...) }

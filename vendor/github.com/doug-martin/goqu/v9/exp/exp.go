@@ -138,6 +138,27 @@ type (
 		// Used internally by update sql
 		Set(interface{}) UpdateExpression
 	}
+
+	Bitwiseable interface {
+		// Creates a Bit Operation Expresion for sql ~
+		// I("col").BitiInversion() // (~ "col")
+		BitwiseInversion() BitwiseExpression
+		// Creates a Bit Operation Expresion for sql |
+		// I("col").BitOr(1) // ("col" | 1)
+		BitwiseOr(interface{}) BitwiseExpression
+		// Creates a Bit Operation Expresion for sql &
+		// I("col").BitAnd(1) // ("col" & 1)
+		BitwiseAnd(interface{}) BitwiseExpression
+		// Creates a Bit Operation Expresion for sql ^
+		// I("col").BitXor(1) // ("col" ^ 1)
+		BitwiseXor(interface{}) BitwiseExpression
+		// Creates a Bit Operation Expresion for sql <<
+		// I("col").BitLeftShift(1) // ("col" << 1)
+		BitwiseLeftShift(interface{}) BitwiseExpression
+		// Creates a Bit Operation Expresion for sql >>
+		// I("col").BitRighttShift(1) // ("col" >> 1)
+		BitwiseRightShift(interface{}) BitwiseExpression
+	}
 )
 
 type (
@@ -188,6 +209,7 @@ type (
 	BooleanOperation  int
 	BooleanExpression interface {
 		Expression
+		Aliaseable
 		// Returns the operator for the expression
 		Op() BooleanOperation
 		// The left hand side of the expression (e.g. I("a")
@@ -195,6 +217,26 @@ type (
 		// The right hand side of the expression could be a primitive value, dataset, or expression
 		RHS() interface{}
 	}
+
+	BitwiseOperation  int
+	BitwiseExpression interface {
+		Expression
+		Aliaseable
+		Comparable
+		Isable
+		Inable
+		Likeable
+		Rangeable
+		Orderable
+		Distinctable
+		// Returns the operator for the expression
+		Op() BitwiseOperation
+		// The left hand side of the expression (e.g. I("a")
+		LHS() Expression
+		// The right hand side of the expression could be a primitive value, dataset, or expression
+		RHS() interface{}
+	}
+
 	// An Expression that represents another Expression casted to a SQL type
 	CastExpression interface {
 		Expression
@@ -276,6 +318,7 @@ type (
 		Updateable
 		Distinctable
 		Castable
+		Bitwiseable
 		// returns true if this identifier has more more than on part (Schema, Table or Col)
 		//	"schema" -> true //cant qualify anymore
 		//	"schema.table" -> true
@@ -345,14 +388,15 @@ type (
 		Likeable
 		Rangeable
 		Orderable
+		Bitwiseable
 		// Returns the literal sql
 		Literal() string
 		// Arguments to be replaced within the sql
 		Args() []interface{}
 	}
 
-	nullSortType  int
-	sortDirection int
+	NullSortType  int
+	SortDirection int
 	// An expression for specifying sort order and options
 	OrderedExpression interface {
 		Expression
@@ -361,7 +405,7 @@ type (
 		// Sort direction (e.g. ASC, DESC)
 		IsAsc() bool
 		// If the adapter supports it null sort type (e.g. NULLS FIRST, NULLS LAST)
-		NullSortType() nullSortType
+		NullSortType() NullSortType
 		// Returns a new OrderedExpression with NullSortType set to NULLS_FIRST
 		NullsFirst() OrderedExpression
 		// Returns a new OrderedExpression with NullSortType set to NULLS_LAST
@@ -394,6 +438,7 @@ type (
 		Aliaseable
 		Rangeable
 		Comparable
+		Orderable
 		Isable
 		Inable
 		Likeable
@@ -414,6 +459,7 @@ type (
 		Aliaseable
 		Rangeable
 		Comparable
+		Orderable
 		Isable
 		Inable
 		Likeable
@@ -453,6 +499,7 @@ type (
 	CaseExpression interface {
 		Expression
 		Aliaseable
+		Orderable
 		GetValue() interface{}
 		GetWhens() []CaseWhen
 		GetElse() CaseElse
@@ -491,15 +538,15 @@ const (
 	OnJoinCondType
 
 	// Default null sort type with no null sort order
-	NoNullsSortType nullSortType = iota
+	NoNullsSortType NullSortType = iota
 	// NULLS FIRST
 	NullsFirstSortType
 	// NULLS LAST
 	NullsLastSortType
 	// ASC
-	ascDir sortDirection = iota
+	AscDir SortDirection = iota
 	// DESC
-	descSortDir
+	DescSortDir
 
 	// BETWEEN
 	BetweenOp RangeOperation = iota
@@ -544,6 +591,13 @@ const (
 	RegexpNotILikeOp
 
 	betweenStr = "between"
+
+	BitwiseInversionOp BitwiseOperation = iota
+	BitwiseOrOp
+	BitwiseAndOp
+	BitwiseXorOp
+	BitwiseLeftShiftOp
+	BitwiseRightShiftOp
 )
 
 var (
@@ -619,6 +673,24 @@ func (bo BooleanOperation) String() string {
 		return "regexpnotilike"
 	}
 	return fmt.Sprintf("%d", bo)
+}
+
+func (bi BitwiseOperation) String() string {
+	switch bi {
+	case BitwiseInversionOp:
+		return "Inversion"
+	case BitwiseOrOp:
+		return "OR"
+	case BitwiseAndOp:
+		return "AND"
+	case BitwiseXorOp:
+		return "XOR"
+	case BitwiseLeftShiftOp:
+		return "Left Shift"
+	case BitwiseRightShiftOp:
+		return "Right Shift"
+	}
+	return fmt.Sprintf("%d", bi)
 }
 
 func (ro RangeOperation) String() string {

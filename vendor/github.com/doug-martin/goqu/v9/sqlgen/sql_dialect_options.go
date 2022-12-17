@@ -12,6 +12,8 @@ type (
 	SQLDialectOptions struct {
 		// Set to true if the dialect supports ORDER BY expressions in DELETE statements (DEFAULT=false)
 		SupportsOrderByOnDelete bool
+		// Set to true if the dialect supports table hint for DELETE statements (DELETE t FROM t ...), DEFAULT=false
+		SupportsDeleteTableHint bool
 		// Set to true if the dialect supports ORDER BY expressions in UPDATE statements (DEFAULT=false)
 		SupportsOrderByOnUpdate bool
 		// Set to true if the dialect supports LIMIT expressions in DELETE statements (DEFAULT=false)
@@ -117,6 +119,8 @@ type (
 		ForNoKeyUpdateFragment []byte
 		// The SQL FOR SHARE fragment(DEFAULT=[]byte(" FOR SHARE "))
 		ForShareFragment []byte
+		// The SQL OF fragment(DEFAULT=[]byte("OF "))
+		OfFragment []byte
 		// The SQL FOR KEY SHARE fragment(DEFAULT=[]byte(" FOR KEY SHARE "))
 		ForKeyShareFragment []byte
 		// The SQL NOWAIT fragment(DEFAULT=[]byte("NOWAIT"))
@@ -213,6 +217,16 @@ type (
 		// 		exp.RegexpNotILikeOp: []byte("!~*"),
 		// })
 		BooleanOperatorLookup map[exp.BooleanOperation][]byte
+		// A map used to look up BitwiseOperations and their SQL equivalents
+		// (Default=map[exp.BitwiseOperation][]byte{
+		// 		exp.BitwiseInversionOp:  []byte("~"),
+		// 		exp.BitwiseOrOp:         []byte("|"),
+		// 		exp.BitwiseAndOp:        []byte("&"),
+		// 		exp.BitwiseXorOp:        []byte("#"),
+		// 		exp.BitwiseLeftShiftOp:  []byte("<<"),
+		// 		exp.BitwiseRightShiftOp: []byte(">>"),
+		// }),
+		BitwiseOperatorLookup map[exp.BitwiseOperation][]byte
 		// A map used to look up RangeOperations and their SQL equivalents
 		// (Default=map[exp.RangeOperation][]byte{
 		// 		exp.BetweenOp:    []byte("BETWEEN"),
@@ -235,6 +249,8 @@ type (
 		// 		exp.CrossJoinType:        []byte(" CROSS JOIN "),
 		// 	})
 		JoinTypeLookup map[exp.JoinType][]byte
+		// Whether or not boolean data type is supported
+		BooleanDataTypeSupported bool
 		// Whether or not to use literal TRUE or FALSE for IS statements (e.g. IS TRUE or IS 0)
 		UseLiteralIsBools bool
 		// EscapedRunes is a map of a rune and the corresponding escape sequence in bytes. Used when escaping text
@@ -390,9 +406,11 @@ func (sf SQLFragmentType) String() string {
 	return fmt.Sprintf("%d", sf)
 }
 
+//nolint:funlen
 func DefaultDialectOptions() *SQLDialectOptions {
 	return &SQLDialectOptions{
 		SupportsOrderByOnDelete:     false,
+		SupportsDeleteTableHint:     false,
 		SupportsOrderByOnUpdate:     false,
 		SupportsLimitOnDelete:       false,
 		SupportsLimitOnUpdate:       false,
@@ -444,6 +462,7 @@ func DefaultDialectOptions() *SQLDialectOptions {
 		ForNoKeyUpdateFragment:    []byte(" FOR NO KEY UPDATE "),
 		ForShareFragment:          []byte(" FOR SHARE "),
 		ForKeyShareFragment:       []byte(" FOR KEY SHARE "),
+		OfFragment:                []byte("OF "),
 		NowaitFragment:            []byte("NOWAIT"),
 		SkipLockedFragment:        []byte("SKIP LOCKED"),
 		LateralFragment:           []byte("LATERAL "),
@@ -503,6 +522,14 @@ func DefaultDialectOptions() *SQLDialectOptions {
 			exp.RegexpILikeOp:    []byte("~*"),
 			exp.RegexpNotILikeOp: []byte("!~*"),
 		},
+		BitwiseOperatorLookup: map[exp.BitwiseOperation][]byte{
+			exp.BitwiseInversionOp:  []byte("~"),
+			exp.BitwiseOrOp:         []byte("|"),
+			exp.BitwiseAndOp:        []byte("&"),
+			exp.BitwiseXorOp:        []byte("#"),
+			exp.BitwiseLeftShiftOp:  []byte("<<"),
+			exp.BitwiseRightShiftOp: []byte(">>"),
+		},
 		RangeOperatorLookup: map[exp.RangeOperation][]byte{
 			exp.BetweenOp:    []byte("BETWEEN"),
 			exp.NotBetweenOp: []byte("NOT BETWEEN"),
@@ -522,8 +549,10 @@ func DefaultDialectOptions() *SQLDialectOptions {
 			exp.CrossJoinType:        []byte(" CROSS JOIN "),
 		},
 
-		TimeFormat:        time.RFC3339Nano,
-		UseLiteralIsBools: true,
+		TimeFormat: time.RFC3339Nano,
+
+		BooleanDataTypeSupported: true,
+		UseLiteralIsBools:        true,
 
 		EscapedRunes: map[rune][]byte{
 			'\'': []byte("''"),

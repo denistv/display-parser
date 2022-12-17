@@ -2,14 +2,17 @@ package main
 
 import (
 	"context"
-	"displayCrawler/internal/respository"
 	"fmt"
-	"github.com/jackc/pgx/v4"
+	"github.com/doug-martin/goqu/v9"
+	"github.com/jackc/pgx/v5"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
+	"go.uber.org/zap"
 	"os"
 
 	"displayCrawler/internal/pipeline"
+	"displayCrawler/internal/repository"
 )
-import "go.uber.org/zap"
 
 func main() {
 	ctx := context.Background()
@@ -20,34 +23,36 @@ func main() {
 		os.Exit(255)
 	}
 
-	conn, err := pgx.Connect(ctx, "postgres://displayspecs:displayspecs@localhost:49153/displayspecs")
+	conn, err := pgx.Connect(ctx, "postgres://postgres:postgres@192.168.1.72:5432/display_crawler")
 	if err != nil {
 		logger.Fatal(fmt.Errorf("creating pq connector: %w", err).Error())
 	}
 
 	defer conn.Close(ctx)
 
+	sqlxConn, err := sqlx.Connect("postgres", "user=postgres password=postgres dbname=display_crawler host=192.168.1.72 sslmode=disable")
+	if err != nil {
+		logger.Fatal(err.Error())
+	}
+
+	goquDb := goqu.New("postgres", sqlxConn)
+
 	// Repositories
-	dbWrapper := respository.NewDBWrapper(conn)
-	modelDocRepo := respository.NewModelDocument(dbWrapper)
+	dbWrapper := repository.NewDBWrapper(conn)
+	docRepo := repository.NewDocument(dbWrapper, goquDb)
+	modelsRepo := repository.NewModel(goquDb)
 
 	// Collectors
 	brandsCollector := pipeline.NewBrandsCollector(logger)
-	modelDocsColector := pipeline.NewModelDocumentCollector(logger, modelDocRepo)
-	modelsCollector := pipeline.NewModelsCollector(logger)
+	docsCollector := pipeline.NewDocumentsCollector(logger, docRepo)
+	modelsURLCollector := pipeline.NewModelsURLCollector(logger)
+	modelParser := pipeline.NewModelParser(logger, modelsRepo)
 
 	// Pipeline chains
-	brandURLsChan := brandsCollector.BrandURLs()
-	modelsIndexURLsChan := modelsCollector.GetItemsIndex(brandURLsChan)
-	modelDocsChan := modelDocsColector.Collect(modelsIndexURLsChan)
+	brandURLsChan := brandsCollector.Run()
+	modelsIndexURLsChan := modelsURLCollector.Run(brandURLsChan)
+	documentsChan := docsCollector.Run(modelsIndexURLsChan)
+	modelParser.Run(documentsChan)
 
-	for modelDoc := range modelDocsChan {
-		err := modelDocRepo.Create(ctx, modelDoc)
-		if err != nil {
-			logger.Error(fmt.Errorf("creating document: %w", err).Error())
-			continue
-		}
-
-		logger.Info("document inserted: " + modelDoc.URL)
-	}
+	<-ctx.Done()
 }

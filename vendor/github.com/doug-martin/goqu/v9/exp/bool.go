@@ -35,6 +35,10 @@ func (b boolean) Op() BooleanOperation {
 	return b.op
 }
 
+func (b boolean) As(val interface{}) AliasedExpression {
+	return NewAliasExpression(b, val)
+}
+
 // used internally to create an equality BooleanExpression
 func eq(lhs Expression, rhs interface{}) BooleanExpression {
 	return checkBoolExpType(EqOp, lhs, rhs, false)
@@ -171,6 +175,7 @@ func checkBoolExpType(op BooleanOperation, lhs Expression, rhs interface{}, inve
 			case *regexp.Regexp:
 				return checkLikeExp(LikeOp, lhs, rhs, invert)
 			}
+		default:
 		}
 	}
 	if invert {

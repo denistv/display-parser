@@ -2,9 +2,10 @@ package pipeline
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/PuerkitoBio/goquery"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 func NewBrandsCollector(logger *zap.Logger) *BrandsCollector {
@@ -19,11 +20,13 @@ type BrandsCollector struct {
 	sourceURL string
 }
 
-func (b *BrandsCollector) BrandURLs() <- chan string{
+func (b *BrandsCollector) Run() <-chan string {
 	out := make(chan string)
 
-	go func(){
+	go func() {
 		defer close(out)
+
+		b.logger.Info("getting brands...")
 
 		res, err := http.Get(b.sourceURL)
 		if err != nil {
@@ -51,6 +54,8 @@ func (b *BrandsCollector) BrandURLs() <- chan string{
 			return
 		}
 
+
+
 		doc.
 			Find(".brand-listing-container-frontpage").
 			Each(func(i int, s *goquery.Selection) {
@@ -66,6 +71,8 @@ func (b *BrandsCollector) BrandURLs() <- chan string{
 					out <- href
 				})
 			})
+
+		b.logger.Info("brands collected")
 	}()
 
 	return out

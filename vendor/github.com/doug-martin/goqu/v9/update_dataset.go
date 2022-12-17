@@ -10,12 +10,12 @@ import (
 type UpdateDataset struct {
 	dialect      SQLDialect
 	clauses      exp.UpdateClauses
-	isPrepared   bool
+	isPrepared   prepared
 	queryFactory exec.QueryFactory
 	err          error
 }
 
-var errUnsupportedUpdateTableType = errors.New("unsupported table type, a string or identifier expression is required")
+var ErrUnsupportedUpdateTableType = errors.New("unsupported table type, a string or identifier expression is required")
 
 // used internally by database to create a database with a specific adapter
 func newUpdateDataset(d string, queryFactory exec.QueryFactory) *UpdateDataset {
@@ -35,12 +35,12 @@ func Update(table interface{}) *UpdateDataset {
 // prepared: If true the dataset WILL NOT interpolate the parameters.
 func (ud *UpdateDataset) Prepared(prepared bool) *UpdateDataset {
 	ret := ud.copy(ud.clauses)
-	ret.isPrepared = prepared
+	ret.isPrepared = preparedFromBool(prepared)
 	return ret
 }
 
 func (ud *UpdateDataset) IsPrepared() bool {
-	return ud.isPrepared
+	return ud.isPrepared.Bool()
 }
 
 // Sets the adapter used to serialize values and create the SQL statement
@@ -117,7 +117,7 @@ func (ud *UpdateDataset) Table(table interface{}) *UpdateDataset {
 	case string:
 		return ud.copy(ud.clauses.SetTable(exp.ParseIdentifier(t)))
 	default:
-		panic(errUnsupportedUpdateTableType)
+		panic(ErrUnsupportedUpdateTableType)
 	}
 }
 
@@ -236,7 +236,7 @@ func (ud *UpdateDataset) Executor() exec.QueryExecutor {
 }
 
 func (ud *UpdateDataset) updateSQLBuilder() sb.SQLBuilder {
-	buf := sb.NewSQLBuilder(ud.isPrepared)
+	buf := sb.NewSQLBuilder(ud.isPrepared.Bool())
 	if ud.err != nil {
 		return buf.SetError(ud.err)
 	}

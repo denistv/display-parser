@@ -44,7 +44,7 @@ func (c caseExpression) Clone() Expression {
 }
 
 func (c caseExpression) As(alias interface{}) AliasedExpression {
-	return aliased(c, alias)
+	return NewAliasExpression(c, alias)
 }
 
 func (c caseExpression) GetValue() interface{} {
@@ -73,3 +73,6 @@ func (c caseExpression) Else(result interface{}) CaseExpression {
 	c.elseCondition = NewCaseElse(result)
 	return c
 }
+
+func (c caseExpression) Asc() OrderedExpression  { return asc(c) }
+func (c caseExpression) Desc() OrderedExpression { return desc(c) }

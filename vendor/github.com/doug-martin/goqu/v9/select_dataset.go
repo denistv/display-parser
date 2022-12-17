@@ -14,15 +14,13 @@ import (
 type SelectDataset struct {
 	dialect      SQLDialect
 	clauses      exp.SelectClauses
-	isPrepared   bool
+	isPrepared   prepared
 	queryFactory exec.QueryFactory
 	err          error
 }
 
-var (
-	errQueryFactoryNotFoundError = errors.New(
-		"unable to execute query did you use goqu.Database#From to create the dataset",
-	)
+var ErrQueryFactoryNotFoundError = errors.New(
+	"unable to execute query did you use goqu.Database#From to create the dataset",
 )
 
 // used internally by database to create a database with a specific adapter
@@ -54,12 +52,12 @@ func (sd *SelectDataset) WithDialect(dl string) *SelectDataset {
 // prepared: If true the dataset WILL NOT interpolate the parameters.
 func (sd *SelectDataset) Prepared(prepared bool) *SelectDataset {
 	ret := sd.copy(sd.clauses)
-	ret.isPrepared = prepared
+	ret.isPrepared = preparedFromBool(prepared)
 	return ret
 }
 
 func (sd *SelectDataset) IsPrepared() bool {
-	return sd.isPrepared
+	return sd.isPrepared.Bool()
 }
 
 // Returns the current adapter on the dataset
@@ -103,7 +101,7 @@ func (sd *SelectDataset) copy(clauses exp.SelectClauses) *SelectDataset {
 // `ORDER , and `LIMIT`
 func (sd *SelectDataset) Update() *UpdateDataset {
 	u := newUpdateDataset(sd.dialect.Dialect(), sd.queryFactory).
-		Prepared(sd.isPrepared)
+		Prepared(sd.isPrepared.Bool())
 	if sd.clauses.HasSources() {
 		u = u.Table(sd.GetClauses().From().Columns()[0])
 	}
@@ -130,7 +128,7 @@ func (sd *SelectDataset) Update() *UpdateDataset {
 // insert.
 func (sd *SelectDataset) Insert() *InsertDataset {
 	i := newInsertDataset(sd.dialect.Dialect(), sd.queryFactory).
-		Prepared(sd.isPrepared)
+		Prepared(sd.isPrepared.Bool())
 	if sd.clauses.HasSources() {
 		i = i.Into(sd.GetClauses().From().Columns()[0])
 	}
@@ -146,7 +144,7 @@ func (sd *SelectDataset) Insert() *InsertDataset {
 // `ORDER , and `LIMIT`
 func (sd *SelectDataset) Delete() *DeleteDataset {
 	d := newDeleteDataset(sd.dialect.Dialect(), sd.queryFactory).
-		Prepared(sd.isPrepared)
+		Prepared(sd.isPrepared.Bool())
 	if sd.clauses.HasSources() {
 		d = d.From(sd.clauses.From().Columns()[0])
 	}
@@ -361,32 +359,37 @@ func (sd *SelectDataset) ClearWhere() *SelectDataset {
 }
 
 // Adds a FOR UPDATE clause. See examples.
-func (sd *SelectDataset) ForUpdate(waitOption exp.WaitOption) *SelectDataset {
-	return sd.withLock(exp.ForUpdate, waitOption)
+func (sd *SelectDataset) ForUpdate(waitOption exp.WaitOption, of ...exp.IdentifierExpression) *SelectDataset {
+	return sd.withLock(exp.ForUpdate, waitOption, of...)
 }
 
 // Adds a FOR NO KEY UPDATE clause. See examples.
-func (sd *SelectDataset) ForNoKeyUpdate(waitOption exp.WaitOption) *SelectDataset {
-	return sd.withLock(exp.ForNoKeyUpdate, waitOption)
+func (sd *SelectDataset) ForNoKeyUpdate(waitOption exp.WaitOption, of ...exp.IdentifierExpression) *SelectDataset {
+	return sd.withLock(exp.ForNoKeyUpdate, waitOption, of...)
 }
 
 // Adds a FOR KEY SHARE clause. See examples.
-func (sd *SelectDataset) ForKeyShare(waitOption exp.WaitOption) *SelectDataset {
-	return sd.withLock(exp.ForKeyShare, waitOption)
+func (sd *SelectDataset) ForKeyShare(waitOption exp.WaitOption, of ...exp.IdentifierExpression) *SelectDataset {
+	return sd.withLock(exp.ForKeyShare, waitOption, of...)
 }
 
 // Adds a FOR SHARE clause. See examples.
-func (sd *SelectDataset) ForShare(waitOption exp.WaitOption) *SelectDataset {
-	return sd.withLock(exp.ForShare, waitOption)
+func (sd *SelectDataset) ForShare(waitOption exp.WaitOption, of ...exp.IdentifierExpression) *SelectDataset {
+	return sd.withLock(exp.ForShare, waitOption, of...)
 }
 
-func (sd *SelectDataset) withLock(strength exp.LockStrength, option exp.WaitOption) *SelectDataset {
-	return sd.copy(sd.clauses.SetLock(exp.NewLock(strength, option)))
+func (sd *SelectDataset) withLock(strength exp.LockStrength, option exp.WaitOption, of ...exp.IdentifierExpression) *SelectDataset {
+	return sd.copy(sd.clauses.SetLock(exp.NewLock(strength, option, of...)))
 }
 
 // Adds a GROUP BY clause. See examples.
 func (sd *SelectDataset) GroupBy(groupBy ...interface{}) *SelectDataset {
 	return sd.copy(sd.clauses.SetGroupBy(exp.NewColumnListExpression(groupBy...)))
+}
+
+// Adds more columns to the current GROUP BY clause. See examples.
+func (sd *SelectDataset) GroupByAppend(groupBy ...interface{}) *SelectDataset {
+	return sd.copy(sd.clauses.GroupByAppend(exp.NewColumnListExpression(groupBy...)))
 }
 
 // Adds a HAVING clause. See examples.
@@ -579,7 +582,7 @@ func (sd *SelectDataset) ScanStructs(i interface{}) error {
 // i: A pointer to a slice of structs
 func (sd *SelectDataset) ScanStructsContext(ctx context.Context, i interface{}) error {
 	if sd.queryFactory == nil {
-		return errQueryFactoryNotFoundError
+		return ErrQueryFactoryNotFoundError
 	}
 	ds := sd
 	if sd.GetClauses().IsDefaultSelect() {
@@ -606,7 +609,7 @@ func (sd *SelectDataset) ScanStruct(i interface{}) (bool, error) {
 // i: A pointer to a structs
 func (sd *SelectDataset) ScanStructContext(ctx context.Context, i interface{}) (bool, error) {
 	if sd.queryFactory == nil {
-		return false, errQueryFactoryNotFoundError
+		return false, ErrQueryFactoryNotFoundError
 	}
 	ds := sd
 	if sd.GetClauses().IsDefaultSelect() {
@@ -628,7 +631,7 @@ func (sd *SelectDataset) ScanVals(i interface{}) error {
 // i: A pointer to a slice of primitive values
 func (sd *SelectDataset) ScanValsContext(ctx context.Context, i interface{}) error {
 	if sd.queryFactory == nil {
-		return errQueryFactoryNotFoundError
+		return ErrQueryFactoryNotFoundError
 	}
 	return sd.Executor().ScanValsContext(ctx, i)
 }
@@ -645,7 +648,7 @@ func (sd *SelectDataset) ScanVal(i interface{}) (bool, error) {
 // i: A pointer to a primitive value
 func (sd *SelectDataset) ScanValContext(ctx context.Context, i interface{}) (bool, error) {
 	if sd.queryFactory == nil {
-		return false, errQueryFactoryNotFoundError
+		return false, ErrQueryFactoryNotFoundError
 	}
 	return sd.Limit(1).Executor().ScanValContext(ctx, i)
 }
@@ -683,7 +686,7 @@ func (sd *SelectDataset) PluckContext(ctx context.Context, i interface{}, col st
 }
 
 func (sd *SelectDataset) selectSQLBuilder() sb.SQLBuilder {
-	buf := sb.NewSQLBuilder(sd.isPrepared)
+	buf := sb.NewSQLBuilder(sd.isPrepared.Bool())
 	if sd.err != nil {
 		return buf.SetError(sd.err)
 	}
