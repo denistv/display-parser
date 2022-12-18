@@ -53,6 +53,9 @@ func main() {
 	modelsIndexURLsChan := modelsURLCollector.Run(brandURLsChan)
 	documentsChan := docsCollector.Run(modelsIndexURLsChan)
 	modelParser.Run(documentsChan)
+	modelParser.Run(documentsChan)
+	modelParser.Run(documentsChan)
+	modelParser.Run(documentsChan)
 
 	<-ctx.Done()
 }
