@@ -1,4 +1,4 @@
-module displayCrawler
+module display_parser
 
 go 1.19
 

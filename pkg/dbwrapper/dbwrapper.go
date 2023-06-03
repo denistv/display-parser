@@ -1,16 +1,9 @@
-package repository
+package dbwrapper
 
 import (
 	"context"
-
 	"github.com/jackc/pgx/v5"
 )
-
-func NewDBWrapper(conn *pgx.Conn) *DBWrapper {
-	return &DBWrapper{
-		Conn: conn,
-	}
-}
 
 // DBWrapper нужен для того, чтобы абстрагироваться от конкретной реализации драйвера для работы с БД и при необходимости,
 // иметь возможность быстро поменять его на другой без переписывания всего приложения.

@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -13,19 +14,19 @@ func NewModelsURLCollector(logger *zap.Logger) *ModelsURLCollector {
 	return &ModelsURLCollector{logger: logger}
 }
 
-// Собирает URL моделей устройств, чтобы затем обойти их и загрузить страницы с описаниями устройств
+// ModelsURLCollector Собирает URL моделей устройств, чтобы затем обойти их и загрузить страницы с описаниями устройств
 type ModelsURLCollector struct {
 	logger *zap.Logger
 }
 
-func (d *ModelsURLCollector) Run(brandsURLChan <-chan string) chan string {
+func (d *ModelsURLCollector) Run(ctx context.Context, brandURLsChan <-chan string) chan string {
 	out := make(chan string)
 
 	go func() {
 		defer close(out)
 
-		for brand := range brandsURLChan {
-			err := d.collect(brand, out)
+		for brandURL := range brandURLsChan {
+			err := d.collect(brandURL, out)
 			if err != nil {
 				d.logger.Error(fmt.Errorf("collect brand models: %w", err).Error())
 

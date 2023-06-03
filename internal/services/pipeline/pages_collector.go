@@ -2,32 +2,33 @@ package pipeline
 
 import (
 	"context"
-	"displayCrawler/internal/domain"
 	"errors"
 	"fmt"
-	"go.uber.org/zap"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"time"
 
-	"displayCrawler/internal/repository"
+	"go.uber.org/zap"
+
+	"display_parser/internal/domain"
+	"display_parser/internal/repository"
 )
 
-func NewDocumentsCollector(logger *zap.Logger, docRepo *repository.Document) *DocumentsCollector {
-	return &DocumentsCollector{
+func NewPagesCollector(logger *zap.Logger, docRepo *repository.Page) *PagesCollector {
+	return &PagesCollector{
 		logger:  logger,
 		docRepo: docRepo,
 	}
 }
 
 // Слушает канал с URL моделей устройств и для каждого URL загружает документ с описанием модели
-type DocumentsCollector struct {
+type PagesCollector struct {
 	logger  *zap.Logger
-	docRepo *repository.Document
+	docRepo *repository.Page
 }
 
-func (d *DocumentsCollector) Run(in <-chan string) chan domain.DocumentEntity {
-	out := make(chan domain.DocumentEntity)
+func (d *PagesCollector) Run(in <-chan string) chan domain.PageEntity {
+	out := make(chan domain.PageEntity)
 
 	go func() {
 		for docURL := range in {
@@ -46,7 +47,7 @@ func (d *DocumentsCollector) Run(in <-chan string) chan domain.DocumentEntity {
 					continue
 				}
 
-				doc = domain.DocumentEntity{
+				doc = domain.PageEntity{
 					URL:  docURL,
 					Body: body,
 				}
@@ -63,12 +64,12 @@ func (d *DocumentsCollector) Run(in <-chan string) chan domain.DocumentEntity {
 	return out
 }
 
-func (d *DocumentsCollector) download(docURL string) (string, error) {
-	if docURL == "" {
+func (d *PagesCollector) download(pageURL string) (string, error) {
+	if pageURL == "" {
 		return "", errors.New("url cannot be empty")
 	}
 
-	res, err := http.Get(docURL)
+	res, err := http.Get(pageURL)
 	if err != nil {
 		return "", fmt.Errorf("getting model: %w", err)
 	}
@@ -79,7 +80,7 @@ func (d *DocumentsCollector) download(docURL string) (string, error) {
 		return "", errors.New("non-200 status code")
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", fmt.Errorf("reading document body: %w", err)
 	}

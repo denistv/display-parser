@@ -3,19 +3,20 @@ package pipeline
 import (
 	"bytes"
 	"context"
-	"displayCrawler/internal/domain"
-	"displayCrawler/internal/repository"
 	"errors"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
 	"go.uber.org/zap"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+
+	"display_parser/internal/domain"
+	"display_parser/internal/repository"
 )
 
-// Разбирает документ и парсит его описание, вытаскивая полезную иформацию, сохраняя ее в сущность модели
-
+// NewModelParser Разбирает страницу с описанием монитора, сохраняя его свойства в сущность модели
 func NewModelParser(logger *zap.Logger, modelsRepo *repository.Model) *ModelParser {
 	ppiRe := regexp.MustCompile("[0-9]+ ppi")
 
@@ -33,23 +34,27 @@ type ModelParser struct {
 	ppiRe *regexp.Regexp
 }
 
-func (m *ModelParser) Run(in <-chan domain.DocumentEntity) {
+// Run запускает часть пайплайна, отвечающую за парсинг страниц.
+func (m *ModelParser) Run(in <-chan domain.PageEntity) {
 	go func() {
-		for document := range in {
-			model, ok, err := m.modelsRepo.Find(context.Background(), document.URL)
+		for page := range in {
+			// TODO поправить N+1, не оптимально. Лучше при старте получать с
+			model, ok, err := m.modelsRepo.Find(context.Background(), page.URL)
 			if err != nil {
-				m.logger.Error(fmt.Errorf("find model for document: %w", err).Error())
+				m.logger.Error(fmt.Errorf("find model for page: %w", err).Error())
 				continue
 			}
 
 			if ok {
-				m.logger.Info("model exists, skipping " + document.URL)
+				// Пока не реализована возможность перезаписи сущестувющей модели.
+				// В моем кейсе проще транкейтнуть таблицу (или удалить конкретные модели, которые нужно перепарсить) руками и перезапустить сервис
+				m.logger.Info("model exists, skipping " + page.URL)
 				continue
 			}
 
-			model, err = m.parse(document)
+			model, err = m.parse(page)
 			if err != nil {
-				m.logger.Error(fmt.Errorf("parsing document: %w", err).Error())
+				m.logger.Error(fmt.Errorf("parsing page: %w", err).Error())
 				continue
 			}
 
@@ -62,7 +67,10 @@ func (m *ModelParser) Run(in <-chan domain.DocumentEntity) {
 	}()
 }
 
-func (m *ModelParser) parse(doc domain.DocumentEntity) (domain.ModelEntity, error) {
+// Общий метод, где вызываем специализированные методы разбора нужных нам атрибутов у монитора.
+// Здесь не держим какой-то конкретной логики по парсингу того или иного свойства монитора, только вызываем специализированыые методы,
+// чтобы не смешивать все вместе превращая код в дробленку, сохраняя читаемость и прозрачность происходящего.
+func (m *ModelParser) parse(doc domain.PageEntity) (domain.ModelEntity, error) {
 	ppiInt, err := m.parsePPI(doc)
 	if err != nil {
 		return domain.ModelEntity{}, fmt.Errorf("parsing ppi: %w", err)
@@ -93,7 +101,7 @@ func (m *ModelParser) parse(doc domain.DocumentEntity) (domain.ModelEntity, erro
 	return model, nil
 }
 
-func (m *ModelParser) parsePPI(doc domain.DocumentEntity) (int64, error) {
+func (m *ModelParser) parsePPI(doc domain.PageEntity) (int64, error) {
 	ppiRaw := m.ppiRe.FindAllString(doc.Body, 1)
 	if len(ppiRaw) == 0 {
 		return 0, errors.New("cannot find ppi value")

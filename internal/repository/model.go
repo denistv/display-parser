@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"displayCrawler/internal/domain"
 	"github.com/doug-martin/goqu/v9"
+
+	"display_parser/internal/domain"
 )
 
 func NewModel(goduDB *goqu.Database) *Model {

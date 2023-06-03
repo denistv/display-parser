@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -11,7 +12,7 @@ import (
 func NewBrandsCollector(logger *zap.Logger) *BrandsCollector {
 	return &BrandsCollector{
 		logger:    logger,
-		sourceURL: "https://www.displayspecifications.com",
+		sourceURL: "https://www.displayspecifications.com", // TODO вынести в конфиг
 	}
 }
 
@@ -20,7 +21,7 @@ type BrandsCollector struct {
 	sourceURL string
 }
 
-func (b *BrandsCollector) Run() <-chan string {
+func (b *BrandsCollector) Run(ctx context.Context) <-chan string {
 	out := make(chan string)
 
 	go func() {
@@ -53,8 +54,6 @@ func (b *BrandsCollector) Run() <-chan string {
 			b.logger.Error("empty response")
 			return
 		}
-
-
 
 		doc.
 			Find(".brand-listing-container-frontpage").
