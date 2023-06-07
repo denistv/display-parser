@@ -25,12 +25,17 @@ func (d *ModelsURLCollector) Run(ctx context.Context, brandURLsChan <-chan strin
 	go func() {
 		defer close(out)
 
-		for brandURL := range brandURLsChan {
-			err := d.collect(brandURL, out)
-			if err != nil {
-				d.logger.Error(fmt.Errorf("collect brand models: %w", err).Error())
+		for {
+			select {
+			case brandURL := <-brandURLsChan:
+				err := d.collect(brandURL, out)
+				if err != nil {
+					d.logger.Error(fmt.Errorf("collect brand models: %w", err).Error())
 
-				continue
+					continue
+				}
+			case <-ctx.Done():
+				return
 			}
 		}
 	}()

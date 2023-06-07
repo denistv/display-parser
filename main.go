@@ -20,7 +20,7 @@ import (
 
 func main() {
 	// Создаем контекст с отменой для реализации gracefull-shutdown и в дальнейшем передаем его в сервисы приложения.
-	// Сервисы могут подписываться на stop-канал в созданном контексте для корректного завершения своей работы, если это требует их реализация.
+	// Сервисы могут читать stop-канал в созданном контексте для корректного завершения своей работы, если это требует их реализация.
 	ctx, _ := signal.NotifyContext(
 		context.Background(),
 		syscall.SIGINT,  // Прерывание приложения через Ctrl+C
@@ -64,12 +64,12 @@ func main() {
 	// Pipeline chains
 	brandURLsChan := brandsCollector.Run(ctx)
 	modelsIndexURLsChan := modelsURLCollector.Run(ctx, brandURLsChan)
-	pagesChan := modelPagesCollector.Run(modelsIndexURLsChan)
+	pagesChan := modelPagesCollector.Run(ctx, modelsIndexURLsChan)
 
-	modelParser.Run(pagesChan)
-	modelParser.Run(pagesChan)
-	modelParser.Run(pagesChan)
-	modelParser.Run(pagesChan)
+	modelParser.Run(ctx, pagesChan)
+	modelParser.Run(ctx, pagesChan)
+	modelParser.Run(ctx, pagesChan)
+	modelParser.Run(ctx, pagesChan)
 
 	<-ctx.Done()
 }

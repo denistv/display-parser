@@ -35,33 +35,39 @@ type ModelParser struct {
 }
 
 // Run запускает часть пайплайна, отвечающую за парсинг страниц.
-func (m *ModelParser) Run(in <-chan domain.PageEntity) {
+func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
 	go func() {
-		for page := range in {
-			// TODO поправить N+1, не оптимально. Лучше при старте получать с
-			model, ok, err := m.modelsRepo.Find(context.Background(), page.URL)
-			if err != nil {
-				m.logger.Error(fmt.Errorf("find model for page: %w", err).Error())
-				continue
-			}
 
-			if ok {
-				// Пока не реализована возможность перезаписи сущестувющей модели.
-				// В моем кейсе проще транкейтнуть таблицу (или удалить конкретные модели, которые нужно перепарсить) руками и перезапустить сервис
-				m.logger.Info("model exists, skipping " + page.URL)
-				continue
-			}
+		for {
+			select {
+			case page := <-in:
+				// TODO поправить N+1, не оптимально. Лучше при старте получать с
+				model, ok, err := m.modelsRepo.Find(context.Background(), page.URL)
+				if err != nil {
+					m.logger.Error(fmt.Errorf("find model for page: %w", err).Error())
+					continue
+				}
 
-			model, err = m.parse(page)
-			if err != nil {
-				m.logger.Error(fmt.Errorf("parsing page: %w", err).Error())
-				continue
-			}
+				if ok {
+					// Пока не реализована возможность перезаписи сущестувющей модели.
+					// В моем кейсе проще транкейтнуть таблицу (или удалить конкретные модели, которые нужно перепарсить) руками и перезапустить сервис
+					m.logger.Info("model exists, skipping " + page.URL)
+					continue
+				}
 
-			err = m.modelsRepo.Create(context.Background(), model)
-			if err != nil {
-				m.logger.Error(fmt.Errorf("creating model: %w", err).Error())
-				continue
+				model, err = m.parse(page)
+				if err != nil {
+					m.logger.Error(fmt.Errorf("parsing page: %w", err).Error())
+					continue
+				}
+
+				err = m.modelsRepo.Create(context.Background(), model)
+				if err != nil {
+					m.logger.Error(fmt.Errorf("creating model: %w", err).Error())
+					continue
+				}
+			case <-ctx.Done():
+				return
 			}
 		}
 	}()
