@@ -28,7 +28,7 @@ func (d *ModelsURLCollector) Run(ctx context.Context, brandURLsChan <-chan strin
 		for {
 			select {
 			case brandURL := <-brandURLsChan:
-				err := d.collect(brandURL, out)
+				err := d.collect(ctx, brandURL, out)
 				if err != nil {
 					d.logger.Error(fmt.Errorf("collect brand models: %w", err).Error())
 
@@ -43,8 +43,13 @@ func (d *ModelsURLCollector) Run(ctx context.Context, brandURLsChan <-chan strin
 	return out
 }
 
-func (d *ModelsURLCollector) collect(brandURL string, out chan string) error {
-	res, err := http.Get(brandURL)
+func (d *ModelsURLCollector) collect(ctx context.Context, brandURL string, out chan string) error {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, brandURL, http.NoBody)
+	if err != nil {
+		return fmt.Errorf("creating http req: %w", err)
+	}
+
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return fmt.Errorf("getting brand: %w", err)
 	}

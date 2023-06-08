@@ -29,7 +29,13 @@ func (b *BrandsCollector) Run(ctx context.Context) <-chan string {
 
 		b.logger.Info("getting brands...")
 
-		res, err := http.Get(b.sourceURL)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, b.sourceURL, http.NoBody)
+		if err != nil {
+			b.logger.Error(fmt.Errorf("creating http req: %w", err).Error())
+			return
+		}
+
+		res, err := http.DefaultClient.Do(req)
 		if err != nil {
 			b.logger.Error(fmt.Errorf("getting brands: %w", err).Error())
 			return

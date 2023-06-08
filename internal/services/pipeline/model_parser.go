@@ -5,10 +5,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go.uber.org/zap"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"go.uber.org/zap"
 
 	"github.com/PuerkitoBio/goquery"
 
@@ -16,7 +17,7 @@ import (
 	"display_parser/internal/repository"
 )
 
-var modelParserPPIRegexp = regexp.MustCompile("[0-9]+ ppi")
+var modelParserPPIRegexp = regexp.MustCompile(`\d+ ppi`)
 
 // NewModelParser Разбирает страницу с описанием монитора, сохраняя его свойства в сущность модели
 func NewModelParser(logger *zap.Logger, modelsRepo repository.ModelRepository) *ModelParser {
@@ -34,11 +35,10 @@ type ModelParser struct {
 // Run запускает часть пайплайна, отвечающую за парсинг страниц.
 func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
 	go func() {
-
 		for {
 			select {
 			case page := <-in:
-				// TODO поправить N+1, не оптимально. Лучше при старте получать с
+				// TODO поправить N+1, не выглядит оптимально
 				_, ok, err := m.modelsRepo.Find(context.Background(), page.URL)
 				if err != nil {
 					m.logger.Error(fmt.Errorf("find model for page: %w", err).Error())
@@ -91,15 +91,8 @@ func (m *ModelParser) parse(page domain.PageEntity) (domain.ModelEntity, error) 
 		return domain.ModelEntity{}, fmt.Errorf("creating html document from reader: %w", err)
 	}
 
-	err = m.parseBrandSeriesModel(htmlDoc, &model)
-	if err != nil {
-		return domain.ModelEntity{}, fmt.Errorf("parsing model: %w", err)
-	}
-
-	err = m.parseDisplay(htmlDoc, &model)
-	if err != nil {
-		return domain.ModelEntity{}, fmt.Errorf("parsing model: %w", err)
-	}
+	m.parseBrandSeriesModel(htmlDoc, &model)
+	m.parseDisplay(htmlDoc, &model)
 
 	return model, nil
 }
@@ -111,7 +104,7 @@ func (m *ModelParser) parsePPI(page domain.PageEntity) (int64, error) {
 	}
 
 	ppi := ppiRaw[0]
-	ppi = strings.Trim(ppi, " ppi")
+	ppi = strings.TrimSuffix(ppi, " ppi")
 
 	ppiInt, err := strconv.ParseInt(ppi, 10, 64)
 	if err != nil {
@@ -121,7 +114,7 @@ func (m *ModelParser) parsePPI(page domain.PageEntity) (int64, error) {
 	return ppiInt, nil
 }
 
-func (m *ModelParser) parseBrandSeriesModel(doc *goquery.Document, model *domain.ModelEntity) error {
+func (m *ModelParser) parseBrandSeriesModel(doc *goquery.Document, model *domain.ModelEntity) {
 	doc.Find("#main > div:nth-child(6) > table:nth-child(2) > tbody > tr").
 		Each(func(i int, s *goquery.Selection) {
 			label := s.Find("td:nth-child(1)").Text()
@@ -135,27 +128,32 @@ func (m *ModelParser) parseBrandSeriesModel(doc *goquery.Document, model *domain
 			case "ModelDesignation of the model.":
 				model.Name = value
 			case "Model yearThe year in which this model was announced.":
-				year, _ := strconv.ParseInt(value, 10, 64)
-				model.Year = year
+				// не для всех моделей может существовать год, поэтому игнорируем ошибку парсинга и оставляем в этом случае дефолтное значение
+				year, err := strconv.ParseInt(value, 10, 64)
+				if err != nil {
+					model.Year = 0
+				} else {
+					model.Year = year
+				}
 			}
 		})
-
-	return nil
 }
 
-func (m *ModelParser) parseDisplay(doc *goquery.Document, model *domain.ModelEntity) error {
+func (m *ModelParser) parseDisplay(doc *goquery.Document, model *domain.ModelEntity) {
 	doc.Find("#main > div:nth-child(6) > table:nth-child(4) > tbody > tr").
 		Each(func(i int, s *goquery.Selection) {
 			label := s.Find("td:nth-child(1)").Text()
 			value := s.Find("td:nth-child(2)").Text()
 
+			//nolint
+			const sizeExistsPattern = "Size classSize class of the display as declared by the manufacturer. Often this is the rounded value of the actual size of the diagonal in inches."
+
+			//nolint:gocritic
 			switch label {
-			case "Size classSize class of the display as declared by the manufacturer. Often this is the rounded value of the actual size of the diagonal in inches.":
-				sizeRaw := strings.Trim(value, "in (inches)")
+			case sizeExistsPattern:
+				sizeRaw := strings.TrimSuffix(value, "in (inches)")
 				size, _ := strconv.ParseInt(sizeRaw, 10, 64)
 				model.Size = size
 			}
 		})
-
-	return nil
 }

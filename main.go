@@ -19,7 +19,7 @@ import (
 )
 
 func main() {
-	// Создаем контекст с отменой для реализации gracefull-shutdown и в дальнейшем передаем его в сервисы приложения.
+	// Создаем контекст с отменой для реализации graceful-shutdown и в дальнейшем передаем его в сервисы приложения.
 	// Сервисы могут читать stop-канал в созданном контексте для корректного завершения своей работы, если это требует их реализация.
 	ctx, _ := signal.NotifyContext(
 		context.Background(),
@@ -28,10 +28,11 @@ func main() {
 	)
 	cfg := app.NewConfigDev()
 
+	const startupErrcode = 255
 	logger, err := zap.NewProduction()
 	if err != nil {
 		fmt.Println(err.Error())
-		os.Exit(255)
+		os.Exit(startupErrcode)
 	}
 
 	conn, err := pgx.Connect(ctx, cfg.DB.DSN())
@@ -48,12 +49,12 @@ func main() {
 		logger.Fatal(err.Error())
 	}
 
-	goquDb := goqu.New(dbDriver, sqlxConn)
+	goquDB := goqu.New(dbDriver, sqlxConn)
 
 	// Repositories
 	dbWrapper := repository.NewDBWrapper(conn)
-	pageRepo := repository.NewPage(dbWrapper, goquDb)
-	modelsRepo := repository.NewModel(goquDb)
+	pageRepo := repository.NewPage(dbWrapper, goquDB)
+	modelsRepo := repository.NewModel(goquDB)
 
 	// Collectors
 	brandsCollector := pipeline.NewBrandsCollector(logger)

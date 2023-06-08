@@ -21,10 +21,10 @@
 
 ### Описание шагов пайплайна
 Приложение представляет из себя пайплайн, состоящий из нескольких этапов:
-1. Сборщик URL брендов мониторов (internal/services/pipeline/brands_collector.go)
-2. Сборщик URL страниц, на которых содержатся ссылки на модели мониторов (internal/services/pipeline/pages_collector.go)
-3. Сборщик URL на модели мониторов бренда (internal/services/pipeline/models_url_collector.go)
-4. Парсер страницы с описанием монитора (internal/services/pipeline/model_parser.go)
+1. Сборщик URL брендов мониторов (**internal/services/pipeline/brands_collector.go**)
+2. Сборщик URL страниц, на которых содержатся ссылки на модели мониторов (**internal/services/pipeline/pages_collector.go**)
+3. Сборщик URL на модели мониторов бренда (**internal/services/pipeline/models_url_collector.go**)
+4. Парсер страницы с описанием монитора (**internal/services/pipeline/model_parser.go**)
 
 
 
@@ -40,6 +40,7 @@
 
 # TODO
 #### High:
+1. сделать враппер для http клиента с моком
 2. сделать gracefull shutdown, прокинуть контекст в коллекторы
 3. cmd's
 
@@ -48,12 +49,9 @@
 2. сделать хранение параметров логгера в гошном контексте
 3. config (env, command line params)
 4. sql-migrator
-5. реализовать команды по сборке проекта (1. компиляция; 2. упаковка в докер-образ)
-6. тесты, команда для быстрого запуска тестов
+5. конфиг для линтера
 
 #### Low:
-1. накинуть запуск линтеров
-2. завести отдельного пользователя на NAS для удобного подключения из виртуальной машины 
 3. описание проекта
 
 # Q&A по реализации:

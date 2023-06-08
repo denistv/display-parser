@@ -6,7 +6,6 @@ import (
 )
 
 func NewConfigDev() Config {
-
 	return Config{
 		DB: DB{
 			User:     "postgres",
@@ -22,17 +21,15 @@ func NewConfigFromEnv() Config {
 	return Config{}
 }
 
-func NewConfigFromJSONFile(path string) (Config, error) {
+func NewConfigFromJSONFile() (Config, error) {
 	return Config{}, nil
 }
 
 type Config struct {
-	// Количество запускаемых парсеров страниц (слишком мало - будет копится очередь страниц на парсинг, слишком много - будут простаивать впустую)
-	PageParserCount int
-	DB              DB
+	DB DB
 }
 
-func (c Config) Validate() error {
+func (c *Config) Validate() error {
 	if err := c.DB.Validate(); err != nil {
 		return fmt.Errorf("validating db config: %w", err)
 	}
@@ -74,7 +71,7 @@ func (d DB) Validate() error {
 
 func (d DB) DSN() string {
 	return fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s", // schema://user:password@host:port/db
+		"postgres://%s:%s@%s:%d/%s",
 		d.User,
 		d.Password,
 		d.Hostname,

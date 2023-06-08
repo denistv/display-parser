@@ -1,14 +1,15 @@
 package pipeline
 
 import (
+	"os"
+	"reflect"
+	"testing"
+
+	"go.uber.org/zap"
+
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
 	"display_parser/mocks"
-	"go.uber.org/zap"
-	"os"
-	"reflect"
-	"regexp"
-	"testing"
 )
 
 func TestModelParser_parsePPI(t *testing.T) {
@@ -26,7 +27,6 @@ func TestModelParser_parsePPI(t *testing.T) {
 	type fields struct {
 		logger     *zap.Logger
 		modelsRepo repository.ModelRepository
-		ppiRe      *regexp.Regexp
 	}
 	type args struct {
 		page domain.PageEntity
@@ -78,7 +78,6 @@ func TestModelParser_parsePPI(t *testing.T) {
 }
 
 func TestModelParser_parse(t *testing.T) {
-
 	pageRaw, err := os.ReadFile("./test_data/model_page.html")
 	if err != nil {
 		t.Error(err)
@@ -106,6 +105,7 @@ func TestModelParser_parse(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name: "full page parse",
 			fields: fields{
 				logger:     zap.NewNop(),
 				modelsRepo: modelRepo,

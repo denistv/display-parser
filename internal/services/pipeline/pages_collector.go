@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"go.uber.org/zap"
 
@@ -44,7 +43,7 @@ func (d *PagesCollector) Run(ctx context.Context, in <-chan string) chan domain.
 				}
 
 				if !isExists {
-					body, err := d.download(docURL)
+					body, err := d.download(ctx, docURL)
 					if err != nil {
 						d.logger.Error(fmt.Errorf("downloading document: %w", err).Error())
 
@@ -55,8 +54,6 @@ func (d *PagesCollector) Run(ctx context.Context, in <-chan string) chan domain.
 						URL:  docURL,
 						Body: body,
 					}
-
-					time.Sleep(50 * time.Millisecond)
 				}
 
 				out <- doc
@@ -64,18 +61,22 @@ func (d *PagesCollector) Run(ctx context.Context, in <-chan string) chan domain.
 				return
 			}
 		}
-
 	}()
 
 	return out
 }
 
-func (d *PagesCollector) download(pageURL string) (string, error) {
+func (d *PagesCollector) download(ctx context.Context, pageURL string) (string, error) {
 	if pageURL == "" {
 		return "", errors.New("url cannot be empty")
 	}
 
-	res, err := http.Get(pageURL)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, pageURL, http.NoBody)
+	if err != nil {
+		return "", fmt.Errorf("creating http req: %w", err)
+	}
+
+	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("getting model: %w", err)
 	}

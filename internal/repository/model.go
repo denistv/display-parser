@@ -26,7 +26,7 @@ type Model struct {
 	table  string
 }
 
-func (d *Model) Find(ctx context.Context, url string) (domain.ModelEntity, bool, error) {
+func (d *Model) Find(_ context.Context, url string) (domain.ModelEntity, bool, error) {
 	var model domain.ModelEntity
 
 	ok, err := d.goquDB.
@@ -40,7 +40,8 @@ func (d *Model) Find(ctx context.Context, url string) (domain.ModelEntity, bool,
 	return model, ok, nil
 }
 
-func (d *Model) Create(ctx context.Context, item domain.ModelEntity) error {
+//nolint:gocritic
+func (d *Model) Create(_ context.Context, item domain.ModelEntity) error {
 	_, err := d.goquDB.
 		Insert(d.table).
 		Rows(item).
