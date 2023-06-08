@@ -1,5 +1,5 @@
-.PHONY: build-docker-image
-build-docker-image:
+.PHONY: image
+image:
 	sudo docker build -t display_parser .
 
 .PHONY: run
@@ -8,14 +8,16 @@ run:
 
 .PHONY: test
 test:
-	sudo docker run -t --rm -v $$(pwd):$$(pwd) -w $$(pwd) golang:1.20 bash -c "go test ./..."
+	go test -v ./...
 
 .PHONY: lint
 lint:
 	sudo docker run -t --rm -v $$(pwd):$$(pwd) -w $$(pwd) golangci/golangci-lint:latest golangci-lint run -v
 
-.PHONY: all
-all:
-	make build-docker-image
-	make lint
-	make test
+.PHONY: install-dev-tools
+install-dev-tools:
+	go install github.com/vektra/mockery/v2@v2.20.0
+
+.PHONY: mock
+mock:
+	mockery --dir internal

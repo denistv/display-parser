@@ -9,6 +9,11 @@ import (
 	"display_parser/internal/domain"
 )
 
+type ModelRepository interface {
+	Find(ctx context.Context, url string) (domain.ModelEntity, bool, error)
+	Create(ctx context.Context, item domain.ModelEntity) error
+}
+
 func NewModel(goduDB *goqu.Database) *Model {
 	return &Model{
 		goquDB: goduDB,

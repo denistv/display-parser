@@ -16,22 +16,19 @@ import (
 	"display_parser/internal/repository"
 )
 
-// NewModelParser Разбирает страницу с описанием монитора, сохраняя его свойства в сущность модели
-func NewModelParser(logger *zap.Logger, modelsRepo *repository.Model) *ModelParser {
-	ppiRe := regexp.MustCompile("[0-9]+ ppi")
+var modelParserPPIRegexp = regexp.MustCompile("[0-9]+ ppi")
 
+// NewModelParser Разбирает страницу с описанием монитора, сохраняя его свойства в сущность модели
+func NewModelParser(logger *zap.Logger, modelsRepo repository.ModelRepository) *ModelParser {
 	return &ModelParser{
 		logger:     logger,
 		modelsRepo: modelsRepo,
-		ppiRe:      ppiRe,
 	}
 }
 
 type ModelParser struct {
 	logger     *zap.Logger
-	modelsRepo *repository.Model
-
-	ppiRe *regexp.Regexp
+	modelsRepo repository.ModelRepository
 }
 
 // Run запускает часть пайплайна, отвечающую за парсинг страниц.
@@ -42,7 +39,7 @@ func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
 			select {
 			case page := <-in:
 				// TODO поправить N+1, не оптимально. Лучше при старте получать с
-				model, ok, err := m.modelsRepo.Find(context.Background(), page.URL)
+				_, ok, err := m.modelsRepo.Find(context.Background(), page.URL)
 				if err != nil {
 					m.logger.Error(fmt.Errorf("find model for page: %w", err).Error())
 					continue
@@ -55,7 +52,7 @@ func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
 					continue
 				}
 
-				model, err = m.parse(page)
+				model, err := m.parse(page)
 				if err != nil {
 					m.logger.Error(fmt.Errorf("parsing page: %w", err).Error())
 					continue
@@ -76,22 +73,22 @@ func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
 // Общий метод, где вызываем специализированные методы разбора нужных нам атрибутов у монитора.
 // Здесь не держим какой-то конкретной логики по парсингу того или иного свойства монитора, только вызываем специализированыые методы,
 // чтобы не смешивать все вместе превращая код в дробленку, сохраняя читаемость и прозрачность происходящего.
-func (m *ModelParser) parse(doc domain.PageEntity) (domain.ModelEntity, error) {
-	ppiInt, err := m.parsePPI(doc)
+func (m *ModelParser) parse(page domain.PageEntity) (domain.ModelEntity, error) {
+	ppiInt, err := m.parsePPI(page)
 	if err != nil {
 		return domain.ModelEntity{}, fmt.Errorf("parsing ppi: %w", err)
 	}
 
 	model := domain.ModelEntity{
-		URL: doc.URL,
+		URL: page.URL,
 		PPI: ppiInt,
 	}
 
-	buf := bytes.NewBufferString(doc.Body)
+	buf := bytes.NewBufferString(page.Body)
 
 	htmlDoc, err := goquery.NewDocumentFromReader(buf)
 	if err != nil {
-		return domain.ModelEntity{}, fmt.Errorf("creating doc from reader: %w", err)
+		return domain.ModelEntity{}, fmt.Errorf("creating html document from reader: %w", err)
 	}
 
 	err = m.parseBrandSeriesModel(htmlDoc, &model)
@@ -107,8 +104,8 @@ func (m *ModelParser) parse(doc domain.PageEntity) (domain.ModelEntity, error) {
 	return model, nil
 }
 
-func (m *ModelParser) parsePPI(doc domain.PageEntity) (int64, error) {
-	ppiRaw := m.ppiRe.FindAllString(doc.Body, 1)
+func (m *ModelParser) parsePPI(page domain.PageEntity) (int64, error) {
+	ppiRaw := modelParserPPIRegexp.FindAllString(page.Body, 1)
 	if len(ppiRaw) == 0 {
 		return 0, errors.New("cannot find ppi value")
 	}
