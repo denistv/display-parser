@@ -2,16 +2,26 @@
 CREATE TABLE models
 (
     id          bigserial primary key,
-    external_id text unique not null,
     url         text,
-    name        text        not null,
-    brand_id    bigint
+    brand    text,
+    series text,
+    name text,
+    year bigint,
+    size bigint,
+    ppi bigint,
+    created_at timestamptz not null
 );
+COMMENT ON TABLE models IS 'Содержит распаршенные модели мониторов';
 
-CREATE TABLE documents
+CREATE TABLE pages
 (
     url  text primary key,
-    body text not null
+    body text not null,
+    created_at timestamptz not null
 );
+COMMENT ON TABLE pages IS 'Содержит сырые html-страницы с описанием мониторов';
 
 -- +migrate Down
+
+DROP TABLE models;
+DROP TABLE pages;

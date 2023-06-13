@@ -37,7 +37,10 @@ func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
 	go func() {
 		for {
 			select {
-			case page := <-in:
+			case page, ok := <-in:
+				if !ok {
+					return
+				}
 				// TODO поправить N+1, не выглядит оптимально
 				_, ok, err := m.modelsRepo.Find(context.Background(), page.URL)
 				if err != nil {
@@ -58,7 +61,7 @@ func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
 					continue
 				}
 
-				err = m.modelsRepo.Create(context.Background(), model)
+				err = m.modelsRepo.Create(ctx, model)
 				if err != nil {
 					m.logger.Error(fmt.Errorf("creating model: %w", err).Error())
 					continue

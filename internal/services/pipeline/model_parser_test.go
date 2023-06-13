@@ -13,7 +13,7 @@ import (
 )
 
 func TestModelParser_parsePPI(t *testing.T) {
-	pageRaw, err := os.ReadFile("./test_data/model_page.html")
+	pageRaw, err := os.ReadFile("./test_data/html/en/model/4e4a322f.html")
 	if err != nil {
 		t.Error(err)
 	}
@@ -78,7 +78,7 @@ func TestModelParser_parsePPI(t *testing.T) {
 }
 
 func TestModelParser_parse(t *testing.T) {
-	pageRaw, err := os.ReadFile("./test_data/model_page.html")
+	pageRaw, err := os.ReadFile("./test_data/html/en/model/4e4a322f.html")
 	if err != nil {
 		t.Error(err)
 	}

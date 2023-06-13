@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"display_parser/internal/services"
 	"fmt"
 	"net/http"
 
@@ -9,16 +10,18 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewBrandsCollector(logger *zap.Logger) *BrandsCollector {
+func NewBrandsCollector(logger *zap.Logger, httpClient services.HTTPClient) *BrandsCollector {
 	return &BrandsCollector{
-		logger:    logger,
-		sourceURL: "https://www.displayspecifications.com", // TODO вынести в конфиг
+		logger:     logger,
+		sourceURL:  "https://www.displayspecifications.com", // TODO вынести в конфиг
+		httpClient: httpClient,
 	}
 }
 
 type BrandsCollector struct {
-	logger    *zap.Logger
-	sourceURL string
+	logger     *zap.Logger
+	sourceURL  string
+	httpClient services.HTTPClient
 }
 
 func (b *BrandsCollector) Run(ctx context.Context) <-chan string {
@@ -35,7 +38,7 @@ func (b *BrandsCollector) Run(ctx context.Context) <-chan string {
 			return
 		}
 
-		res, err := http.DefaultClient.Do(req)
+		res, err := b.httpClient.Do(req)
 		if err != nil {
 			b.logger.Error(fmt.Errorf("getting brands: %w", err).Error())
 			return
@@ -61,6 +64,8 @@ func (b *BrandsCollector) Run(ctx context.Context) <-chan string {
 			return
 		}
 
+		urls := make([]string, 0, 0)
+
 		doc.
 			Find(".brand-listing-container-frontpage").
 			Each(func(i int, s *goquery.Selection) {
@@ -73,9 +78,15 @@ func (b *BrandsCollector) Run(ctx context.Context) <-chan string {
 						return
 					}
 
-					out <- href
+					b.logger.Debug(fmt.Sprintf("brand collected: %s", href))
+
+					urls = append(urls, href)
 				})
 			})
+
+		for _, v := range urls {
+			out <- v
+		}
 
 		b.logger.Info("brands collected")
 	}()

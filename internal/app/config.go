@@ -1,32 +1,20 @@
 package app
 
 import (
+	"display_parser/internal/services/pipeline"
 	"errors"
 	"fmt"
+	"time"
 )
 
-func NewConfigDev() Config {
-	return Config{
-		DB: DB{
-			User:     "postgres",
-			Password: "postgres",
-			Hostname: "localhost",
-			DBName:   "display_parser",
-			Port:     5432,
-		},
-	}
-}
-
-func NewConfigFromEnv() Config {
+func NewConfig() Config {
 	return Config{}
 }
 
-func NewConfigFromJSONFile() (Config, error) {
-	return Config{}, nil
-}
-
 type Config struct {
-	DB DB
+	HTTP     HTTP
+	DB       DB
+	Pipeline pipeline.Cfg
 }
 
 func (c *Config) Validate() error {
@@ -34,7 +22,18 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("validating db config: %w", err)
 	}
 
+	if err := c.Pipeline.Validate(); err != nil {
+		return fmt.Errorf("validating pipeline config: %w", err)
+	}
+
 	return nil
+}
+
+type HTTP struct {
+	// Задержка между HTTP-запросами в сервис
+	// Если не использовать ограничений, сервис забанит вас на какое-то время.
+	Timeout         time.Duration
+	DelayPerRequest time.Duration
 }
 
 type DB struct {

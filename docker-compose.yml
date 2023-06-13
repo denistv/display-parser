@@ -1,17 +1,22 @@
-secrets:
-  postgres_password:
-    environment: "postgres"
-
 services:
   postgres:
     image: postgres:13
+    ports:
+      - "5432:5432"
     environment:
-      POSTGRES_PASSWORD: "${display_parser-postgres_password}"
+      POSTGRES_USER: display_parser
+      POSTGRES_PASSWORD: display_parser
+      POSTGRES_DB: display_parser
+    expose:
+      - 5432
+
+  migrate:
+    image: alpine:latest
 
   app:
     image: display_parser
     build:
       context: .
       dockerfile: Dockerfile
-
-
+    links:
+      - postgres:postgres

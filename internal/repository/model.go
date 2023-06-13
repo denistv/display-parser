@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/doug-martin/goqu/v9"
 
@@ -42,6 +43,8 @@ func (d *Model) Find(_ context.Context, url string) (domain.ModelEntity, bool, e
 
 //nolint:gocritic
 func (d *Model) Create(_ context.Context, item domain.ModelEntity) error {
+	item.CreatedAt = time.Now()
+
 	_, err := d.goquDB.
 		Insert(d.table).
 		Rows(item).

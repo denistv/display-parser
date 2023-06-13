@@ -1,6 +1,6 @@
 .PHONY: image
 image:
-	sudo docker build -t display_parser -f Dockerfile.
+	sudo docker build -t display_parser:latest -f Dockerfile .
 
 .PHONY: run
 run:

@@ -1,4 +1,5 @@
 development:
   dialect: postgres
-  datasource: dbname=display_parser sslmode=disable host=192.168.1.72 user=postgres password=postgres
+  datasource: dbname=display_parser sslmode=disable host=localhost user=display_parser password=display_parser
   dir: migrations
+  table: migrations

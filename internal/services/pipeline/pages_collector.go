@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"context"
+	"display_parser/internal/services"
 	"errors"
 	"fmt"
 	"io"
@@ -13,17 +14,19 @@ import (
 	"display_parser/internal/repository"
 )
 
-func NewPagesCollector(logger *zap.Logger, docRepo *repository.Page) *PagesCollector {
+func NewPagesCollector(logger *zap.Logger, docRepo *repository.Page, httpClient services.HTTPClient) *PagesCollector {
 	return &PagesCollector{
-		logger:  logger,
-		docRepo: docRepo,
+		logger:     logger,
+		docRepo:    docRepo,
+		httpClient: httpClient,
 	}
 }
 
 // Слушает канал с URL моделей устройств и для каждого URL загружает документ с описанием модели
 type PagesCollector struct {
-	logger  *zap.Logger
-	docRepo *repository.Page
+	logger     *zap.Logger
+	docRepo    *repository.Page
+	httpClient services.HTTPClient
 }
 
 func (d *PagesCollector) Run(ctx context.Context, in <-chan string) chan domain.PageEntity {
@@ -34,8 +37,12 @@ func (d *PagesCollector) Run(ctx context.Context, in <-chan string) chan domain.
 
 		for {
 			select {
-			case docURL := <-in:
-				doc, isExists, err := d.docRepo.Find(context.Background(), docURL)
+			case docURL, ok := <-in:
+				if !ok {
+					return
+				}
+
+				doc, isExists, err := d.docRepo.Find(ctx, docURL)
 				if err != nil {
 					d.logger.Error("checking model is exists: " + err.Error())
 
@@ -76,7 +83,7 @@ func (d *PagesCollector) download(ctx context.Context, pageURL string) (string, 
 		return "", fmt.Errorf("creating http req: %w", err)
 	}
 
-	res, err := http.DefaultClient.Do(req)
+	res, err := d.httpClient.Do(req)
 	if err != nil {
 		return "", fmt.Errorf("getting model: %w", err)
 	}
