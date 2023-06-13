@@ -2,19 +2,21 @@ package pipeline
 
 import (
 	"context"
-	"display_parser/internal/services"
 	"fmt"
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
 	"go.uber.org/zap"
+
+	"display_parser/internal/services"
 )
 
-func NewBrandsCollector(logger *zap.Logger, httpClient services.HTTPClient) *BrandsCollector {
+func NewBrandsCollector(logger *zap.Logger, httpClient services.HTTPClient, cancel context.CancelFunc) *BrandsCollector {
 	return &BrandsCollector{
 		logger:     logger,
 		sourceURL:  "https://www.displayspecifications.com", // TODO вынести в конфиг
 		httpClient: httpClient,
+		cancel:     cancel,
 	}
 }
 
@@ -22,6 +24,9 @@ type BrandsCollector struct {
 	logger     *zap.Logger
 	sourceURL  string
 	httpClient services.HTTPClient
+
+	// Останавливаем через канал отмены работу программы в случаях, когда дальнейшая работа не имеет смысла
+	cancel context.CancelFunc
 }
 
 func (b *BrandsCollector) Run(ctx context.Context) <-chan string {
@@ -35,12 +40,14 @@ func (b *BrandsCollector) Run(ctx context.Context) <-chan string {
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, b.sourceURL, http.NoBody)
 		if err != nil {
 			b.logger.Error(fmt.Errorf("creating http req: %w", err).Error())
+			b.cancel()
 			return
 		}
 
 		res, err := b.httpClient.Do(req)
 		if err != nil {
 			b.logger.Error(fmt.Errorf("getting brands: %w", err).Error())
+			b.cancel()
 			return
 		}
 
@@ -48,23 +55,25 @@ func (b *BrandsCollector) Run(ctx context.Context) <-chan string {
 
 		if res.StatusCode != http.StatusOK {
 			b.logger.Error("non-200 status code")
+			b.cancel()
 
 			return
 		}
 
 		doc, err := goquery.NewDocumentFromReader(res.Body)
 		if err != nil {
-			b.logger.Error(fmt.Errorf("reading document: %w", err).Error())
-
+			b.logger.Error(fmt.Errorf("reading document: %w from remote server", err).Error())
+			b.cancel()
 			return
 		}
 
 		if doc.Text() == "" {
-			b.logger.Error("empty response")
+			b.logger.Error("empty response from remote server")
+			b.cancel()
 			return
 		}
 
-		urls := make([]string, 0, 0)
+		urls := make([]string, 0)
 
 		doc.
 			Find(".brand-listing-container-frontpage").

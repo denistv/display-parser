@@ -2,6 +2,7 @@ package xakep
 
 import (
 	"context"
+
 	"display_parser/internal/services"
 )
 
@@ -16,6 +17,6 @@ type Pipeline struct {
 	pdf *PDFDownloader
 }
 
-func (p *Pipeline) Run(ctx context.Context) {
+func (p *Pipeline) Run(_ context.Context) {
 
 }

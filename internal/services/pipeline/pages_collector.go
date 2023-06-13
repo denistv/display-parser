@@ -2,7 +2,6 @@ package pipeline
 
 import (
 	"context"
-	"display_parser/internal/services"
 	"errors"
 	"fmt"
 	"io"
@@ -12,6 +11,7 @@ import (
 
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
+	"display_parser/internal/services"
 )
 
 func NewPagesCollector(logger *zap.Logger, docRepo *repository.Page, httpClient services.HTTPClient) *PagesCollector {
@@ -82,6 +82,8 @@ func (d *PagesCollector) download(ctx context.Context, pageURL string) (string, 
 	if err != nil {
 		return "", fmt.Errorf("creating http req: %w", err)
 	}
+
+	d.logger.Debug(fmt.Sprintf("getting model page for %s", pageURL))
 
 	res, err := d.httpClient.Do(req)
 	if err != nil {

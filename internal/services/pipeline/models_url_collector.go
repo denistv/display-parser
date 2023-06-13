@@ -2,13 +2,14 @@ package pipeline
 
 import (
 	"context"
-	"display_parser/internal/services"
 	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
 	"go.uber.org/zap"
+
+	"display_parser/internal/services"
 )
 
 func NewModelsURLCollector(logger *zap.Logger, httpClient services.HTTPClient) *ModelsURLCollector {

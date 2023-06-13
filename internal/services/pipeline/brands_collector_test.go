@@ -3,16 +3,18 @@ package pipeline
 import (
 	"bytes"
 	"context"
-	"display_parser/internal/services"
-	"display_parser/mocks"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"os"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"go.uber.org/zap"
+
+	"display_parser/internal/services"
+	"display_parser/mocks"
 )
 
 func TestBrandsCollector_Run(t *testing.T) {
@@ -64,14 +66,17 @@ func TestBrandsCollector_Run(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithCancel(tt.args.ctx)
+
 			b := &BrandsCollector{
 				logger:     tt.fields.logger,
 				sourceURL:  tt.fields.sourceURL,
 				httpClient: tt.fields.httpClient,
+				cancel:     cancel,
 			}
 
-			ch := b.Run(tt.args.ctx)
-			urls := make([]string, 0, 0)
+			ch := b.Run(ctx)
+			urls := make([]string, 0)
 
 			for v := range ch {
 				urls = append(urls, v)

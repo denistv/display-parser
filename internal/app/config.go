@@ -1,10 +1,11 @@
 package app
 
 import (
-	"display_parser/internal/services/pipeline"
 	"errors"
 	"fmt"
 	"time"
+
+	"display_parser/internal/services/pipeline"
 )
 
 func NewConfig() Config {

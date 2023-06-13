@@ -29,6 +29,19 @@
 
 
 # Описание команд
+Запуск:
+
+```
+./display_parser \
+    --pipeline-model-parser-count=1 \
+    --http-timeout=10s \
+    --db-user=display_parser \
+    --db-password=display_parser \
+    --db-hostname=localhost \
+    --db-port=5432 \
+    --db-name=display_parser
+```
+
 Прогон линтеров:
 > $ make lint
 
@@ -40,8 +53,6 @@
 
 # TODO
 #### High:
-1. сделать враппер для http клиента с моком
-2. сделать gracefull shutdown, прокинуть контекст в коллекторы
 3. cmd's
 
 #### Average
@@ -50,8 +61,6 @@
 1. реализовать враппер для логгера
 2. сделать хранение параметров логгера в гошном контексте
 3. config (env, command line params)
-4. sql-migrator
-5. конфиг для линтера
 
 #### Low:
 3. описание проекта
