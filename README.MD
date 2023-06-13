@@ -50,6 +50,15 @@
 
 Сборка docker-образа:
 > $ make image
+> 
+# Используемые пакеты
+* mockery
+* testify
+* goqu
+* sql-migrate
+* cobra
+* zap
+* pq
 
 # TODO
 #### High:

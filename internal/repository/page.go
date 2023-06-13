@@ -15,7 +15,7 @@ func NewPage(db *DBWrapper, goquDB *goqu.Database) *Page {
 	return &Page{
 		dbw:    db,
 		goquDB: goquDB,
-		table:  "documents",
+		table:  "pages",
 	}
 }
 
@@ -25,13 +25,24 @@ type Page struct {
 	table  string
 }
 
-func (d *Page) Find(ctx context.Context, pageURL string) (domain.PageEntity, bool, error) {
-	var doc domain.PageEntity
+func (p *Page) All(ctx context.Context) ([]domain.PageEntity, error) {
+	var pages []domain.PageEntity
 
-	ok, err := d.goquDB.
+	err := p.goquDB.From(p.table).ScanStructsContext(ctx, &pages)
+	if err != nil {
+		return nil, fmt.Errorf("exec query: %w", err)
+	}
+
+	return pages, nil
+}
+
+func (p *Page) Find(ctx context.Context, pageURL string) (domain.PageEntity, bool, error) {
+	var page domain.PageEntity
+
+	ok, err := p.goquDB.
 		From("pages").
 		Where(goqu.C("url").Eq(pageURL)).
-		ScanStructContext(ctx, &doc)
+		ScanStructContext(ctx, &page)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.PageEntity{}, false, nil
@@ -40,12 +51,12 @@ func (d *Page) Find(ctx context.Context, pageURL string) (domain.PageEntity, boo
 		return domain.PageEntity{}, false, fmt.Errorf("exec query: %w", err)
 	}
 
-	return doc, ok, nil
+	return page, ok, nil
 }
 
-func (d *Page) Create(ctx context.Context, doc domain.PageEntity) error {
+func (p *Page) Create(ctx context.Context, doc domain.PageEntity) error {
 	sqlQuery, args, err := goqu.
-		Insert(d.table).
+		Insert(p.table).
 		Rows(doc).
 		OnConflict(goqu.DoUpdate("url", doc)).
 		ToSQL()
@@ -53,7 +64,7 @@ func (d *Page) Create(ctx context.Context, doc domain.PageEntity) error {
 		return fmt.Errorf("building sql query: %w", err)
 	}
 
-	rows, err := d.dbw.Conn.Query(ctx, sqlQuery, args...)
+	rows, err := p.dbw.Conn.Query(ctx, sqlQuery, args...)
 	if err != nil {
 		return fmt.Errorf("inserting item to db: %w", err)
 	}

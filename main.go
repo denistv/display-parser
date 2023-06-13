@@ -71,7 +71,7 @@ func main() {
 
 	// Collectors
 	brandsCollector := pipeline.NewBrandsCollector(logger, delayedHTTPClient, cancel)
-	modelPagesCollector := pipeline.NewPagesCollector(logger, pageRepo, delayedHTTPClient)
+	modelPagesCollector := pipeline.NewPagesCollector(logger, pageRepo, delayedHTTPClient, cfg.Pipeline.UseStoredPagesCacheOnly)
 	modelsURLCollector := pipeline.NewModelsURLCollector(logger, delayedHTTPClient)
 	modelParser := pipeline.NewModelParser(logger, modelsRepo)
 
