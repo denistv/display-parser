@@ -13,6 +13,7 @@ import (
 type ModelRepository interface {
 	Find(ctx context.Context, url string) (domain.ModelEntity, bool, error)
 	Create(ctx context.Context, item domain.ModelEntity) error
+	Update(ctx context.Context, item domain.ModelEntity) error
 }
 
 func NewModel(goduDB *goqu.Database) *Model {
@@ -52,6 +53,24 @@ func (d *Model) Create(_ context.Context, item domain.ModelEntity) error {
 		Exec()
 	if err != nil {
 		return fmt.Errorf("executing query: %w", err)
+	}
+
+	return nil
+}
+
+func (d *Model) Update(_ context.Context, item domain.ModelEntity) error {
+	item.UpdatedAt = time.Now()
+
+	_, err := d.goquDB.
+		Update(d.table).
+		Where(
+			goqu.C("url").Eq(item.URL),
+		).
+		Set(item).
+		Executor().
+		Exec()
+	if err != nil {
+		return fmt.Errorf("executing update query: %w", err)
 	}
 
 	return nil

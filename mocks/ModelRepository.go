@@ -125,6 +125,49 @@ func (_c *ModelRepository_Find_Call) RunAndReturn(run func(context.Context, stri
 	return _c
 }
 
+// Update provides a mock function with given fields: ctx, item
+func (_m *ModelRepository) Update(ctx context.Context, item domain.ModelEntity) error {
+	ret := _m.Called(ctx, item)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, domain.ModelEntity) error); ok {
+		r0 = rf(ctx, item)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// ModelRepository_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type ModelRepository_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - ctx context.Context
+//   - item domain.ModelEntity
+func (_e *ModelRepository_Expecter) Update(ctx interface{}, item interface{}) *ModelRepository_Update_Call {
+	return &ModelRepository_Update_Call{Call: _e.mock.On("Update", ctx, item)}
+}
+
+func (_c *ModelRepository_Update_Call) Run(run func(ctx context.Context, item domain.ModelEntity)) *ModelRepository_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(domain.ModelEntity))
+	})
+	return _c
+}
+
+func (_c *ModelRepository_Update_Call) Return(_a0 error) *ModelRepository_Update_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *ModelRepository_Update_Call) RunAndReturn(run func(context.Context, domain.ModelEntity) error) *ModelRepository_Update_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 type mockConstructorTestingTNewModelRepository interface {
 	mock.TestingT
 	Cleanup(func())

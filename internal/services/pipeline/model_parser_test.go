@@ -118,6 +118,7 @@ func TestModelParser_parse(t *testing.T) {
 				Name:   "XZ323QU X3",
 				Year:   2023,
 				PPI:    93,
+				Size:   31.5,
 			},
 		},
 	}

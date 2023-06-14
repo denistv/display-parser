@@ -42,16 +42,9 @@ func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
 					return
 				}
 				// TODO поправить N+1, не выглядит оптимально
-				_, ok, err := m.modelsRepo.Find(context.Background(), page.URL)
+				_, isExists, err := m.modelsRepo.Find(ctx, page.URL)
 				if err != nil {
 					m.logger.Error(fmt.Errorf("find model for page: %w", err).Error())
-					continue
-				}
-
-				if ok {
-					// Пока не реализована возможность перезаписи сущестувющей модели.
-					// В моем кейсе проще транкейтнуть таблицу (или удалить конкретные модели, которые нужно перепарсить) руками и перезапустить сервис
-					m.logger.Info("model exists, skipping " + page.URL)
 					continue
 				}
 
@@ -61,11 +54,20 @@ func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
 					continue
 				}
 
-				err = m.modelsRepo.Create(ctx, model)
-				if err != nil {
-					m.logger.Error(fmt.Errorf("creating model: %w", err).Error())
-					continue
+				if isExists {
+					err = m.modelsRepo.Update(ctx, model)
+					if err != nil {
+						m.logger.Error(fmt.Errorf("updating model: %w", err).Error())
+						continue
+					}
+				} else {
+					err = m.modelsRepo.Create(ctx, model)
+					if err != nil {
+						m.logger.Error(fmt.Errorf("creating model: %w", err).Error())
+						continue
+					}
 				}
+
 			case <-ctx.Done():
 				return
 			}
@@ -154,8 +156,8 @@ func (m *ModelParser) parseDisplay(doc *goquery.Document, model *domain.ModelEnt
 			//nolint:gocritic
 			switch label {
 			case sizeExistsPattern:
-				sizeRaw := strings.TrimSuffix(value, "in (inches)")
-				size, _ := strconv.ParseInt(sizeRaw, 10, 64)
+				sizeRaw := strings.TrimSuffix(value, " in (inches)")
+				size, _ := strconv.ParseFloat(sizeRaw, 10)
 				model.Size = size
 			}
 		})

@@ -11,11 +11,8 @@ import (
 )
 
 type Cfg struct {
-	// Пересобрать модели на основе кэша страниц в базе. Если флаг взведен, не ходим во внешний сервис для сбора данных и используем имеющийся кэш страниц в БД.
-	// Полезно в тех случаях, когда сайт спаршен (данные страниц сохранены в кэше в таблице pages, но сущность модели расширена дополнительным полем.
-	// Чтобы не собирать все данные по новой через сеть, используем сохраненные в базу страницы и перераспаршиваем их, обновляя сущности моделей).
-	UseStoredPagesCacheOnly bool
-	ModelParserCount        int
+	ModelParserCount int
+	PageCollector    PagesCollectorCfg
 }
 
 func (c *Cfg) Validate() error {
@@ -26,7 +23,7 @@ func (c *Cfg) Validate() error {
 	return nil
 }
 
-func NewPipeline(cfg Cfg, brandsCollector *BrandsCollector, pagesColl *PagesCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger) *Pipeline {
+func NewPipeline(cfg Cfg, brandsCollector *BrandsCollector, pagesColl *PagesCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger, pageRepo *repository.Page) *Pipeline {
 	return &Pipeline{
 		cfg:           cfg,
 		logger:        logger,
@@ -34,6 +31,7 @@ func NewPipeline(cfg Cfg, brandsCollector *BrandsCollector, pagesColl *PagesColl
 		modelsURLColl: modelURLColl,
 		pagesColl:     pagesColl,
 		modelParser:   modelParser,
+		pageRepo:      pageRepo,
 	}
 }
 
@@ -55,7 +53,7 @@ func (p *Pipeline) Run(ctx context.Context) {
 
 	pageChan := make(chan domain.PageEntity)
 
-	if p.cfg.UseStoredPagesCacheOnly {
+	if p.cfg.PageCollector.UseStoredPagesOnly {
 		// используем кэш страниц в базе. Подходит для второго и последующих запусков или когда у сущности модели
 		// появился новый параметр, который необходимо быстро перепарсить без хождения в сеть
 		p.loadPagesFromCache(ctx, pageChan)
@@ -78,13 +76,17 @@ func (p *Pipeline) Run(ctx context.Context) {
 }
 
 func (p *Pipeline) loadPagesFromCache(ctx context.Context, pageChan chan domain.PageEntity) {
-	pages, err := p.pageRepo.All(ctx)
-	if err != nil {
-		p.logger.Error(err.Error())
-		//todo cancel
-	}
+	go func() {
+		pages, err := p.pageRepo.All(ctx) //никогда не делай так в реальном проекте -- число записей в таблице может быть оче большим
+		if err != nil {
+			p.logger.Error(err.Error())
+			//todo cancel
+		}
 
-	for _, page := range pages {
-		pageChan <- page
-	}
+		for _, page := range pages {
+			pageChan <- page
+		}
+
+		close(pageChan)
+	}()
 }

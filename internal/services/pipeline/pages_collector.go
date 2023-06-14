@@ -14,69 +14,79 @@ import (
 	"display_parser/internal/services"
 )
 
-func NewPagesCollector(logger *zap.Logger, docRepo *repository.Page, httpClient services.HTTPClient, useStoredPagesOnly bool) *PagesCollector {
+type PagesCollectorCfg struct {
+	Count int
+	// Пересобрать модели на основе кэша страниц в базе. Если флаг взведен, не ходим во внешний сервис для сбора данных и используем имеющийся кэш страниц в БД.
+	// Полезно в тех случаях, когда сайт спаршен (данные страниц сохранены в кэше в таблице pages, но сущность модели расширена дополнительным полем.
+	// Чтобы не собирать все данные по новой через сеть, используем сохраненные в базу страницы и перераспаршиваем их, обновляя сущности моделей).
+	UseStoredPagesOnly bool
+}
+
+func NewPagesCollector(logger *zap.Logger, docRepo *repository.Page, httpClient services.HTTPClient, cfg PagesCollectorCfg) *PagesCollector {
 	return &PagesCollector{
-		logger:             logger,
-		pageRepo:           docRepo,
-		httpClient:         httpClient,
-		useStoredPagesOnly: useStoredPagesOnly,
+		logger:     logger,
+		pageRepo:   docRepo,
+		httpClient: httpClient,
+		cfg:        cfg,
 	}
 }
 
 // Слушает канал с URL моделей устройств и для каждого URL загружает документ с описанием модели
 type PagesCollector struct {
-	logger             *zap.Logger
-	pageRepo           *repository.Page
-	httpClient         services.HTTPClient
-	useStoredPagesOnly bool
+	logger     *zap.Logger
+	pageRepo   *repository.Page
+	httpClient services.HTTPClient
+	cfg        PagesCollectorCfg
 }
 
 func (d *PagesCollector) Run(ctx context.Context, in <-chan string) chan domain.PageEntity {
 	out := make(chan domain.PageEntity)
 
-	go func() {
-		defer close(out)
+	for i := 0; i < d.cfg.Count; i++ {
+		d.logger.Info(fmt.Sprintf("starting page collector #%d", i+1))
 
-		for {
-			select {
-			case pageURL, ok := <-in:
-				if !ok {
+		go func() {
+			for {
+				select {
+				case pageURL, ok := <-in:
+					if !ok {
+						return
+					}
+
+					page, isExists, err := d.pageRepo.Find(ctx, pageURL)
+					if err != nil {
+						d.logger.Error("checking model is exists: " + err.Error())
+
+						continue
+					}
+
+					if !d.cfg.UseStoredPagesOnly && !isExists {
+						body, err := d.download(ctx, pageURL)
+						if err != nil {
+							d.logger.Error(fmt.Errorf("downloading document: %w", err).Error())
+
+							continue
+						}
+
+						page = domain.PageEntity{
+							URL:  pageURL,
+							Body: body,
+						}
+
+						err = d.pageRepo.Create(ctx, page)
+						if err != nil {
+							d.logger.Error(fmt.Errorf("creating page for %s: %w", pageURL, err).Error())
+							continue
+						}
+					}
+
+					out <- page
+				case <-ctx.Done():
 					return
 				}
-
-				page, isExists, err := d.pageRepo.Find(ctx, pageURL)
-				if err != nil {
-					d.logger.Error("checking model is exists: " + err.Error())
-
-					continue
-				}
-
-				if !d.useStoredPagesOnly && !isExists {
-					body, err := d.download(ctx, pageURL)
-					if err != nil {
-						d.logger.Error(fmt.Errorf("downloading document: %w", err).Error())
-
-						continue
-					}
-
-					page = domain.PageEntity{
-						URL:  pageURL,
-						Body: body,
-					}
-
-					err = d.pageRepo.Create(ctx, page)
-					if err != nil {
-						d.logger.Error(fmt.Errorf("creating page for %s: %w", pageURL, err).Error())
-						continue
-					}
-				}
-
-				out <- page
-			case <-ctx.Done():
-				return
 			}
-		}
-	}()
+		}()
+	}
 
 	return out
 }

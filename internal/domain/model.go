@@ -21,11 +21,13 @@ type ModelEntity struct {
 	Year int64 `db:"year"`
 
 	// Диагональ (опционально)
-	Size int64 `db:"size"`
+	Size float64 `db:"size"`
 
 	// Число точек на дюйм (опционально)
 	PPI int64 `db:"ppi"`
 
 	// Время сохранения модели в БД
 	CreatedAt time.Time `db:"created_at"`
+
+	UpdatedAt time.Time `db:"updated_at"`
 }
