@@ -28,13 +28,13 @@ type Model struct {
 	table  string
 }
 
-func (d *Model) Find(_ context.Context, url string) (domain.ModelEntity, bool, error) {
+func (d *Model) Find(ctx context.Context, url string) (domain.ModelEntity, bool, error) {
 	var model domain.ModelEntity
 
 	ok, err := d.goquDB.
 		From(d.table).
 		Where(goqu.C("url").Eq(url)).
-		ScanStruct(&model)
+		ScanStructContext(ctx, &model)
 	if err != nil {
 		return domain.ModelEntity{}, false, fmt.Errorf("scanning struct: %w", err)
 	}
@@ -43,14 +43,14 @@ func (d *Model) Find(_ context.Context, url string) (domain.ModelEntity, bool, e
 }
 
 //nolint:gocritic
-func (d *Model) Create(_ context.Context, item domain.ModelEntity) error {
+func (d *Model) Create(ctx context.Context, item domain.ModelEntity) error {
 	item.CreatedAt = time.Now()
 
 	_, err := d.goquDB.
 		Insert(d.table).
 		Rows(item).
 		Executor().
-		Exec()
+		ExecContext(ctx)
 	if err != nil {
 		return fmt.Errorf("executing query: %w", err)
 	}
@@ -58,7 +58,7 @@ func (d *Model) Create(_ context.Context, item domain.ModelEntity) error {
 	return nil
 }
 
-func (d *Model) Update(_ context.Context, item domain.ModelEntity) error {
+func (d *Model) Update(ctx context.Context, item domain.ModelEntity) error {
 	item.UpdatedAt = time.Now()
 
 	_, err := d.goquDB.
@@ -68,7 +68,7 @@ func (d *Model) Update(_ context.Context, item domain.ModelEntity) error {
 		).
 		Set(item).
 		Executor().
-		Exec()
+		ExecContext(ctx)
 	if err != nil {
 		return fmt.Errorf("executing update query: %w", err)
 	}

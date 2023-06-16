@@ -22,6 +22,14 @@ type PagesCollectorCfg struct {
 	UseStoredPagesOnly bool
 }
 
+func (p PagesCollectorCfg) Validate() error {
+	if p.Count <= 0 {
+		return errors.New("count must be > 0")
+	}
+
+	return nil
+}
+
 func NewPagesCollector(logger *zap.Logger, docRepo *repository.Page, httpClient services.HTTPClient, cfg PagesCollectorCfg) *PagesCollector {
 	return &PagesCollector{
 		logger:     logger,

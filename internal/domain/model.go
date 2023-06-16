@@ -7,27 +7,13 @@ type ModelEntity struct {
 	ID int64 `db:"id" goqu:"defaultifempty"`
 	// URL страницы с монитором
 	URL string `db:"url"`
-
-	// Название бренда (обязательно)
 	Brand string `db:"brand"`
-
-	// Линейка монитора (опционально)
 	Series string `db:"series"`
-
-	// Название модели
 	Name string `db:"name"`
-
-	// Год выпуска (опционально)
 	Year int64 `db:"year"`
-
-	// Диагональ (опционально)
+	// Диагональ (опционально),может быть дробным числом
 	Size float64 `db:"size"`
-
-	// Число точек на дюйм (опционально)
 	PPI int64 `db:"ppi"`
-
-	// Время сохранения модели в БД
 	CreatedAt time.Time `db:"created_at"`
-
 	UpdatedAt time.Time `db:"updated_at"`
 }

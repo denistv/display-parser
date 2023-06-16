@@ -8,9 +8,7 @@ import (
 	"syscall"
 
 	"github.com/doug-martin/goqu/v9"
-	"github.com/jackc/pgx/v5"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 
 	"display_parser/internal/app"
@@ -45,16 +43,9 @@ func main() {
 		os.Exit(defaultErrorCode)
 	}
 
-	conn, err := pgx.Connect(ctx, cfg.DB.DSN())
-	if err != nil {
-		logger.Fatal(fmt.Errorf("creating pq connector: %w", err).Error())
-	}
-
-	defer conn.Close(ctx)
-
 	const dbDriver = "postgres"
 
-	sqlxConn, err := sqlx.Connect(dbDriver, cfg.DB.NewSqlxDSN())
+	sqlxConn, err := sqlx.Connect(dbDriver, cfg.DB.ConnStringSQLX())
 	if err != nil {
 		logger.Fatal(err.Error())
 	}
@@ -62,8 +53,7 @@ func main() {
 	goquDB := goqu.New(dbDriver, sqlxConn)
 
 	// Repositories
-	dbWrapper := repository.NewDBWrapper(conn)
-	pageRepo := repository.NewPage(dbWrapper, goquDB)
+	pageRepo := repository.NewPage(goquDB)
 	modelsRepo := repository.NewModel(goquDB)
 
 	httpClient := services.NewDefaultHTTPClient(cfg.HTTP.Timeout)
@@ -75,7 +65,16 @@ func main() {
 	modelsURLCollector := pipeline.NewModelsURLCollector(logger, delayedHTTPClient)
 	modelParser := pipeline.NewModelParser(logger, modelsRepo)
 
-	pp := pipeline.NewPipeline(cfg.Pipeline, brandsCollector, modelPagesCollector, modelsURLCollector, modelParser, logger, pageRepo)
+	pp := pipeline.NewPipeline(
+		cfg.Pipeline,
+		brandsCollector,
+		modelPagesCollector,
+		modelsURLCollector,
+		modelParser,
+		logger,
+		pageRepo,
+	)
+
 	pp.Run(ctx)
 
 	<-ctx.Done()

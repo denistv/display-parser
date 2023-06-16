@@ -11,16 +11,14 @@ import (
 	"display_parser/internal/domain"
 )
 
-func NewPage(db *DBWrapper, goquDB *goqu.Database) *Page {
+func NewPage(goquDB *goqu.Database) *Page {
 	return &Page{
-		dbw:    db,
 		goquDB: goquDB,
 		table:  "pages",
 	}
 }
 
 type Page struct {
-	dbw    *DBWrapper
 	goquDB *goqu.Database
 	table  string
 }
@@ -55,21 +53,15 @@ func (p *Page) Find(ctx context.Context, pageURL string) (domain.PageEntity, boo
 }
 
 func (p *Page) Create(ctx context.Context, doc domain.PageEntity) error {
-	sqlQuery, args, err := goqu.
+	_, err := goqu.
 		Insert(p.table).
 		Rows(doc).
 		OnConflict(goqu.DoUpdate("url", doc)).
-		ToSQL()
+		Executor().
+		ExecContext(ctx)
 	if err != nil {
 		return fmt.Errorf("building sql query: %w", err)
 	}
-
-	rows, err := p.dbw.Conn.Query(ctx, sqlQuery, args...)
-	if err != nil {
-		return fmt.Errorf("inserting item to db: %w", err)
-	}
-
-	rows.Close()
 
 	return nil
 }

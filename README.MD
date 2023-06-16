@@ -34,26 +34,23 @@
 Холодный старт:
 
 ```shell
-./display_parser \
-    --pipeline-model-parser-count=1 \
-    --http-timeout=10s \
-    --db-user=display_parser \
-    --db-password=display_parser \
-    --db-hostname=localhost \
-    --db-port=5432 \
-    --db-name=display_parser
+make run
 ```
 
 Запуск в режиме использования кэша страниц (когда все страницы с сайта уже загружены в базу и нужно перестраивать сущности моделей):
 
 ```shell
 ./display_parser \
-  --db-user=display_parser \
-  --db-password=display_parser \
-  --db-hostname=localhost \
-  --db-port=5432 \
-  --db-name=display_parser \
-  --pipeline-use-stored-pages-only=true
+    --http-timeout=30s \
+    --http-delay-per-request=500ms \
+    --db-user=display_parser \
+    --db-password=display_parser \
+    --db-hostname=localhost \
+    --db-port=5432 \
+    --db-name=display_parser \
+    --pipeline-use-stored-pages-only=true \
+    --pipeline-model-parser-count=5 \
+    --pipeline-page-collector-count=10
 ```
 
 Прогон линтеров:

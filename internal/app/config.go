@@ -69,7 +69,7 @@ func (d DB) Validate() error {
 	return nil
 }
 
-func (d DB) DSN() string {
+func (d DB) ConnString() string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s",
 		d.User,
@@ -80,7 +80,7 @@ func (d DB) DSN() string {
 	)
 }
 
-func (d DB) NewSqlxDSN() string {
+func (d DB) ConnStringSQLX() string {
 	return fmt.Sprintf(
 		"user=%s password=%s dbname=%s host=%s sslmode=disable",
 		d.User,

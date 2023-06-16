@@ -1,16 +1,22 @@
+BIN=display_parser
+
 ### Build
 .PHONY: image
 image:
-	sudo docker build -t display_parser:latest -f Dockerfile .
+	sudo docker build -t $(BIN):latest -f Dockerfile .
+
+.PHONY: vendor
+vendor:
+	go mod vendor
 
 .PHONY: build
-build:
-	go build -o display_parser
+build: vendor test
+	go build -o $(BIN)
 
 ### Run
 .PHONY: run
 run:
-	./display_parser \
+	./$(BIN) \
 		--http-timeout=30s \
 		--http-delay-per-request=500ms \
 		--db-user=display_parser \
@@ -22,9 +28,23 @@ run:
 		--pipeline-model-parser-count=5 \
 		--pipeline-page-collector-count=10
 
+.PHONY: run-page-cache
+run-page-cache:
+		./$(BIN) \
+    		--http-timeout=30s \
+    		--http-delay-per-request=500ms \
+    		--db-user=display_parser \
+    		--db-password=display_parser \
+    		--db-hostname=localhost \
+    		--db-port=5432 \
+    		--db-name=display_parser \
+    		--pipeline-use-stored-pages-only=true \
+    		--pipeline-model-parser-count=5 \
+    		--pipeline-page-collector-count=10
+
 ### Dev
 .PHONY: test
-test:
+test: vendor
 	go test -v ./...
 
 .PHONY: lint
@@ -41,3 +61,7 @@ install-dev-tools:
 .PHONY: mock
 mock:
 	mockery --dir internal
+
+.PHONY: run-docker
+run-docker:
+	sudo docker-compose up

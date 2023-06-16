@@ -20,6 +20,10 @@ func (c *Cfg) Validate() error {
 		return errors.New("parser count must be leather than 0")
 	}
 
+	if err := c.PageCollector.Validate(); err != nil {
+		return fmt.Errorf("validating page collector config: %w", err)
+	}
+
 	return nil
 }
 
