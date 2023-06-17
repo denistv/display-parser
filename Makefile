@@ -39,7 +39,7 @@ run-page-cache:
     		--db-port=5432 \
     		--db-name=display_parser \
     		--pipeline-use-stored-pages-only=true \
-    		--pipeline-model-parser-count=5 \
+    		--pipeline-model-parser-count=10 \
     		--pipeline-page-collector-count=10
 
 ### Dev

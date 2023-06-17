@@ -1,13 +1,13 @@
-<mxfile host="Electron" modified="2023-06-17T15:20:15.055Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.4.0 Chrome/112.0.5615.204 Electron/24.5.1 Safari/537.36" etag="6ZZO0TOH3qRR5uPlZUPB" version="21.4.0" type="device">
+<mxfile host="Electron" modified="2023-06-17T19:46:53.020Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.4.0 Chrome/112.0.5615.204 Electron/24.5.1 Safari/537.36" etag="JkB7PTNVkQn-J2UZYtsV" version="21.4.0" type="device">
   <diagram name="Страница 1" id="jV9yJ5Iw43YUvvW95kSO">
-    <mxGraphModel dx="1661" dy="2378" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1412" dy="2196" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="Q8z2hUsK44NVa-dtH0da-1" target="6m8CLDb69LJXBCj5FW6X-6">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="Q8z2hUsK44NVa-dtH0da-1" target="6m8CLDb69LJXBCj5FW6X-6" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Q8z2hUsK44NVa-dtH0da-1" target="6m8CLDb69LJXBCj5FW6X-10">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="Q8z2hUsK44NVa-dtH0da-1" target="6m8CLDb69LJXBCj5FW6X-10" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="760" y="75" />
@@ -27,7 +27,7 @@
         <mxCell id="Q8z2hUsK44NVa-dtH0da-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="6m8CLDb69LJXBCj5FW6X-4" target="Q8z2hUsK44NVa-dtH0da-53" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Q8z2hUsK44NVa-dtH0da-2" target="6m8CLDb69LJXBCj5FW6X-10">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="Q8z2hUsK44NVa-dtH0da-2" target="6m8CLDb69LJXBCj5FW6X-10" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="Q8z2hUsK44NVa-dtH0da-2" value="Model URLs Collector" style="whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
@@ -85,6 +85,9 @@
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
+        <mxCell id="moRboGbSg9CiqHO73stz-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="Q8z2hUsK44NVa-dtH0da-9" target="moRboGbSg9CiqHO73stz-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="Q8z2hUsK44NVa-dtH0da-9" value="Model persister" style="whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
           <mxGeometry x="494.5" y="1530" width="80" height="80" as="geometry" />
         </mxCell>
@@ -114,11 +117,11 @@
         <mxCell id="Q8z2hUsK44NVa-dtH0da-32" value="Парсит тело html страницы и создает внутреннюю сущность модели монитора с требуемыми атрибутами" style="shape=note;size=20;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="5" y="910" width="150" height="120" as="geometry" />
         </mxCell>
-        <mxCell id="Q8z2hUsK44NVa-dtH0da-93" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;dashPattern=1 4;" parent="1" source="Q8z2hUsK44NVa-dtH0da-35" target="Q8z2hUsK44NVa-dtH0da-9" edge="1">
+        <mxCell id="Q8z2hUsK44NVa-dtH0da-93" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;dashPattern=1 4;" parent="1" source="Q8z2hUsK44NVa-dtH0da-35" target="Q8z2hUsK44NVa-dtH0da-9" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="Q8z2hUsK44NVa-dtH0da-35" value="Сохраняет в БД сущность модели (или обновляет)" style="shape=note;size=20;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="195" y="1660" width="140" height="120" as="geometry" />
+          <mxGeometry x="100" y="1634" width="140" height="120" as="geometry" />
         </mxCell>
         <mxCell id="Q8z2hUsK44NVa-dtH0da-37" value="Связь между этапами пайплайна через каналы. Каждый этап можно легко масштабировать по горизонтали, запуская дополнительные воркеры" style="shape=note;size=20;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="684" y="1355" width="180" height="130" as="geometry" />
@@ -135,7 +138,7 @@
         <mxCell id="Q8z2hUsK44NVa-dtH0da-60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="Q8z2hUsK44NVa-dtH0da-53" target="Q8z2hUsK44NVa-dtH0da-61" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Q8z2hUsK44NVa-dtH0da-53" target="6m8CLDb69LJXBCj5FW6X-10">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="Q8z2hUsK44NVa-dtH0da-53" target="6m8CLDb69LJXBCj5FW6X-10" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="760" y="605" />
@@ -211,50 +214,59 @@
         <mxCell id="Q8z2hUsK44NVa-dtH0da-90" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.145;entryY=0.855;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;dashPattern=1 4;" parent="1" source="Q8z2hUsK44NVa-dtH0da-89" target="Q8z2hUsK44NVa-dtH0da-67" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="Q8z2hUsK44NVa-dtH0da-89" value="Мультиплексирование нескольких выходных каналов в один.&lt;br&gt;&lt;br&gt;Если для стейжа парсинга сделать один общий канал, в который парсеры будут записывать результат своей работы, то они будут блокироваться на записи в канал и простаивать, пока следующий стейж персиста не вычитает данные.&lt;br&gt;&lt;br&gt;Чтобы этого не происходило, каждый воркер стейжа парсинга имеет свой выходной канал, куда он может записывать результат своей работы и приступать к парсингу следующей страницы.&lt;br&gt;&lt;br&gt;Аналогичная реализация -- один выходной канал с буфером по числу воркеров стейжа. Но тогда его придется создавать заранее и передавать на вход воркеру парсера, что менее удобно, чем схема, когда воркер стейжа создает его внутри себя и возвращает наружу с последующим мультиплексированием.&lt;br&gt;&lt;br&gt;Говей при построении стейжев пайплайна -- когда воркер стейжа принимает на вход входные каналы и возвращает выходные. Это упрощает понимание схемы." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" parent="1" vertex="1">
+        <mxCell id="Q8z2hUsK44NVa-dtH0da-89" value="Мультиплексирование нескольких выходных каналов в один.&lt;br&gt;&lt;br&gt;Если для стейжа парсинга сделать один общий канал, в который парсеры будут записывать результат своей работы, то они будут блокироваться на записи в канал и простаивать, пока следующий стейж персиста не вычитает данные.&lt;br&gt;&lt;br&gt;Чтобы этого не происходило, каждый воркер стейжа парсинга имеет свой выходной канал, куда он может записывать результат своей работы и приступать к парсингу следующей страницы.&lt;br&gt;&lt;br&gt;Аналогичная реализация -- один выходной канал с буфером по числу воркеров стейжа. Но тогда его придется создавать заранее и передавать на вход воркеру парсера, что менее удобно, чем схема, когда воркер стейжа создает его внутри себя и возвращает наружу с последующим мультиплексированием.&lt;br&gt;&lt;br&gt;Говей при построении стейжев пайплайна -- когда воркер стейжа принимает на вход входные каналы и возвращает выходные. Это упрощает построение/понимание схемы." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" parent="1" vertex="1">
           <mxGeometry x="20" y="1220" width="340" height="350" as="geometry" />
         </mxCell>
         <mxCell id="Q8z2hUsK44NVa-dtH0da-98" value="https://displayspecifications.com" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.multi-document;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="1040" y="217.5" width="300.67" height="205" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="Q8z2hUsK44NVa-dtH0da-2" target="6m8CLDb69LJXBCj5FW6X-4">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="Q8z2hUsK44NVa-dtH0da-2" target="6m8CLDb69LJXBCj5FW6X-4" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="534" y="470" as="sourcePoint" />
             <mxPoint x="660" y="585" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-4" value="model URLs chan" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;" vertex="1" parent="1">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-4" value="model URLs chan" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="461.5" y="420" width="146" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="6m8CLDb69LJXBCj5FW6X-6" target="Q8z2hUsK44NVa-dtH0da-2">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="6m8CLDb69LJXBCj5FW6X-6" target="Q8z2hUsK44NVa-dtH0da-2" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-6" value="brands URL chan" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;" vertex="1" parent="1">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-6" value="brands URL chan" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;" parent="1" vertex="1">
           <mxGeometry x="461.5" y="160" width="146" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="6m8CLDb69LJXBCj5FW6X-10" target="Q8z2hUsK44NVa-dtH0da-98">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="6m8CLDb69LJXBCj5FW6X-10" target="Q8z2hUsK44NVa-dtH0da-98" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-10" value="http-client with rate-limit" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-10" value="http-client with rate-limit" style="whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
           <mxGeometry x="864" y="280" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;dashPattern=1 4;" edge="1" parent="1" source="6m8CLDb69LJXBCj5FW6X-16" target="Q8z2hUsK44NVa-dtH0da-61">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;dashPattern=1 4;" parent="1" source="6m8CLDb69LJXBCj5FW6X-16" target="Q8z2hUsK44NVa-dtH0da-61" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-16" value="Зачастую возникает необходимость добавить какой-то новый атрибут к модели монитора (хранится в таблице models), а страницы моделей уже загружены в базу.&lt;br&gt;&lt;br&gt;Чтобы не загружать страницы моделей повторно через сеть с сайта (их не одна тысяча), можно извлечь их из БД и повторно распарсить, добавив в имеющиеся сущности моделей новые атрибуты.&lt;br&gt;&lt;br&gt;Для этого можно просто наполнить этот канал сущностями моделей мониторов, не запуская BrandsCollector, ModelURLsCollector.&lt;br&gt;&lt;br&gt;Два этих сценария конфигурируются через специальную настройку пайплайна при запуске" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" vertex="1" parent="1">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-16" value="Зачастую возникает необходимость добавить какой-то новый атрибут к модели монитора (хранится в таблице models), а страницы моделей уже загружены в базу.&lt;br&gt;&lt;br&gt;Чтобы не загружать страницы моделей повторно через сеть с сайта (их не одна тысяча), можно извлечь их из БД и повторно распарсить, добавив в имеющиеся сущности моделей новые атрибуты.&lt;br&gt;&lt;br&gt;Для этого можно просто наполнить этот канал сущностями моделей мониторов, не запуская BrandsCollector, ModelURLsCollector.&lt;br&gt;&lt;br&gt;Два этих сценария конфигурируются через специальную настройку пайплайна при запуске" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" parent="1" vertex="1">
           <mxGeometry x="1040" y="642.5" width="270" height="315" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-20" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;dashPattern=1 4;" edge="1" parent="1" source="6m8CLDb69LJXBCj5FW6X-19" target="6m8CLDb69LJXBCj5FW6X-10">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-20" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;dashPattern=1 4;" parent="1" source="6m8CLDb69LJXBCj5FW6X-19" target="6m8CLDb69LJXBCj5FW6X-10" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-19" value="http-client, реализованный в виде синглтон-сервиса, который внедряется в другие сервисы, которые собираются общаться с сайтом.&lt;br&gt;&lt;br&gt;&lt;b&gt;Проблема:&lt;br&gt;&lt;/b&gt;сайт ограничивает одновременное число соединений с одного хоста банит, если в него часто ходить.&lt;br&gt;&lt;br&gt;&lt;b&gt;Решение:&amp;nbsp;&lt;br&gt;&lt;/b&gt;Поскольку внутри приложения есть три сервиса, которые могут ходить в сайт, необходимо реализовать общий рейт-лимит до сайта, чтобы не приходилось реализовывать его отдельно в каждом из сервисов, что усложняет реализацию.&lt;br&gt;В один момент времени в сторону сайта должен уходить только один http-запрос и это контролируется общим http-клиентом." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" vertex="1" parent="1">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-19" value="http-client, реализованный в виде синглтон-сервиса, который внедряется в другие сервисы, которые собираются общаться с сайтом.&lt;br&gt;&lt;br&gt;&lt;b&gt;Проблема:&lt;br&gt;&lt;/b&gt;сайт ограничивает одновременное число соединений с одного хоста банит, если в него часто ходить.&lt;br&gt;&lt;br&gt;&lt;b&gt;Решение:&amp;nbsp;&lt;br&gt;&lt;/b&gt;Поскольку внутри приложения есть три сервиса, которые могут ходить в сайт, необходимо реализовать общий рейт-лимит до сайта, чтобы не приходилось реализовывать его отдельно в каждом из сервисов, что усложняет реализацию.&lt;br&gt;В один момент времени в сторону сайта должен уходить только один http-запрос и это контролируется общим http-клиентом." style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" parent="1" vertex="1">
           <mxGeometry x="742.5" y="-330" width="323" height="310" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="6m8CLDb69LJXBCj5FW6X-21" target="Q8z2hUsK44NVa-dtH0da-1">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="6m8CLDb69LJXBCj5FW6X-21" target="Q8z2hUsK44NVa-dtH0da-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="6m8CLDb69LJXBCj5FW6X-21" value="&lt;b&gt;Run&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+        <mxCell id="6m8CLDb69LJXBCj5FW6X-21" value="&lt;b&gt;Run&lt;/b&gt;" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
           <mxGeometry x="494.5" y="-150" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="moRboGbSg9CiqHO73stz-1" value="done ch" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="487.5" y="1693.5" width="93" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="moRboGbSg9CiqHO73stz-5" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;dashed=1;dashPattern=1 4;" edge="1" parent="1" source="moRboGbSg9CiqHO73stz-3" target="moRboGbSg9CiqHO73stz-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="moRboGbSg9CiqHO73stz-3" value="Закрытие done-канала сигнализирует внешнему миру о завершении работы пайплайна (все данные обработаны)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;" vertex="1" parent="1">
+          <mxGeometry x="700" y="1634" width="142.5" height="150" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

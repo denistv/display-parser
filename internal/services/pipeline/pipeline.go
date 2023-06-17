@@ -72,6 +72,13 @@ func (p *Pipeline) Run(ctx context.Context) chan struct{}{
 		pageCh = p.pagesColl.Run(ctx, modelURLChan)
 	}
 
+	modelsCh := p.spawnParsers(ctx, pageCh)
+	done := p.modelPersister.Run(ctx, mergeCh(modelsCh...))
+
+	return done
+}
+
+func (p *Pipeline) spawnParsers(ctx context.Context, pageCh chan domain.PageEntity) []<-chan domain.ModelEntity {
 	// Запускаем требуемое число парсеров. С практической точки зрения, в данной задаче запускать большое число парсеров
 	// на небольших наборах данных особого смысла не имеет.
 	// Просто для демонстрации паралеллизма. Здесь пайплайн ветвится -- канал с URL страниц читает множество парсеров
@@ -85,9 +92,7 @@ func (p *Pipeline) Run(ctx context.Context) chan struct{}{
 		modelsCh = append(modelsCh, ch)
 	}
 
-	done := p.modelPersister.Run(ctx, mergeCh(modelsCh...))
-
-	return done
+	return modelsCh
 }
 
 func mergeCh[T any](in ...<-chan T) chan T {
