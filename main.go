@@ -62,7 +62,7 @@ func main() {
 
 	// Collectors
 	brandsCollector := pipeline.NewBrandsCollector(logger, delayedHTTPClient, cancel)
-	modelPagesCollector := pipeline.NewPagesCollector(logger, pageRepo, delayedHTTPClient, cfg.Pipeline.PageCollector)
+	modelPagesCollector := pipeline.NewPageCollector(logger, pageRepo, delayedHTTPClient, cfg.Pipeline.PageCollector)
 	modelsURLCollector := pipeline.NewModelsURLCollector(logger, delayedHTTPClient)
 	modelParser := pipeline.NewModelParser(logger, modelsRepo)
 	modelPersister := pipeline.NewModelPersister(logger, modelsRepo)

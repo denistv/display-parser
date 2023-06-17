@@ -28,7 +28,7 @@ func (c *Cfg) Validate() error {
 	return nil
 }
 
-func NewPipeline(cfg Cfg, brandsCollector *BrandsCollector, pagesColl *PagesCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger, pageRepo *repository.Page, modelPersister *ModelPersister) *Pipeline {
+func NewPipeline(cfg Cfg, brandsCollector *BrandsCollector, pagesColl *PageCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger, pageRepo *repository.Page, modelPersister *ModelPersister) *Pipeline {
 	return &Pipeline{
 		cfg:           cfg,
 		logger:        logger,
@@ -47,7 +47,7 @@ type Pipeline struct {
 	cfg           Cfg
 	brandsColl    *BrandsCollector
 	modelsURLColl *ModelsURLCollector
-	pagesColl     *PagesCollector
+	pagesColl     *PageCollector
 	modelParser   *ModelParser
 	modelPersister *ModelPersister
 	pageRepo      *repository.Page
@@ -58,7 +58,7 @@ type Pipeline struct {
 func (p *Pipeline) Run(ctx context.Context) chan struct{}{
 	p.logger.Info("starting pipeline")
 
-	pageCh := make(chan domain.PageEntity)
+	pageCh := make([]<-chan domain.PageEntity, 0, 0)
 
 	if p.cfg.PageCollector.UseStoredPagesOnly {
 		// используем кэш страниц в базе. Подходит для второго и последующих запусков или когда у сущности модели
@@ -69,20 +69,31 @@ func (p *Pipeline) Run(ctx context.Context) chan struct{}{
 		// Подходит для первого запуска.
 		brandURLsChan := p.brandsColl.Run(ctx)
 		modelURLChan := p.modelsURLColl.Run(ctx, brandURLsChan)
-		pageCh = p.pagesColl.Run(ctx, modelURLChan)
+		pageCh = p.spawnPageCollectors(ctx, modelURLChan)
 	}
 
-	modelsCh := p.spawnParsers(ctx, pageCh)
+	modelsCh := p.spawnParsers(ctx, mergeCh(pageCh...))
 	done := p.modelPersister.Run(ctx, mergeCh(modelsCh...))
 
 	return done
 }
 
+// spawnPageCollectors запускает нужное число воркеров PageCollector
+func (p *Pipeline) spawnPageCollectors(ctx context.Context, modelURLChan <-chan string) []<-chan domain.PageEntity {
+	pageCh := make([]<-chan domain.PageEntity, 0, p.cfg.ModelParserCount)
+
+	for i := 0; i < p.cfg.PageCollector.Count; i++ {
+		p.logger.Info(fmt.Sprintf("starting model parser #%d of %d", i+1, p.cfg.ModelParserCount))
+
+		ch := p.pagesColl.Run(ctx, modelURLChan)
+		pageCh = append(pageCh, ch)
+	}
+
+	return pageCh
+}
+
+// spawnParsers запускает нужное число ModelParser
 func (p *Pipeline) spawnParsers(ctx context.Context, pageCh chan domain.PageEntity) []<-chan domain.ModelEntity {
-	// Запускаем требуемое число парсеров. С практической точки зрения, в данной задаче запускать большое число парсеров
-	// на небольших наборах данных особого смысла не имеет.
-	// Просто для демонстрации паралеллизма. Здесь пайплайн ветвится -- канал с URL страниц читает множество парсеров
-	// TODO сделать объединение результатов работы этапа парсинга в этап сохранения модели в рамках отдельного шага
 	modelsCh := make([]<-chan domain.ModelEntity, 0, p.cfg.ModelParserCount)
 
 	for i := 0; i < p.cfg.ModelParserCount; i++ {
@@ -120,11 +131,11 @@ func mergeCh[T any](in ...<-chan T) chan T {
 	return out
 }
 
-func (p *Pipeline) loadPagesFromCache(ctx context.Context) chan domain.PageEntity {
+func (p *Pipeline) loadPagesFromCache(ctx context.Context) []<-chan domain.PageEntity {
 	out := make(chan domain.PageEntity)
 
 	go func() {
-		pages, err := p.pageRepo.All(ctx) //никогда не делай так в реальном проекте -- число записей в таблице может быть оче большим
+		pages, err := p.pageRepo.All(ctx) // помним про то, что в настоящем проекте так делать не нужно
 		if err != nil {
 			p.logger.Error(err.Error())
 			//todo cancel
@@ -137,5 +148,5 @@ func (p *Pipeline) loadPagesFromCache(ctx context.Context) chan domain.PageEntit
 		close(out)
 	}()
 
-	return out
+	return []<-chan domain.PageEntity{out}
 }
