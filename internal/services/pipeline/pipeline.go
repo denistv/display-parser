@@ -85,18 +85,18 @@ func (p *Pipeline) Run(ctx context.Context) {
 		modelsChan = append(modelsChan, ch)
 	}
 
-	modelsChanMerged := mergeModelsChan(modelsChan...)
+	modelsChanMerged := mergeChannels(modelsChan...)
 	p.modelPersister.Run(ctx, modelsChanMerged)
 }
 
-func mergeModelsChan(in ...<-chan domain.ModelEntity) <-chan domain.ModelEntity {
-	out := make(chan domain.ModelEntity, len(in))
+func mergeChannels[T any](in ...<-chan T) chan T {
+	out := make(chan T, len(in))
 
 	// стартуем горутины, которые читают из входных каналов и пересылают результат в один выходной
 	for _, c := range in {
-		go func(c <-chan domain.ModelEntity){
-			for model := range c {
-				out <-model
+		go func(c <-chan T){
+			for v := range c {
+				out <-v
 			}
 		}(c)
 	}
