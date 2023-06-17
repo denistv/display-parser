@@ -6,6 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.6.1
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/jmoiron/sqlx v1.3.5
+	github.com/lib/pq v1.10.1
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.17.0

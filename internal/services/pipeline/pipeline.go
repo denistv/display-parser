@@ -27,7 +27,7 @@ func (c *Cfg) Validate() error {
 	return nil
 }
 
-func NewPipeline(cfg Cfg, brandsCollector *BrandsCollector, pagesColl *PagesCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger, pageRepo *repository.Page) *Pipeline {
+func NewPipeline(cfg Cfg, brandsCollector *BrandsCollector, pagesColl *PagesCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger, pageRepo *repository.Page, modelPersister *ModelPersister) *Pipeline {
 	return &Pipeline{
 		cfg:           cfg,
 		logger:        logger,
@@ -36,6 +36,7 @@ func NewPipeline(cfg Cfg, brandsCollector *BrandsCollector, pagesColl *PagesColl
 		pagesColl:     pagesColl,
 		modelParser:   modelParser,
 		pageRepo:      pageRepo,
+		modelPersister: modelPersister,
 	}
 }
 
@@ -47,6 +48,7 @@ type Pipeline struct {
 	modelsURLColl *ModelsURLCollector
 	pagesColl     *PagesCollector
 	modelParser   *ModelParser
+	modelPersister *ModelPersister
 	pageRepo      *repository.Page
 }
 
@@ -73,10 +75,33 @@ func (p *Pipeline) Run(ctx context.Context) {
 	// на небольших наборах данных особого смысла не имеет.
 	// Просто для демонстрации паралеллизма. Здесь пайплайн ветвится -- канал с URL страниц читает множество парсеров
 	// TODO сделать объединение результатов работы этапа парсинга в этап сохранения модели в рамках отдельного шага
+
+	modelsChan := make([]<-chan domain.ModelEntity, 0, p.cfg.ModelParserCount)
+
 	for i := 0; i < p.cfg.ModelParserCount; i++ {
 		p.logger.Info(fmt.Sprintf("starting model parser #%d of %d", i+1, p.cfg.ModelParserCount))
-		p.modelParser.Run(ctx, pageChan)
+
+		ch := p.modelParser.Run(ctx, pageChan)
+		modelsChan = append(modelsChan, ch)
 	}
+
+	modelsChanMerged := mergeModelsChan(modelsChan...)
+	p.modelPersister.Run(ctx, modelsChanMerged)
+}
+
+func mergeModelsChan(in ...<-chan domain.ModelEntity) <-chan domain.ModelEntity {
+	out := make(chan domain.ModelEntity, len(in))
+
+	// стартуем горутины, которые читают из входных каналов и пересылают результат в один выходной
+	for _, c := range in {
+		go func(c <-chan domain.ModelEntity){
+			for model := range c {
+				out <-model
+			}
+		}(c)
+	}
+
+	return out
 }
 
 func (p *Pipeline) loadPagesFromCache(ctx context.Context, pageChan chan domain.PageEntity) {

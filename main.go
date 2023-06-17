@@ -9,6 +9,7 @@ import (
 
 	"github.com/doug-martin/goqu/v9"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 
 	"display_parser/internal/app"
@@ -64,6 +65,7 @@ func main() {
 	modelPagesCollector := pipeline.NewPagesCollector(logger, pageRepo, delayedHTTPClient, cfg.Pipeline.PageCollector)
 	modelsURLCollector := pipeline.NewModelsURLCollector(logger, delayedHTTPClient)
 	modelParser := pipeline.NewModelParser(logger, modelsRepo)
+	modelPersister := pipeline.NewModelPersister(logger, modelsRepo)
 
 	pp := pipeline.NewPipeline(
 		cfg.Pipeline,
@@ -73,6 +75,7 @@ func main() {
 		modelParser,
 		logger,
 		pageRepo,
+		modelPersister,
 	)
 
 	pp.Run(ctx)

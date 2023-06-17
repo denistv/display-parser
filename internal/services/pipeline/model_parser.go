@@ -33,7 +33,9 @@ type ModelParser struct {
 }
 
 // Run запускает часть пайплайна, отвечающую за парсинг страниц.
-func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
+func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) <-chan domain.ModelEntity {
+	out := make(chan domain.ModelEntity)
+
 	go func() {
 		for {
 			select {
@@ -41,12 +43,8 @@ func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
 				if !ok {
 					return
 				}
-				// TODO поправить N+1, не выглядит оптимально
-				_, isExists, err := m.modelsRepo.Find(ctx, page.URL)
-				if err != nil {
-					m.logger.Error(fmt.Errorf("find model for page: %w", err).Error())
-					continue
-				}
+
+				m.logger.Debug(fmt.Sprintf("parsing model %s", page.URL))
 
 				model, err := m.parse(page)
 				if err != nil {
@@ -54,25 +52,15 @@ func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) {
 					continue
 				}
 
-				if isExists {
-					err = m.modelsRepo.Update(ctx, model)
-					if err != nil {
-						m.logger.Error(fmt.Errorf("updating model: %w", err).Error())
-						continue
-					}
-				} else {
-					err = m.modelsRepo.Create(ctx, model)
-					if err != nil {
-						m.logger.Error(fmt.Errorf("creating model: %w", err).Error())
-						continue
-					}
-				}
+				out <- model
 
 			case <-ctx.Done():
 				return
 			}
 		}
 	}()
+
+	return out
 }
 
 // Общий метод, где вызываем специализированные методы разбора нужных нам атрибутов у монитора.
