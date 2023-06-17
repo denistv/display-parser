@@ -20,14 +20,21 @@ type ModelPersister struct {
 	modelRepo repository.ModelRepository
 }
 
-func (m *ModelPersister) Run(ctx context.Context, modelChan <-chan domain.ModelEntity) {
+func (m *ModelPersister) Run(ctx context.Context, modelChan <-chan domain.ModelEntity) chan struct{} {
+	done := make(chan struct{})
+
 	go func(){
+		// выходной канал закрывается в случае, если опустошился входной канал или если в контексте прилетела отмена
+		defer close(done)
+
 		for {
 			select {
 				case model, ok := <-modelChan:
 					if !ok {
 						return
 					}
+
+					m.logger.Debug(fmt.Sprintf("persisting model %s", model.URL))
 
 					if model.ID != 0 {
 						err := m.modelRepo.Create(ctx, model)
@@ -47,4 +54,6 @@ func (m *ModelPersister) Run(ctx context.Context, modelChan <-chan domain.ModelE
 			}
 		}
 	}()
+
+	return done
 }

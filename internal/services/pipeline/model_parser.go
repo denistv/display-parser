@@ -37,6 +37,8 @@ func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) <-ch
 	out := make(chan domain.ModelEntity)
 
 	go func() {
+		defer close(out)
+
 		for {
 			select {
 			case page, ok := <-in:

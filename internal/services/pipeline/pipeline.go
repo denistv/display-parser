@@ -6,6 +6,7 @@ import (
 	"display_parser/internal/repository"
 	"errors"
 	"fmt"
+	"sync"
 
 	"go.uber.org/zap"
 )
@@ -54,43 +55,45 @@ type Pipeline struct {
 
 // Run связывает этапы пайплайна и запускает его.
 // В зависимости от настройки UseStoredPagesCacheOnly конфигурируются требуемые шаги.
-func (p *Pipeline) Run(ctx context.Context) {
+func (p *Pipeline) Run(ctx context.Context) chan struct{}{
 	p.logger.Info("starting pipeline")
 
-	pageChan := make(chan domain.PageEntity)
+	pageCh := make(chan domain.PageEntity)
 
 	if p.cfg.PageCollector.UseStoredPagesOnly {
 		// используем кэш страниц в базе. Подходит для второго и последующих запусков или когда у сущности модели
 		// появился новый параметр, который необходимо быстро перепарсить без хождения в сеть
-		p.loadPagesFromCache(ctx, pageChan)
+		pageCh = p.loadPagesFromCache(ctx)
 	} else {
 		//В этом случае не используем кэш страниц, хранящийся в базе и получаем все данные из интернета.
 		// Подходит для первого запуска.
 		brandURLsChan := p.brandsColl.Run(ctx)
 		modelURLChan := p.modelsURLColl.Run(ctx, brandURLsChan)
-		pageChan = p.pagesColl.Run(ctx, modelURLChan)
+		pageCh = p.pagesColl.Run(ctx, modelURLChan)
 	}
 
 	// Запускаем требуемое число парсеров. С практической точки зрения, в данной задаче запускать большое число парсеров
 	// на небольших наборах данных особого смысла не имеет.
 	// Просто для демонстрации паралеллизма. Здесь пайплайн ветвится -- канал с URL страниц читает множество парсеров
 	// TODO сделать объединение результатов работы этапа парсинга в этап сохранения модели в рамках отдельного шага
-
-	modelsChan := make([]<-chan domain.ModelEntity, 0, p.cfg.ModelParserCount)
+	modelsCh := make([]<-chan domain.ModelEntity, 0, p.cfg.ModelParserCount)
 
 	for i := 0; i < p.cfg.ModelParserCount; i++ {
 		p.logger.Info(fmt.Sprintf("starting model parser #%d of %d", i+1, p.cfg.ModelParserCount))
 
-		ch := p.modelParser.Run(ctx, pageChan)
-		modelsChan = append(modelsChan, ch)
+		ch := p.modelParser.Run(ctx, pageCh)
+		modelsCh = append(modelsCh, ch)
 	}
 
-	modelsChanMerged := mergeChannels(modelsChan...)
-	p.modelPersister.Run(ctx, modelsChanMerged)
+	done := p.modelPersister.Run(ctx, mergeCh(modelsCh...))
+
+	return done
 }
 
-func mergeChannels[T any](in ...<-chan T) chan T {
+func mergeCh[T any](in ...<-chan T) chan T {
 	out := make(chan T, len(in))
+	var wg sync.WaitGroup
+	wg.Add(len(in))
 
 	// стартуем горутины, которые читают из входных каналов и пересылают результат в один выходной
 	for _, c := range in {
@@ -98,13 +101,23 @@ func mergeChannels[T any](in ...<-chan T) chan T {
 			for v := range c {
 				out <-v
 			}
+
+			wg.Done()
 		}(c)
 	}
+
+	go func() {
+		// Закрываем выходной канал в том случае, если все входные так же закрыты
+		wg.Wait()
+		close(out)
+	}()
 
 	return out
 }
 
-func (p *Pipeline) loadPagesFromCache(ctx context.Context, pageChan chan domain.PageEntity) {
+func (p *Pipeline) loadPagesFromCache(ctx context.Context) chan domain.PageEntity {
+	out := make(chan domain.PageEntity)
+
 	go func() {
 		pages, err := p.pageRepo.All(ctx) //никогда не делай так в реальном проекте -- число записей в таблице может быть оче большим
 		if err != nil {
@@ -113,9 +126,11 @@ func (p *Pipeline) loadPagesFromCache(ctx context.Context, pageChan chan domain.
 		}
 
 		for _, page := range pages {
-			pageChan <- page
+			out <- page
 		}
 
-		close(pageChan)
+		close(out)
 	}()
+
+	return out
 }

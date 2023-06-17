@@ -78,7 +78,5 @@ func main() {
 		modelPersister,
 	)
 
-	pp.Run(ctx)
-
-	<-ctx.Done()
+    <-pp.Run(ctx)
 }
