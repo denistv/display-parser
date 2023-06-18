@@ -20,6 +20,8 @@ services:
       - postgres
     links:
       - postgres:postgres
+    ports:
+      - "3000:3000"
     command:
       - /app/http
       - "--db-hostname=postgres"

@@ -18,8 +18,7 @@ build: vendor test
 ### Run
 .PHONY: run
 run:
-	cd bin
-	./app \
+	cd bin && ./app \
 		--http-timeout=30s \
 		--http-delay-per-request=500ms \
 		--db-user=display_parser \
@@ -33,24 +32,27 @@ run:
 
 .PHONY: run-http
 run-http:
-	cd bin
-	./http
+	cd bin && ./http \
+		--db-user=display_parser \
+		--db-password=display_parser \
+		--db-hostname=localhost \
+		--db-port=5432 \
+		--db-name=display_parser
 
 
 .PHONY: run-page-cache
 run-page-cache:
-		cd bin
-		./app \
-    		--http-timeout=30s \
-    		--http-delay-per-request=500ms \
-    		--db-user=display_parser \
-    		--db-password=display_parser \
-    		--db-hostname=localhost \
-    		--db-port=5432 \
-    		--db-name=display_parser \
-    		--pipeline-use-stored-pages-only=true \
-    		--pipeline-model-parser-count=10 \
-    		--pipeline-page-collector-count=10
+	cd bin && ./app \
+		--http-timeout=30s \
+		--http-delay-per-request=500ms \
+		--db-user=display_parser \
+		--db-password=display_parser \
+		--db-hostname=localhost \
+		--db-port=5432 \
+		--db-name=display_parser \
+		--pipeline-use-stored-pages-only=true \
+		--pipeline-model-parser-count=10 \
+		--pipeline-page-collector-count=10
 
 ### Dev
 .PHONY: test
@@ -75,3 +77,8 @@ mock:
 .PHONY: run-docker
 run-docker:
 	sudo docker-compose up
+
+.PHONY: migrate
+migrate:
+	sql-migrate up
+

@@ -22,6 +22,60 @@ func (_m *ModelRepository) EXPECT() *ModelRepository_Expecter {
 	return &ModelRepository_Expecter{mock: &_m.Mock}
 }
 
+// All provides a mock function with given fields: ctx
+func (_m *ModelRepository) All(ctx context.Context) ([]domain.ModelEntity, error) {
+	ret := _m.Called(ctx)
+
+	var r0 []domain.ModelEntity
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) ([]domain.ModelEntity, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) []domain.ModelEntity); ok {
+		r0 = rf(ctx)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]domain.ModelEntity)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// ModelRepository_All_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'All'
+type ModelRepository_All_Call struct {
+	*mock.Call
+}
+
+// All is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *ModelRepository_Expecter) All(ctx interface{}) *ModelRepository_All_Call {
+	return &ModelRepository_All_Call{Call: _e.mock.On("All", ctx)}
+}
+
+func (_c *ModelRepository_All_Call) Run(run func(ctx context.Context)) *ModelRepository_All_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *ModelRepository_All_Call) Return(_a0 []domain.ModelEntity, _a1 error) *ModelRepository_All_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *ModelRepository_All_Call) RunAndReturn(run func(context.Context) ([]domain.ModelEntity, error)) *ModelRepository_All_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Create provides a mock function with given fields: ctx, item
 func (_m *ModelRepository) Create(ctx context.Context, item domain.ModelEntity) error {
 	ret := _m.Called(ctx, item)

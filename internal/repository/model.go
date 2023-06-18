@@ -14,6 +14,7 @@ type ModelRepository interface {
 	Find(ctx context.Context, url string) (domain.ModelEntity, bool, error)
 	Create(ctx context.Context, item domain.ModelEntity) error
 	Update(ctx context.Context, item domain.ModelEntity) error
+	All(ctx context.Context) ([]domain.ModelEntity, error)
 }
 
 func NewModel(goduDB *goqu.Database) *Model {
@@ -74,4 +75,15 @@ func (d *Model) Update(ctx context.Context, item domain.ModelEntity) error {
 	}
 
 	return nil
+}
+
+func (d *Model) All(ctx context.Context) ([]domain.ModelEntity, error) {
+	var out []domain.ModelEntity
+
+	err := d.goquDB.Select().From(d.table).ScanStructsContext(ctx, &out)
+	if err != nil {
+		return nil, fmt.Errorf("executing query: %w", err)
+	}
+
+	return out, nil
 }
