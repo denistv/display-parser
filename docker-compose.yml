@@ -10,13 +10,40 @@ services:
     expose:
       - 5432
 
-  migrate:
-    image: alpine:latest
-
-  app:
-    image: display_parser
+  http:
+    image: display_parser-http
     build:
       context: .
       dockerfile: Dockerfile
+      target: http-image
+    depends_on:
+      - postgres
     links:
       - postgres:postgres
+    command:
+      - /app/http
+      - "--db-hostname=postgres"
+      - "--db-port=5432"
+      - "--db-user=display_parser"
+      - "--db-password=display_parser"
+      - "--db-name=display_parser"
+
+  app:
+    image: display_parser-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app-image
+    depends_on:
+      - postgres
+    links:
+      - postgres:postgres
+    command:
+      - /app/app
+      - "--db-hostname=postgres"
+      - "--db-port=5432"
+      - "--db-user=display_parser"
+      - "--db-password=display_parser"
+      - "--db-name=display_parser"
+      - "--http-timeout=30s"
+      - "--http-delay-per-request=2s"

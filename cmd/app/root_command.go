@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"display_parser/internal/app"
 )
@@ -29,6 +30,8 @@ func newRootCommand(cfg *app.Config) *cobra.Command {
 	rootCmd.PersistentFlags().StringVar(&cfg.DB.Password, "db-password", "", "")
 	rootCmd.PersistentFlags().StringVar(&cfg.DB.Hostname, "db-hostname", "localhost", "")
 	rootCmd.PersistentFlags().IntVar(&cfg.DB.Port, "db-port", 5432, "")
+
+	viper.AutomaticEnv()
 
 	return &rootCmd
 }

@@ -1,9 +1,10 @@
-BIN=display_parser
+NAME=display_parser
 
 ### Build
 .PHONY: image
 image:
-	sudo docker build -t $(BIN):latest -f Dockerfile .
+	sudo docker build -t ${NAME}-app:latest --target=app-image -f Dockerfile .
+	sudo docker build -t ${NAME}-http:latest --target=http-image -f Dockerfile .
 
 .PHONY: vendor
 vendor:
@@ -11,12 +12,14 @@ vendor:
 
 .PHONY: build
 build: vendor test
-	go build -o $(BIN)
+	go build -o bin/app ./cmd/app
+	go build -o bin/http ./cmd/http
 
 ### Run
 .PHONY: run
 run:
-	./$(BIN) \
+	cd bin
+	./app \
 		--http-timeout=30s \
 		--http-delay-per-request=500ms \
 		--db-user=display_parser \
@@ -28,9 +31,16 @@ run:
 		--pipeline-model-parser-count=5 \
 		--pipeline-page-collector-count=10
 
+.PHONY: run-http
+run-http:
+	cd bin
+	./http
+
+
 .PHONY: run-page-cache
 run-page-cache:
-		./$(BIN) \
+		cd bin
+		./app \
     		--http-timeout=30s \
     		--http-delay-per-request=500ms \
     		--db-user=display_parser \
