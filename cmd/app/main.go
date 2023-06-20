@@ -18,8 +18,6 @@ import (
 	"display_parser/internal/services/pipeline"
 )
 
-const defaultErrorCode = 255
-
 func main() {
 	cfg := app.NewConfig()
 	rootCmd := newRootCommand(&cfg)
@@ -27,7 +25,7 @@ func main() {
 	err := rootCmd.Execute()
 	if err != nil {
 		fmt.Println(err.Error())
-		os.Exit(defaultErrorCode)
+		os.Exit(app.UnexpectedErrCode)
 	}
 
 	// Создаем контекст с отменой для реализации graceful-shutdown и в дальнейшем передаем его в сервисы приложения.
@@ -41,7 +39,7 @@ func main() {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		fmt.Println(err.Error())
-		os.Exit(defaultErrorCode)
+		os.Exit(app.UnexpectedErrCode)
 	}
 
 	const dbDriver = "postgres"
@@ -78,5 +76,5 @@ func main() {
 		modelPersister,
 	)
 
-    <-pp.Run(ctx)
+	<-pp.Run(ctx)
 }

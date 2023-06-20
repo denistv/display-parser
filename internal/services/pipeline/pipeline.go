@@ -2,13 +2,14 @@ package pipeline
 
 import (
 	"context"
-	"display_parser/internal/domain"
-	"display_parser/internal/repository"
 	"errors"
 	"fmt"
 	"sync"
 
 	"go.uber.org/zap"
+
+	"display_parser/internal/domain"
+	"display_parser/internal/repository"
 )
 
 type Cfg struct {
@@ -30,42 +31,42 @@ func (c *Cfg) Validate() error {
 
 func NewPipeline(cfg Cfg, brandsCollector *BrandsCollector, pagesColl *PageCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger, pageRepo *repository.Page, modelPersister *ModelPersister) *Pipeline {
 	return &Pipeline{
-		cfg:           cfg,
-		logger:        logger,
-		brandsColl:    brandsCollector,
-		modelsURLColl: modelURLColl,
-		pagesColl:     pagesColl,
-		modelParser:   modelParser,
-		pageRepo:      pageRepo,
+		cfg:            cfg,
+		logger:         logger,
+		brandsColl:     brandsCollector,
+		modelsURLColl:  modelURLColl,
+		pagesColl:      pagesColl,
+		modelParser:    modelParser,
+		pageRepo:       pageRepo,
 		modelPersister: modelPersister,
 	}
 }
 
 // Pipeline представляет собой сущность, которая связывает шаги пайплайна и централизовано управляет его жизненным циклом.
 type Pipeline struct {
-	logger        *zap.Logger
-	cfg           Cfg
-	brandsColl    *BrandsCollector
-	modelsURLColl *ModelsURLCollector
-	pagesColl     *PageCollector
-	modelParser   *ModelParser
+	logger         *zap.Logger
+	cfg            Cfg
+	brandsColl     *BrandsCollector
+	modelsURLColl  *ModelsURLCollector
+	pagesColl      *PageCollector
+	modelParser    *ModelParser
 	modelPersister *ModelPersister
-	pageRepo      *repository.Page
+	pageRepo       *repository.Page
 }
 
 // Run связывает этапы пайплайна и запускает его.
 // В зависимости от настройки UseStoredPagesCacheOnly конфигурируются требуемые шаги.
-func (p *Pipeline) Run(ctx context.Context) chan struct{}{
+func (p *Pipeline) Run(ctx context.Context) chan struct{} {
 	p.logger.Info("starting pipeline")
 
-	pageCh := make([]<-chan domain.PageEntity, 0, 0)
+	var pageCh []<-chan domain.PageEntity
 
 	if p.cfg.PageCollector.UseStoredPagesOnly {
 		// используем кэш страниц в базе. Подходит для второго и последующих запусков или когда у сущности модели
 		// появился новый параметр, который необходимо быстро перепарсить без хождения в сеть
 		pageCh = p.loadPagesFromCache(ctx)
 	} else {
-		//В этом случае не используем кэш страниц, хранящийся в базе и получаем все данные из интернета.
+		// В этом случае не используем кэш страниц, хранящийся в базе и получаем все данные из интернета.
 		// Подходит для первого запуска.
 		brandURLsChan := p.brandsColl.Run(ctx)
 		modelURLChan := p.modelsURLColl.Run(ctx, brandURLsChan)
@@ -113,9 +114,9 @@ func mergeCh[T any](in ...<-chan T) chan T {
 
 	// стартуем горутины, которые читают из входных каналов и пересылают результат в один выходной
 	for _, c := range in {
-		go func(c <-chan T){
+		go func(c <-chan T) {
 			for v := range c {
-				out <-v
+				out <- v
 			}
 
 			wg.Done()
@@ -138,7 +139,7 @@ func (p *Pipeline) loadPagesFromCache(ctx context.Context) []<-chan domain.PageE
 		pages, err := p.pageRepo.All(ctx) // помним про то, что в настоящем проекте так делать не нужно
 		if err != nil {
 			p.logger.Error(err.Error())
-			//todo cancel
+			// todo cancel
 		}
 
 		for _, page := range pages {

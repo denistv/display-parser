@@ -10,8 +10,7 @@ import (
 	"go.uber.org/zap"
 
 	"display_parser/internal/domain"
-	"display_parser/internal/repository"
-	"display_parser/internal/services"
+	"display_parser/internal/iface"
 )
 
 type PagesCollectorCfg struct {
@@ -30,10 +29,10 @@ func (p PagesCollectorCfg) Validate() error {
 	return nil
 }
 
-func NewPageCollector(logger *zap.Logger, docRepo *repository.Page, httpClient services.HTTPClient, cfg PagesCollectorCfg) *PageCollector {
+func NewPageCollector(logger *zap.Logger, pageRepo iface.PageRepository, httpClient iface.HTTPClient, cfg PagesCollectorCfg) *PageCollector {
 	return &PageCollector{
 		logger:     logger,
-		pageRepo:   docRepo,
+		pageRepo:   pageRepo,
 		httpClient: httpClient,
 		cfg:        cfg,
 	}
@@ -42,13 +41,13 @@ func NewPageCollector(logger *zap.Logger, docRepo *repository.Page, httpClient s
 // PageCollector Слушает канал с URL моделей устройств и для каждого URL загружает документ с описанием модели
 type PageCollector struct {
 	logger     *zap.Logger
-	pageRepo   *repository.Page
-	httpClient services.HTTPClient
+	pageRepo   iface.PageRepository
+	httpClient iface.HTTPClient
 	cfg        PagesCollectorCfg
 }
 
 func (d *PageCollector) Run(ctx context.Context, in <-chan string) <-chan domain.PageEntity {
-	out := make(chan domain.PageEntity,d.cfg.Count)
+	out := make(chan domain.PageEntity, d.cfg.Count)
 
 	go func() {
 		defer close(out)

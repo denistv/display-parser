@@ -8,10 +8,10 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"go.uber.org/zap"
 
-	"display_parser/internal/services"
+	"display_parser/internal/iface"
 )
 
-func NewBrandsCollector(logger *zap.Logger, httpClient services.HTTPClient, cancel context.CancelFunc) *BrandsCollector {
+func NewBrandsCollector(logger *zap.Logger, httpClient iface.HTTPClient, cancel context.CancelFunc) *BrandsCollector {
 	return &BrandsCollector{
 		logger:     logger,
 		sourceURL:  "https://www.displayspecifications.com", // TODO вынести в конфиг
@@ -23,7 +23,7 @@ func NewBrandsCollector(logger *zap.Logger, httpClient services.HTTPClient, canc
 type BrandsCollector struct {
 	logger     *zap.Logger
 	sourceURL  string
-	httpClient services.HTTPClient
+	httpClient iface.HTTPClient
 
 	// Останавливаем через канал отмены работу программы в случаях, когда дальнейшая работа не имеет смысла
 	cancel context.CancelFunc

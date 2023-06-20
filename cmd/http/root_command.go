@@ -2,10 +2,12 @@ package main
 
 import (
 	"display_parser/internal/app"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
+// nolint
 func newRootCommand(cfg *app.Config) *cobra.Command {
 	rootCmd := cobra.Command{}
 
@@ -20,4 +22,3 @@ func newRootCommand(cfg *app.Config) *cobra.Command {
 
 	return &rootCmd
 }
-

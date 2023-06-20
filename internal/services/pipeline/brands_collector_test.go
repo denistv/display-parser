@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/zap"
 
-	"display_parser/internal/services"
+	"display_parser/internal/iface"
 	"display_parser/mocks"
 )
 
@@ -43,7 +43,7 @@ func TestBrandsCollector_Run(t *testing.T) {
 	type fields struct {
 		logger     *zap.Logger
 		sourceURL  string
-		httpClient services.HTTPClient
+		httpClient iface.HTTPClient
 	}
 	type args struct {
 		ctx context.Context

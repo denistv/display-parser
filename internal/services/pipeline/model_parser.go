@@ -147,7 +147,7 @@ func (m *ModelParser) parseDisplay(doc *goquery.Document, model *domain.ModelEnt
 			switch label {
 			case sizeExistsPattern:
 				sizeRaw := strings.TrimSuffix(value, " in (inches)")
-				size, _ := strconv.ParseFloat(sizeRaw, 10)
+				size, _ := strconv.ParseFloat(sizeRaw, 64)
 				model.Size = size
 			}
 		})

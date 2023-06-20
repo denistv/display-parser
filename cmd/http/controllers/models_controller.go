@@ -1,22 +1,24 @@
 package controllers
 
 import (
-	"display_parser/internal/repository"
 	"encoding/json"
-	"go.uber.org/zap"
 	"net/http"
+
+	"go.uber.org/zap"
+
+	"display_parser/internal/repository"
 )
 
 func NewModelsController(logger *zap.Logger, repo repository.ModelRepository) *ModelsController {
 	return &ModelsController{
 		logger: logger,
-		repo: repo,
+		repo:   repo,
 	}
 }
 
 type ModelsController struct {
 	logger *zap.Logger
-	repo repository.ModelRepository
+	repo   repository.ModelRepository
 }
 
 func (m *ModelsController) ModelsIndex(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +34,6 @@ func (m *ModelsController) ModelsIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(data)
+	_, _ = w.Write(data)
 	w.WriteHeader(http.StatusOK)
 }
-

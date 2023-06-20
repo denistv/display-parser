@@ -4,10 +4,6 @@ import (
 	"net/http"
 	"time"
 )
-// HTTPClient с возможностью задавать таймаут соединения
-type HTTPClient interface {
-	Do(req *http.Request) (*http.Response, error)
-}
 
 func NewDefaultHTTPClient(timeout time.Duration) *DefaultHTTPClient {
 	c := http.Client{

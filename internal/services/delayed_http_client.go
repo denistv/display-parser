@@ -4,9 +4,11 @@ import (
 	"context"
 	"net/http"
 	"time"
+
+	"display_parser/internal/iface"
 )
 
-func NewDelayedHTTPClient(ctx context.Context, delayPerReq time.Duration, httpClient HTTPClient) *DelayedHTTPClient {
+func NewDelayedHTTPClient(ctx context.Context, delayPerReq time.Duration, httpClient iface.HTTPClient) *DelayedHTTPClient {
 	d := DelayedHTTPClient{
 		ticker:     time.NewTicker(delayPerReq),
 		httpClient: httpClient,
@@ -27,7 +29,7 @@ func NewDelayedHTTPClient(ctx context.Context, delayPerReq time.Duration, httpCl
 // уйдет в сеть только у одной горутины, остальные будут ждать следующего тика.
 type DelayedHTTPClient struct {
 	ticker     *time.Ticker
-	httpClient HTTPClient
+	httpClient iface.HTTPClient
 }
 
 func (d *DelayedHTTPClient) Do(req *http.Request) (*http.Response, error) {

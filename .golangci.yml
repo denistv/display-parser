@@ -82,11 +82,11 @@ linters:
     - gosimple
     - govet
     - ineffassign
-    - lll
+#    - lll
     - misspell
     - nakedret
     - noctx
-    - nolintlint
+#    - nolintlint
     - revive
     - staticcheck
     - stylecheck

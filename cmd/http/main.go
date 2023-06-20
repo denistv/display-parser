@@ -1,19 +1,21 @@
 package main
 
 import (
-	"display_parser/cmd/http/controllers"
-	"display_parser/internal/app"
-	"display_parser/internal/repository"
 	"fmt"
+	"log"
+	"net/http"
+	"os"
+
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"go.uber.org/zap"
-	"log"
-	"net/http"
-	"os"
+
+	"display_parser/cmd/http/controllers"
+	"display_parser/internal/app"
+	"display_parser/internal/repository"
 )
 
 func main() {
@@ -22,11 +24,11 @@ func main() {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		fmt.Println(err.Error())
-		os.Exit(255)
+		os.Exit(app.UnexpectedErrCode)
 	}
 
 	rootCmd := newRootCommand(&cfg)
-	if err := rootCmd.Execute(); err != nil {
+	if err = rootCmd.Execute(); err != nil {
 		log.Fatal(fmt.Errorf("executing command: %w", err))
 	}
 
@@ -49,4 +51,3 @@ func main() {
 		panic(err)
 	}
 }
-
