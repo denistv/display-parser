@@ -52,11 +52,11 @@ func (p *Page) Find(ctx context.Context, pageURL string) (domain.PageEntity, boo
 	return page, ok, nil
 }
 
-func (p *Page) Create(ctx context.Context, doc domain.PageEntity) error {
-	_, err := goqu.
+func (p *Page) Create(ctx context.Context, page domain.PageEntity) error {
+	_, err := p.goquDB.
 		Insert(p.table).
-		Rows(doc).
-		OnConflict(goqu.DoUpdate("url", doc)).
+		Rows(page).
+		OnConflict(goqu.DoUpdate("url", page)).
 		Executor().
 		ExecContext(ctx)
 	if err != nil {

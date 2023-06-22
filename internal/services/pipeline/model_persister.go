@@ -38,7 +38,7 @@ func (m *ModelPersister) Run(ctx context.Context, modelChan <-chan domain.ModelE
 
 				m.logger.Debug(fmt.Sprintf("persisting model %s", model.URL))
 
-				if model.ID != 0 {
+				if model.ID == 0 {
 					err := m.modelRepo.Create(ctx, model)
 					if err != nil {
 						m.logger.Error(fmt.Errorf("creating model: %w", err).Error())

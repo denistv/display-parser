@@ -18,21 +18,21 @@ build: vendor test
 ### Run
 .PHONY: run
 run:
-	cd bin && ./app \
+	bin/app \
 		--http-timeout=30s \
-		--http-delay-per-request=500ms \
+		--http-delay-per-request=1s \
 		--db-user=display_parser \
 		--db-password=display_parser \
 		--db-hostname=localhost \
 		--db-port=5432 \
 		--db-name=display_parser \
 		--pipeline-use-stored-pages-only=false \
-		--pipeline-model-parser-count=5 \
-		--pipeline-page-collector-count=10
+		--pipeline-model-parser-count=1 \
+		--pipeline-page-collector-count=1
 
 .PHONY: run-http
 run-http:
-	cd bin && ./http \
+	bin/http \
 		--db-user=display_parser \
 		--db-password=display_parser \
 		--db-hostname=localhost \
@@ -42,7 +42,7 @@ run-http:
 
 .PHONY: run-page-cache
 run-page-cache:
-	cd bin && ./app \
+	bin/app \
 		--http-timeout=30s \
 		--http-delay-per-request=500ms \
 		--db-user=display_parser \

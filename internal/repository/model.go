@@ -46,6 +46,7 @@ func (d *Model) Find(ctx context.Context, url string) (domain.ModelEntity, bool,
 //nolint:gocritic
 func (d *Model) Create(ctx context.Context, item domain.ModelEntity) error {
 	item.CreatedAt = time.Now()
+	item.UpdatedAt = item.CreatedAt
 
 	_, err := d.goquDB.
 		Insert(d.table).

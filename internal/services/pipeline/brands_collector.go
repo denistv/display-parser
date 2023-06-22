@@ -87,13 +87,12 @@ func (b *BrandsCollector) Run(ctx context.Context) <-chan string {
 						return
 					}
 
-					b.logger.Debug(fmt.Sprintf("brand collected: %s", href))
-
 					urls = append(urls, href)
 				})
 			})
 
 		for _, v := range urls {
+			b.logger.Debug(fmt.Sprintf("brand URL parsed: %s", v))
 			out <- v
 		}
 

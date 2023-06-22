@@ -67,6 +67,8 @@ func (d *PageCollector) Run(ctx context.Context, in <-chan string) <-chan domain
 				}
 
 				if !d.cfg.UseStoredPagesOnly && !isExists {
+					d.logger.Debug(fmt.Sprintf("downloading page: %s", pageURL))
+
 					body, err := d.download(ctx, pageURL)
 					if err != nil {
 						d.logger.Error(fmt.Errorf("downloading document: %w", err).Error())

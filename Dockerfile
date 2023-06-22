@@ -12,11 +12,9 @@ RUN apk add gcompat make
 
 # Final image stages
 FROM bin-image AS app-image
-COPY --from=build /src/bin/app /app/app
-LABEL bin=app
+COPY --from=build /src/bin/app /app/bin/app
 CMD ["make", "run"]
 
 FROM bin-image AS http-image
-COPY --from=build /src/bin/http /app/http
-LABEL bin=http
+COPY --from=build /src/bin/http /app/bin/http
 CMD ["make", "run-http"]
