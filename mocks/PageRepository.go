@@ -4,6 +4,7 @@ package mocks
 
 import (
 	context "context"
+
 	domain "display_parser/internal/domain"
 
 	mock "github.com/stretchr/testify/mock"
@@ -76,13 +77,13 @@ func (_c *PageRepository_All_Call) RunAndReturn(run func(context.Context) ([]dom
 	return _c
 }
 
-// Create provides a mock function with given fields: ctx, doc
-func (_m *PageRepository) Create(ctx context.Context, doc domain.PageEntity) error {
-	ret := _m.Called(ctx, doc)
+// Create provides a mock function with given fields: ctx, page
+func (_m *PageRepository) Create(ctx context.Context, page domain.PageEntity) error {
+	ret := _m.Called(ctx, page)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, domain.PageEntity) error); ok {
-		r0 = rf(ctx, doc)
+		r0 = rf(ctx, page)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -97,12 +98,12 @@ type PageRepository_Create_Call struct {
 
 // Create is a helper method to define mock.On call
 //   - ctx context.Context
-//   - doc domain.PageEntity
-func (_e *PageRepository_Expecter) Create(ctx interface{}, doc interface{}) *PageRepository_Create_Call {
-	return &PageRepository_Create_Call{Call: _e.mock.On("Create", ctx, doc)}
+//   - page domain.PageEntity
+func (_e *PageRepository_Expecter) Create(ctx interface{}, page interface{}) *PageRepository_Create_Call {
+	return &PageRepository_Create_Call{Call: _e.mock.On("Create", ctx, page)}
 }
 
-func (_c *PageRepository_Create_Call) Run(run func(ctx context.Context, doc domain.PageEntity)) *PageRepository_Create_Call {
+func (_c *PageRepository_Create_Call) Run(run func(ctx context.Context, page domain.PageEntity)) *PageRepository_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(domain.PageEntity))
 	})

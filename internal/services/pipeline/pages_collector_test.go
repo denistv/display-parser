@@ -14,6 +14,7 @@ import (
 
 	"display_parser/internal/domain"
 	"display_parser/internal/iface"
+	"display_parser/internal/iface/db"
 	"display_parser/mocks"
 )
 
@@ -44,7 +45,7 @@ func TestPageCollector_Run(t *testing.T) {
 
 	type fields struct {
 		logger     *zap.Logger
-		pageRepo   iface.PageRepository
+		pageRepo   db.PageRepository
 		httpClient iface.HTTPClient
 		cfg        PagesCollectorCfg
 	}

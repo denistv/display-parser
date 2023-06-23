@@ -7,8 +7,8 @@ import (
 
 	"github.com/doug-martin/goqu/v9"
 
-	"display_parser/internal/db"
 	"display_parser/internal/domain"
+	"display_parser/internal/iface/db"
 )
 
 type ModelRepository interface {
@@ -18,15 +18,15 @@ type ModelRepository interface {
 	All(ctx context.Context) ([]domain.ModelEntity, error)
 }
 
-func NewModel(db db.SQLDatabase) *Model {
+func NewModel(dbConn db.Pool) *Model {
 	return &Model{
-		db:    db,
+		db:    dbConn,
 		table: "models",
 	}
 }
 
 type Model struct {
-	db    db.SQLDatabase
+	db    db.Pool
 	table string
 }
 
@@ -46,11 +46,7 @@ func (d *Model) Find(ctx context.Context, url string) (domain.ModelEntity, bool,
 		return domain.ModelEntity{}, false, fmt.Errorf("make query: %w", err)
 	}
 
-	row := d.db.QueryRowContext(ctx, query, params...)
-	if row.Err() != nil {
-		return domain.ModelEntity{}, false, fmt.Errorf("exec query: %w", err)
-	}
-
+	row := d.db.QueryRow(ctx, query, params...)
 	err = row.Scan(&model.ID, &model.URL, &model.Brand, &model.Series, &model.Name, &model.Year, &model.Size, &model.PPI, &model.CreatedAt, &model.UpdatedAt)
 	if err != nil {
 		return domain.ModelEntity{}, false, fmt.Errorf("scan: %w", err)
@@ -69,7 +65,7 @@ func (d *Model) Create(ctx context.Context, item domain.ModelEntity) error {
 		return fmt.Errorf("make query: %w", err)
 	}
 
-	if _, err = d.db.ExecContext(ctx, query, params...); err != nil {
+	if _, err = d.db.Exec(ctx, query, params...); err != nil {
 		return fmt.Errorf("exec query: %w", err)
 	}
 
@@ -88,7 +84,7 @@ func (d *Model) Update(ctx context.Context, item domain.ModelEntity) error {
 		return fmt.Errorf("making sql query: %w", err)
 	}
 
-	_, err = d.db.ExecContext(ctx, query, params...)
+	_, err = d.db.Exec(ctx, query, params...)
 	if err != nil {
 		return fmt.Errorf("exec query: %w", err)
 	}
@@ -104,7 +100,7 @@ func (d *Model) All(ctx context.Context) ([]domain.ModelEntity, error) {
 		return nil, fmt.Errorf("make query: %w", err)
 	}
 
-	rows, err := d.db.QueryContext(ctx, query, params...)
+	rows, err := d.db.Query(ctx, query, params...)
 	if err != nil {
 		return nil, fmt.Errorf("exec query: %w", err)
 	}

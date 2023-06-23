@@ -1,4 +1,4 @@
-package iface
+package db
 
 import (
 	"context"

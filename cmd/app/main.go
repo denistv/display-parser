@@ -7,9 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/doug-martin/goqu/v9"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 
 	"display_parser/internal/app"
@@ -42,18 +40,16 @@ func main() {
 		os.Exit(app.UnexpectedErrCode)
 	}
 
-	const dbDriver = "postgres"
-
-	sqlxConn, err := sqlx.Connect(dbDriver, cfg.DB.ConnStringSQLX())
+	dbpool, err := pgxpool.New(context.Background(), cfg.DB.ConnString())
 	if err != nil {
-		logger.Fatal(err.Error())
+		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
+		os.Exit(1)
 	}
-
-	goquDB := goqu.New(dbDriver, sqlxConn)
+	defer dbpool.Close()
 
 	// Repositories
-	pageRepo := repository.NewPage(goquDB)
-	modelsRepo := repository.NewModel(sqlxConn)
+	pageRepo := repository.NewPage(dbpool)
+	modelsRepo := repository.NewModel(dbpool)
 
 	httpClient := services.NewDefaultHTTPClient(cfg.HTTP.Timeout)
 	delayedHTTPClient := services.NewDelayedHTTPClient(ctx, cfg.HTTP.DelayPerRequest, httpClient)

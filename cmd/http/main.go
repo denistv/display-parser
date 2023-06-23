@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -8,8 +9,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 
 	"display_parser/cmd/http/controllers"
@@ -31,12 +31,14 @@ func main() {
 		log.Fatal(fmt.Errorf("executing command: %w", err))
 	}
 
-	sqlxConn, err := sqlx.Connect("postgres", cfg.DB.ConnStringSQLX())
+	dbpool, err := pgxpool.New(context.Background(), cfg.DB.ConnString())
 	if err != nil {
-		logger.Fatal(err.Error())
+		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
+		os.Exit(1)
 	}
+	defer dbpool.Close()
 
-	modelsRepo := repository.NewModel(sqlxConn)
+	modelsRepo := repository.NewModel(dbpool)
 	modelsController := controllers.NewModelsController(logger, modelsRepo)
 
 	r := chi.NewRouter()

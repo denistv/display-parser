@@ -38,14 +38,15 @@ type HTTP struct {
 }
 
 type DB struct {
-	User     string
-	Password string
-	Hostname string
-	DBName   string
-	Port     int
+	User         string
+	Password     string
+	Hostname     string
+	DBName       string
+	Port         int
+	PoolMaxConns int
 }
 
-func (d DB) Validate() error {
+func (d *DB) Validate() error {
 	if d.Hostname == "" {
 		return errors.New("empty hostname")
 	}
@@ -62,30 +63,26 @@ func (d DB) Validate() error {
 		return errors.New("empty dbname")
 	}
 
-	if d.Port == 0 {
-		return errors.New("empty port")
+	if d.Port <= 0 {
+		return errors.New("port must be >= 0")
+	}
+
+	if d.PoolMaxConns <= 0 {
+		return errors.New("pool-max-conns must be >= 0")
 	}
 
 	return nil
 }
 
-func (d DB) ConnString() string {
+// postgres://jack:secret@pg.example.com:5432/mydb?sslmode=verify-ca&pool_max_conns=10
+func (d *DB) ConnString() string {
 	return fmt.Sprintf(
-		"postgres://%s:%s@%s:%d/%s",
+		"postgres://%s:%s@%s:%d/%s?pool_max_conns=%d",
 		d.User,
 		d.Password,
 		d.Hostname,
 		d.Port,
 		d.DBName,
-	)
-}
-
-func (d DB) ConnStringSQLX() string {
-	return fmt.Sprintf(
-		"user=%s password=%s dbname=%s host=%s sslmode=disable",
-		d.User,
-		d.Password,
-		d.DBName,
-		d.Hostname,
+		d.PoolMaxConns,
 	)
 }

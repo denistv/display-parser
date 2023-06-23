@@ -11,6 +11,7 @@ import (
 
 	"display_parser/internal/domain"
 	"display_parser/internal/iface"
+	"display_parser/internal/iface/db"
 )
 
 type PagesCollectorCfg struct {
@@ -29,7 +30,7 @@ func (p PagesCollectorCfg) Validate() error {
 	return nil
 }
 
-func NewPageCollector(logger *zap.Logger, pageRepo iface.PageRepository, httpClient iface.HTTPClient, cfg PagesCollectorCfg) *PageCollector {
+func NewPageCollector(logger *zap.Logger, pageRepo db.PageRepository, httpClient iface.HTTPClient, cfg PagesCollectorCfg) *PageCollector {
 	return &PageCollector{
 		logger:     logger,
 		pageRepo:   pageRepo,
@@ -41,7 +42,7 @@ func NewPageCollector(logger *zap.Logger, pageRepo iface.PageRepository, httpCli
 // PageCollector Слушает канал с URL моделей устройств и для каждого URL загружает документ с описанием модели
 type PageCollector struct {
 	logger     *zap.Logger
-	pageRepo   iface.PageRepository
+	pageRepo   db.PageRepository
 	httpClient iface.HTTPClient
 	cfg        PagesCollectorCfg
 }
