@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/doug-martin/goqu/v9"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jmoiron/sqlx"
@@ -37,8 +36,7 @@ func main() {
 		logger.Fatal(err.Error())
 	}
 
-	goquDB := goqu.New("postgres", sqlxConn)
-	modelsRepo := repository.NewModel(goquDB)
+	modelsRepo := repository.NewModel(sqlxConn)
 	modelsController := controllers.NewModelsController(logger, modelsRepo)
 
 	r := chi.NewRouter()

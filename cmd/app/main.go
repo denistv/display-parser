@@ -53,7 +53,7 @@ func main() {
 
 	// Repositories
 	pageRepo := repository.NewPage(goquDB)
-	modelsRepo := repository.NewModel(goquDB)
+	modelsRepo := repository.NewModel(sqlxConn)
 
 	httpClient := services.NewDefaultHTTPClient(cfg.HTTP.Timeout)
 	delayedHTTPClient := services.NewDelayedHTTPClient(ctx, cfg.HTTP.DelayPerRequest, httpClient)

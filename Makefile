@@ -43,16 +43,14 @@ run-http:
 .PHONY: run-page-cache
 run-page-cache:
 	bin/app \
-		--http-timeout=30s \
-		--http-delay-per-request=500ms \
 		--db-user=display_parser \
 		--db-password=display_parser \
 		--db-hostname=localhost \
 		--db-port=5432 \
 		--db-name=display_parser \
 		--pipeline-use-stored-pages-only=true \
-		--pipeline-model-parser-count=10 \
-		--pipeline-page-collector-count=10
+		--pipeline-model-parser-count=1 \
+		--pipeline-page-collector-count=1
 
 ### Dev
 .PHONY: test
