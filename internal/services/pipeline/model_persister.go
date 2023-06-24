@@ -26,7 +26,6 @@ func (m *ModelPersister) Run(ctx context.Context, modelChan <-chan domain.ModelE
 	done := make(chan struct{})
 
 	go func() {
-		// выходной канал закрывается в случае, если опустошился входной канал или если в контексте прилетела отмена
 		defer close(done)
 
 		for {
