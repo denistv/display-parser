@@ -29,6 +29,7 @@ services:
       - --db-hostname=postgres
       - --db-port=5432
       - --db-name=display_parser
+      - --cors-allowed-origin=http://localhost:8080
 
   swagger-ui:
     image: swaggerapi/swagger-ui

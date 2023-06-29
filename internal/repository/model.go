@@ -166,7 +166,7 @@ func (d *Model) All(ctx context.Context, mq ModelQuery) ([]domain.ModelEntity, e
 		return nil, fmt.Errorf("validating model query: %w", err)
 	}
 
-	var out []domain.ModelEntity
+	out := make([]domain.ModelEntity, 0)
 
 	q := goqu.
 		Select(selectFields()...).

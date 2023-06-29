@@ -4,6 +4,7 @@ import (
 	"display_parser/internal/config/service_cfg"
 	"errors"
 	"fmt"
+	"net/url"
 )
 
 func NewHTTPConfig() HTTPConfig {
@@ -11,8 +12,9 @@ func NewHTTPConfig() HTTPConfig {
 }
 
 type HTTPConfig struct {
-	DB         service_cfg.DB
-	ListenPort int
+	DB                service_cfg.DB
+	ListenPort        int
+	CORSAllowedOrigin string
 }
 
 func (h *HTTPConfig) Validate() error {
@@ -22,6 +24,12 @@ func (h *HTTPConfig) Validate() error {
 
 	if h.ListenPort <= 0 {
 		return errors.New("listen port must be > 0")
+	}
+
+	if h.CORSAllowedOrigin != "" {
+		if _, err := url.Parse(h.CORSAllowedOrigin); err != nil {
+			return fmt.Errorf("parsing cors allowed origin: %w", err)
+		}
 	}
 
 	return nil

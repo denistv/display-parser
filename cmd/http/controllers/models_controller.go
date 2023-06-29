@@ -23,13 +23,13 @@ type ModelsController struct {
 	repo   repository.ModelRepository
 }
 
-// newModelQuery создает экземпляр структуры, заполняя ее данными из параметров запроса
+// parseModelQuery создает экземпляр структуры, заполняя ее данными из параметров запроса
 // Прячем в подобных конструкторах всю подобную внутрянку в пакете `controllers`.
 // Таким образом, слой с http-стаффом и слой с репозиториями разделены и не мешают друг другу.
 // Более высокоуровневый пакет содержащий репозитории БД ничего не знает про низкоуровневый пакет с HTTP-контроллераи,
 // но пакет с http-контроллерами использует структуры пакета репозиториев и знает как заполнить его структуры
 // запросов данными.
-func newModelQuery(r *http.Request) (repository.ModelQuery, error) {
+func parseModelQuery(r *http.Request) (repository.ModelQuery, error) {
 	var err error
 
 	mq := repository.NewModelQuery()
@@ -85,16 +85,12 @@ func newModelQuery(r *http.Request) (repository.ModelQuery, error) {
 		mq.SizeTo.Valid = true
 	}
 
-	if err = mq.Validate(); err != nil {
-		return repository.ModelQuery{}, fmt.Errorf("validating model query: %w", err)
-	}
-
 	return mq, nil
 }
 
 func (m *ModelsController) ModelsIndex(w http.ResponseWriter, r *http.Request) {
 	// todo populate params
-	mq, err := newModelQuery(r)
+	mq, err := parseModelQuery(r)
 	if err != nil {
 		m.logger.Error(err.Error())
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)

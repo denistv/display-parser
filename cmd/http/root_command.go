@@ -20,6 +20,7 @@ func newRootCommand(cfg *config.HTTPConfig) *cobra.Command {
 	rootCmd.PersistentFlags().IntVar(&cfg.DB.PoolMaxConns, "db-pool-max-conns", 3, "")
 
 	rootCmd.PersistentFlags().IntVar(&cfg.ListenPort, "listen-port", 3000, "")
+	rootCmd.PersistentFlags().StringVar(&cfg.CORSAllowedOrigin, "cors-allowed-origin", "", "")
 
 	viper.AutomaticEnv()
 

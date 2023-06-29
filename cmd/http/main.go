@@ -38,8 +38,7 @@ func main() {
 
 	dbpool, err := pgxpool.New(context.Background(), cfg.DB.ConnString())
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to create connection pool: %v\n", err)
-		os.Exit(1)
+		logger.Fatal(fmt.Errorf("unable to create connection pool: %w", err).Error())
 	}
 	defer dbpool.Close()
 
@@ -49,14 +48,16 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	// Для корректной работы swagger-ui, который работает в браузере на другом порту
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"http://localhost:8080"},
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders: []string{"Link"},
-		MaxAge:         300, // Maximum value not ignored by any of major browsers
-	}))
+	if cfg.CORSAllowedOrigin != "" {
+		// Для корректной работы swagger-ui, который работает в браузере на другом порту
+		r.Use(cors.Handler(cors.Options{
+			AllowedOrigins: []string{cfg.CORSAllowedOrigin},
+			AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			ExposedHeaders: []string{"Link"},
+			MaxAge:         300, // Maximum value not ignored by any of major browsers
+		}))
+	}
 
 	r.Get("/models", modelsController.ModelsIndex)
 
