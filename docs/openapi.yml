@@ -1,15 +1,13 @@
 openapi: "3.1.0"
 info:
-  title: Sample API
-  description: API description in Markdown.
+  title: Display parser
+  description: API для поиска подходящих моделей мониторов
   version: 1.0.0
 
 servers:
   - url: http://localhost:3000
     description: localhost server
     default: 3000
-
-  - url: http://http:3000
 
 paths:
   /models:
@@ -25,12 +23,14 @@ paths:
           required: false
           schema:
             type: integer
+          minimum: 1
+          maximum: 1000
         - name: brand
           in: query
           description: Поиск по точному названию
           required: false
           schema:
-            type: string
+            "$ref": "#/components/schemas/brand"
 
         - name: ppi-from
           in: query
@@ -78,24 +78,131 @@ paths:
               schema:
                 type: array
                 items:
-                  - "$ref": "#/components/schemas/model"
-
-
+                  "$ref": "#/components/schemas/model"
+        400:
+          description: Проблема в параметрах запроса, необходимо прочекать корректность фильтров (например, пары from-to), диапазоны значений
+        500:
+          description: Внутренняя ошибка сервера
 components:
   schemas:
     model:
       type: object
       properties:
-        id:
+        ID:
           type: integer
-        created_at:
+        URL:
+          type: string
+          format: uri
+        Brand:
+          type: string
+        Series:
+          type: string
+        Name:
+          type: string
+        Year:
+          type: integer
+        PPI:
+          type: integer
+        Size:
+          type: integer
+        CreatedAt:
           type: string
           format: time
-        updated_at:
+        UpdatedAt:
           type: string
           format: time
-
-      required:
-        - id
-        - created_at
-        - updated_at
+      example:
+        ID: 51360
+        URL: "https://www.displayspecifications.com/en/model/ef652ae9"
+        Brand: "Apple"
+        Series: ""
+        Name      : "Studio Display"
+        Year: 2022
+        Size: 27
+        PPI: 217
+        CreatedAt: "2023-06-23T14:20:07.946822+03:00"
+        UpdatedAt: "0001-01-01T02:30:17+02:30"
+    brand:
+      type: string
+      enum:
+        - AOC
+        - AOpen
+        - ASRock
+        - Acer
+        - Amazon
+        - Apple
+        - Asus
+        - BOE
+        - Bang & Olufsen
+        - BenQ
+        - Continental Edison
+        - Cooler Master
+        - Corsair
+        - Dell
+        - Denver
+        - Dough
+        - EIZO
+        - Edenwood
+        - Eve
+        - Fujitsu
+        - Gamemax
+        - Gigabyte
+        - Grundig
+        - HKC
+        - HP
+        - Haier
+        - Hannspree
+        - Hisense
+        - Hitachi
+        - Huawei
+        - Hyundai
+        - Iiyama
+        - Insignia
+        - JVC
+        - KTC
+        - Konka
+        - LG
+        - LeEco
+        - Lenovo
+        - Loewe
+        - MSI
+        - Medion
+        - Metz
+        - Metz Blue
+        - Monoprice
+        - Motorola
+        - NEC
+        - NZXT
+        - Nevir
+        - Nixeus
+        - Nokia
+        - OK.
+        - OnePlus
+        - Oppo
+        - Ozone
+        - Panasonic
+        - Philips
+        - Pixio
+        - QNIX
+        - RCA
+        - Razer
+        - Realme
+        - Redmi
+        - Samsung
+        - Sceptre
+        - Sharp
+        - Skyworth
+        - Sony
+        - TCL
+        - Telefunken
+        - Terra
+        - Thomson
+        - Toshiba
+        - Vestel
+        - VideoSeven
+        - ViewSonic
+        - Viotek
+        - Vizio
+        - Wasabi Mango
+        - Xiaomi
+        - Yashi
