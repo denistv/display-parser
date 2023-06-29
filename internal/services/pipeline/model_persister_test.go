@@ -25,7 +25,7 @@ func TestModelPersister_Run(t *testing.T) {
 		args        args
 	}{
 		{
-			name: "new entity",
+			name: "create new entity",
 			args: args{
 				in: func() <-chan domain.ModelEntity {
 					ch := make(chan domain.ModelEntity)
@@ -54,7 +54,7 @@ func TestModelPersister_Run(t *testing.T) {
 			},
 		},
 		{
-			name: "existing entity",
+			name: "update existing entity",
 			args: args{
 				in: func() <-chan domain.ModelEntity {
 					ch := make(chan domain.ModelEntity, 1)

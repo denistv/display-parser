@@ -1,0 +1,101 @@
+openapi: "3.1.0"
+info:
+  title: Sample API
+  description: API description in Markdown.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: localhost server
+    default: 3000
+
+  - url: http://http:3000
+
+paths:
+  /models:
+    get:
+      summary: Returns a list of models.
+      description: Optional extended description in Markdown.
+      produces:
+        - application/json
+      parameters:
+        - name: limit
+          in: query
+          description: Ограничить выборку n-записями. По-умолчанию = 100
+          required: false
+          schema:
+            type: integer
+        - name: brand
+          in: query
+          description: Поиск по точному названию
+          required: false
+          schema:
+            type: string
+
+        - name: ppi-from
+          in: query
+          description: Число точек на дюйм
+          required: false
+          schema:
+            type: integer
+        - name: ppi-to
+          in: query
+          description: Число точек на дюйм
+          required: false
+          schema:
+            type: integer
+
+        - name: size-from
+          in: query
+          description: Диагональ экрана (десятичная дробь)
+          required: false
+          schema:
+            type: number
+        - name: size-to
+          in: query
+          description: Диагональ экрана (десятичная дробь)
+          required: false
+          schema:
+            type: number
+
+        - name: year-from
+          in: query
+          description: Год выпуска
+          required: false
+          schema:
+            type: number
+        - name: year-to
+          in: query
+          description: Год выпуска
+          required: false
+          schema:
+            type: number
+      responses:
+        200:
+          description: OK
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  - "$ref": "#/components/schemas/model"
+
+
+components:
+  schemas:
+    model:
+      type: object
+      properties:
+        id:
+          type: integer
+        created_at:
+          type: string
+          format: time
+        updated_at:
+          type: string
+          format: time
+
+      required:
+        - id
+        - created_at
+        - updated_at

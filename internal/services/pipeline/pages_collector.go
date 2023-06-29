@@ -9,28 +9,13 @@ import (
 
 	"go.uber.org/zap"
 
+	"display_parser/internal/config/service_cfg"
 	"display_parser/internal/domain"
 	"display_parser/internal/iface"
 	"display_parser/internal/iface/db"
 )
 
-type PagesCollectorCfg struct {
-	Count int
-	// Пересобрать модели на основе кэша страниц в базе. Если флаг взведен, не ходим во внешний сервис для сбора данных и используем имеющийся кэш страниц в БД.
-	// Полезно в тех случаях, когда сайт спаршен (данные страниц сохранены в кэше в таблице pages, но сущность модели расширена дополнительным полем.
-	// Чтобы не собирать все данные по новой через сеть, используем сохраненные в базу страницы и перераспаршиваем их, обновляя сущности моделей).
-	UseStoredPagesOnly bool
-}
-
-func (p PagesCollectorCfg) Validate() error {
-	if p.Count <= 0 {
-		return errors.New("count must be > 0")
-	}
-
-	return nil
-}
-
-func NewPageCollector(logger *zap.Logger, pageRepo db.PageRepository, httpClient iface.HTTPClient, cfg PagesCollectorCfg) *PageCollector {
+func NewPageCollector(logger *zap.Logger, pageRepo db.PageRepository, httpClient iface.HTTPClient, cfg service_cfg.PagesCollectorCfg) *PageCollector {
 	return &PageCollector{
 		logger:     logger,
 		pageRepo:   pageRepo,
@@ -44,7 +29,7 @@ type PageCollector struct {
 	logger     *zap.Logger
 	pageRepo   db.PageRepository
 	httpClient iface.HTTPClient
-	cfg        PagesCollectorCfg
+	cfg        service_cfg.PagesCollectorCfg
 }
 
 func (d *PageCollector) Run(ctx context.Context, in <-chan string) <-chan domain.PageEntity {

@@ -20,7 +20,7 @@ build: vendor test
 run:
 	bin/app \
 		--http-timeout=30s \
-		--http-delay-per-request=1s \
+		--http-delay-per-request=3s \
 		--db-user=display_parser \
 		--db-password=display_parser \
 		--db-hostname=localhost \
@@ -52,6 +52,9 @@ run-page-cache:
 		--pipeline-model-parser-count=1 \
 		--pipeline-page-collector-count=1
 
+.PHONY: run-swagger-ui
+run-swagger-ui:
+	sudo docker run --rm -p 80:8080 -e SWAGGER_JSON=/openapi.yml -v $$(pwd)/docs/openapi.yml:/openapi.yml swaggerapi/swagger-ui
 ### Dev
 .PHONY: test
 test: vendor

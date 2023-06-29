@@ -1,14 +1,14 @@
 package main
 
 import (
-	"display_parser/internal/app"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"display_parser/internal/config"
 )
 
 // nolint
-func newRootCommand(cfg *app.Config) *cobra.Command {
+func newRootCommand(cfg *config.HTTPConfig) *cobra.Command {
 	rootCmd := cobra.Command{}
 
 	// Database
@@ -18,6 +18,8 @@ func newRootCommand(cfg *app.Config) *cobra.Command {
 	rootCmd.PersistentFlags().StringVar(&cfg.DB.Hostname, "db-hostname", "localhost", "")
 	rootCmd.PersistentFlags().IntVar(&cfg.DB.Port, "db-port", 5432, "")
 	rootCmd.PersistentFlags().IntVar(&cfg.DB.PoolMaxConns, "db-pool-max-conns", 3, "")
+
+	rootCmd.PersistentFlags().IntVar(&cfg.ListenPort, "listen-port", 3000, "")
 
 	viper.AutomaticEnv()
 

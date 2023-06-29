@@ -10,20 +10,20 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 
-	"display_parser/internal/app"
+	"display_parser/internal/config"
 	"display_parser/internal/repository"
 	"display_parser/internal/services"
 	"display_parser/internal/services/pipeline"
 )
 
 func main() {
-	cfg := app.NewConfig()
+	cfg := config.NewAppConfig()
 	rootCmd := newRootCommand(&cfg)
 
 	err := rootCmd.Execute()
 	if err != nil {
 		fmt.Println(err.Error())
-		os.Exit(app.UnexpectedErrCode)
+		os.Exit(config.UNIXDefaultErrCode)
 	}
 
 	// Создаем контекст с отменой для реализации graceful-shutdown и в дальнейшем передаем его в сервисы приложения.
@@ -37,7 +37,7 @@ func main() {
 	logger, err := zap.NewDevelopment()
 	if err != nil {
 		fmt.Println(err.Error())
-		os.Exit(app.UnexpectedErrCode)
+		os.Exit(config.UNIXDefaultErrCode)
 	}
 
 	dbpool, err := pgxpool.New(context.Background(), cfg.DB.ConnString())

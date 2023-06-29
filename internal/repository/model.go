@@ -2,20 +2,21 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
-	"github.com/doug-martin/goqu/v9"
-
 	"display_parser/internal/domain"
 	"display_parser/internal/iface/db"
+	"github.com/doug-martin/goqu/v9"
+	"gopkg.in/guregu/null.v4"
 )
 
 type ModelRepository interface {
 	Find(ctx context.Context, url string) (domain.ModelEntity, bool, error)
 	Create(ctx context.Context, item domain.ModelEntity) error
 	Update(ctx context.Context, item domain.ModelEntity) error
-	All(ctx context.Context) ([]domain.ModelEntity, error)
+	All(ctx context.Context, modelQuery ModelQuery) ([]domain.ModelEntity, error)
 }
 
 func NewModel(dbConn db.Pool) *Model {
@@ -92,10 +93,113 @@ func (d *Model) Update(ctx context.Context, item domain.ModelEntity) error {
 	return nil
 }
 
-func (d *Model) All(ctx context.Context) ([]domain.ModelEntity, error) {
+const selectLimitDefault = 100
+
+func NewModelQuery() ModelQuery {
+	return ModelQuery{
+		Limit: null.NewInt(selectLimitDefault, true),
+	}
+}
+
+// ModelQuery Позволяет кастомизовать запрос в репозиторий, например, из http-контроллера
+type ModelQuery struct {
+	Limit null.Int
+	Brand null.String
+
+	SizeFrom null.Float
+	SizeTo   null.Float
+
+	PPIFrom null.Int
+	PPITo   null.Int
+
+	YearFrom null.Int
+	YearTo   null.Int
+}
+
+func (m *ModelQuery) Validate() error {
+	if m.Limit.Valid && m.Limit.Int64 <= 0 {
+		return errors.New("limit must be > 0")
+	}
+
+	if m.Brand.Valid && m.Brand.String == "" {
+		return errors.New("brand cannot be empty string")
+	}
+
+	if m.SizeFrom.Valid && m.SizeFrom.Float64 <= 0 {
+		return errors.New("size must be > 0.0")
+	}
+	if m.SizeTo.Valid && m.SizeTo.Float64 <= 0 {
+		return errors.New("size must be > 0.0")
+	}
+	if (m.SizeFrom.Valid && m.SizeTo.Valid) && m.SizeTo.Float64 < m.SizeFrom.Float64 {
+		return errors.New("size-to must greater than size-from")
+	}
+
+	if m.YearFrom.Valid && m.YearFrom.Int64 <= 0 {
+		return errors.New("year must be > 0")
+	}
+	if m.YearTo.Valid && m.YearTo.Int64 <= 0 {
+		return errors.New("year must be > 0")
+	}
+	if (m.YearFrom.Valid && m.YearTo.Valid) && m.YearTo.Int64 < m.YearFrom.Int64 {
+		return errors.New("year-to must greater than year-from")
+	}
+
+	if m.PPIFrom.Valid && m.PPIFrom.Int64 <= 0 {
+		return errors.New("ppi must be > 0")
+	}
+	if m.PPITo.Valid && m.PPITo.Int64 <= 0 {
+		return errors.New("ppi must be > 0")
+	}
+	if m.PPIFrom.Valid && m.PPIFrom.Int64 <= 0 {
+		return errors.New("ppi must be > 0")
+	}
+	if (m.PPIFrom.Valid && m.PPITo.Valid) && m.PPITo.Int64 < m.PPIFrom.Int64 {
+		return errors.New("ppi-to must greater than ppi-from")
+	}
+
+	return nil
+}
+
+func (d *Model) All(ctx context.Context, mq ModelQuery) ([]domain.ModelEntity, error) {
+	if err := mq.Validate(); err != nil {
+		return nil, fmt.Errorf("validating model query: %w", err)
+	}
+
 	var out []domain.ModelEntity
 
-	query, params, err := goqu.Select(selectFields()...).From(d.table).ToSQL()
+	q := goqu.
+		Select(selectFields()...).
+		From(d.table)
+	if mq.Limit.Valid {
+		q = q.Limit(uint(mq.Limit.Int64))
+	}
+	if mq.Brand.Valid {
+		q = q.Where(goqu.C("brand").Eq(mq.Brand.String))
+	}
+
+	if mq.YearFrom.Valid {
+		q = q.Where(goqu.C("year").Gte(mq.YearFrom.Int64))
+	}
+	if mq.YearTo.Valid {
+		q = q.Where(goqu.C("year").Lte(mq.YearTo.Int64))
+	}
+
+	if mq.SizeFrom.Valid {
+		q = q.Where(goqu.C("size").Gte(mq.SizeFrom.Float64))
+	}
+	if mq.SizeTo.Valid {
+		q = q.Where(goqu.C("size").Lte(mq.SizeTo.Float64))
+	}
+
+	if mq.PPIFrom.Valid {
+		q = q.Where(goqu.C("ppi").Gte(mq.PPIFrom.Int64))
+	}
+	if mq.PPITo.Valid {
+		q = q.Where(goqu.C("ppi").Lte(mq.PPITo.Int64))
+	}
+
+	query, params, err := q.ToSQL()
 	if err != nil {
 		return nil, fmt.Errorf("make query: %w", err)
 	}

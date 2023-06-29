@@ -3,6 +3,7 @@ package pipeline
 import (
 	"bytes"
 	"context"
+	"display_parser/internal/config/service_cfg"
 	"io"
 	"net/http"
 	"os"
@@ -47,7 +48,7 @@ func TestPageCollector_Run(t *testing.T) {
 		logger     *zap.Logger
 		pageRepo   db.PageRepository
 		httpClient iface.HTTPClient
-		cfg        PagesCollectorCfg
+		cfg        service_cfg.PagesCollectorCfg
 	}
 
 	tests := []struct {
@@ -61,7 +62,7 @@ func TestPageCollector_Run(t *testing.T) {
 				logger:     zap.NewNop(),
 				pageRepo:   pageRepo,
 				httpClient: c,
-				cfg:        PagesCollectorCfg{},
+				cfg:        service_cfg.PagesCollectorCfg{},
 			},
 			want: []domain.PageEntity{
 				{

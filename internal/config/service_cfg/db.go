@@ -1,41 +1,9 @@
-package app
+package service_cfg
 
 import (
 	"errors"
 	"fmt"
-	"time"
-
-	"display_parser/internal/services/pipeline"
 )
-
-func NewConfig() Config {
-	return Config{}
-}
-
-type Config struct {
-	HTTP     HTTP
-	DB       DB
-	Pipeline pipeline.Cfg
-}
-
-func (c *Config) Validate() error {
-	if err := c.DB.Validate(); err != nil {
-		return fmt.Errorf("validating db config: %w", err)
-	}
-
-	if err := c.Pipeline.Validate(); err != nil {
-		return fmt.Errorf("validating pipeline config: %w", err)
-	}
-
-	return nil
-}
-
-type HTTP struct {
-	// Задержка между HTTP-запросами в сервис
-	// Если не использовать ограничений, сервис забанит вас на какое-то время.
-	Timeout         time.Duration
-	DelayPerRequest time.Duration
-}
 
 type DB struct {
 	User         string

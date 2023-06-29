@@ -5,6 +5,7 @@ package mocks
 import (
 	context "context"
 	domain "display_parser/internal/domain"
+	"display_parser/internal/repository"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -23,7 +24,7 @@ func (_m *ModelRepository) EXPECT() *ModelRepository_Expecter {
 }
 
 // All provides a mock function with given fields: ctx
-func (_m *ModelRepository) All(ctx context.Context) ([]domain.ModelEntity, error) {
+func (_m *ModelRepository) All(ctx context.Context, modelQuery repository.ModelQuery) ([]domain.ModelEntity, error) {
 	ret := _m.Called(ctx)
 
 	var r0 []domain.ModelEntity

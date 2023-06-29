@@ -2,34 +2,17 @@ package pipeline
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sync"
 
 	"go.uber.org/zap"
 
+	"display_parser/internal/config/service_cfg"
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
 )
 
-type Cfg struct {
-	ModelParserCount int
-	PageCollector    PagesCollectorCfg
-}
-
-func (c *Cfg) Validate() error {
-	if c.ModelParserCount <= 0 {
-		return errors.New("parser count must be leather than 0")
-	}
-
-	if err := c.PageCollector.Validate(); err != nil {
-		return fmt.Errorf("validating page collector config: %w", err)
-	}
-
-	return nil
-}
-
-func NewPipeline(cfg Cfg, brandsCollector *BrandsCollector, pagesColl *PageCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger, pageRepo *repository.Page, modelPersister *ModelPersister) *Pipeline {
+func NewPipeline(cfg service_cfg.Pipeline, brandsCollector *BrandsCollector, pagesColl *PageCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger, pageRepo *repository.Page, modelPersister *ModelPersister) *Pipeline {
 	return &Pipeline{
 		cfg:            cfg,
 		logger:         logger,
@@ -45,7 +28,7 @@ func NewPipeline(cfg Cfg, brandsCollector *BrandsCollector, pagesColl *PageColle
 // Pipeline представляет собой сущность, которая связывает шаги пайплайна и централизовано управляет его жизненным циклом.
 type Pipeline struct {
 	logger         *zap.Logger
-	cfg            Cfg
+	cfg            service_cfg.Pipeline
 	brandsColl     *BrandsCollector
 	modelsURLColl  *ModelsURLCollector
 	pagesColl      *PageCollector

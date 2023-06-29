@@ -6,13 +6,13 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"display_parser/internal/app"
+	"display_parser/internal/config"
 )
 
 // В этом проекте не задействуется вся функциональность cobra.
 // На данном этапе мне достаточно возможности удобной работы с параметрами (отображение справки, парсинг флагов из CLI и ENV)
 // nolint
-func newRootCommand(cfg *app.Config) *cobra.Command {
+func newRootCommand(cfg *config.AppConfig) *cobra.Command {
 	rootCmd := cobra.Command{}
 
 	// Common flags

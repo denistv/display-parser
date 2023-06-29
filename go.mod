@@ -7,12 +7,13 @@ require (
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.8
+	github.com/go-chi/cors v1.2.1
 	github.com/jackc/pgx/v5 v5.4.1
-	github.com/jmoiron/sqlx v1.3.5
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.16.0
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.21.0
+	gopkg.in/guregu/null.v4 v4.0.0
 )
 
 require (

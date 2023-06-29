@@ -23,19 +23,31 @@ services:
     ports:
       - "3000:3000"
     command:
-      - make
-      - run-http
-  app:
-    image: display_parser-app
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: app-image
-    depends_on:
-      - postgres
-    links:
-      - postgres:postgres
-    command:
-      - make
-      - run
+      - bin/http
+      - --db-user=display_parser
+      - --db-password=display_parser
+      - --db-hostname=postgres
+      - --db-port=5432
+      - --db-name=display_parser
 
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    volumes:
+      - ./docs/openapi.yml:/openapi.yml
+    environment:
+      SWAGGER_JSON: /openapi.yml
+    ports:
+      - 8080:8080
+#  app:
+#    image: display_parser-app
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#      target: app-image
+#    depends_on:
+#      - postgres
+#    links:
+#      - postgres:postgres
+#    command:
+#      - make
+#      - run
