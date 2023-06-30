@@ -97,6 +97,12 @@ func (m *ModelsController) ModelsIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err = mq.Validate(); err != nil {
+		m.logger.Error(err.Error())
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
 	all, err := m.repo.All(r.Context(), mq)
 	if err != nil {
 		m.logger.Error(err.Error())

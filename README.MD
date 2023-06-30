@@ -142,6 +142,111 @@ display_parser-app       latest    514a5debf071   4 minutes ago       20.6MB
 Применение пайплайнов оправдано не во всех задачах, поэтому данный код нужно воспринимать лишь как демонстрацию подхода.
 **TODO** подумать над формулировкой  первого предложения
 
+# Тесты
+```shell
+$ make test
+go mod vendor
+go clean -testcache
+go test -v ./...
+?       display_parser/cmd/app  [no test files]
+?       display_parser/cmd/http [no test files]
+?       display_parser/internal/config  [no test files]
+?       display_parser/internal/config/service_cfg      [no test files]
+?       display_parser/internal/domain  [no test files]
+?       display_parser/internal/iface   [no test files]
+?       display_parser/internal/iface/db        [no test files]
+?       display_parser/internal/services        [no test files]
+=== RUN   Test_parseModelQuery
+=== RUN   Test_parseModelQuery/parse_year-from
+=== RUN   Test_parseModelQuery/parse_year-to
+=== RUN   Test_parseModelQuery/parse_size-from
+=== RUN   Test_parseModelQuery/parse_size-to
+=== RUN   Test_parseModelQuery/parse_incorrect_size-to
+--- PASS: Test_parseModelQuery (0.00s)
+    --- PASS: Test_parseModelQuery/parse_year-from (0.00s)
+    --- PASS: Test_parseModelQuery/parse_year-to (0.00s)
+    --- PASS: Test_parseModelQuery/parse_size-from (0.00s)
+    --- PASS: Test_parseModelQuery/parse_size-to (0.00s)
+    --- PASS: Test_parseModelQuery/parse_incorrect_size-to (0.00s)
+PASS
+ok      display_parser/cmd/http/controllers     0.002s
+=== RUN   TestModelQuery_Validate
+=== RUN   TestModelQuery_Validate/correct_year-from/year-to
+=== RUN   TestModelQuery_Validate/incorrect_year-from_>_year-to
+=== RUN   TestModelQuery_Validate/year-from_<_0
+=== RUN   TestModelQuery_Validate/year-to_<_0
+=== RUN   TestModelQuery_Validate/correct_ppi-from/ppi-to
+=== RUN   TestModelQuery_Validate/incorrect_ppi-from_>_ppi-to
+=== RUN   TestModelQuery_Validate/ppi-from_<_0
+=== RUN   TestModelQuery_Validate/ppi-to_<_0
+=== RUN   TestModelQuery_Validate/correct_size-from/size-to
+=== RUN   TestModelQuery_Validate/size-from_>_size-to
+=== RUN   TestModelQuery_Validate/size-from_<_0
+=== RUN   TestModelQuery_Validate/size-to_<_0
+=== RUN   TestModelQuery_Validate/brand_passed,_valid=true
+=== RUN   TestModelQuery_Validate/empty_brand_passed,_valid=true
+=== RUN   TestModelQuery_Validate/correct_limit_passed
+=== RUN   TestModelQuery_Validate/limit_<_0_passed
+=== RUN   TestModelQuery_Validate/limit_==_0_passed
+--- PASS: TestModelQuery_Validate (0.00s)
+    --- PASS: TestModelQuery_Validate/correct_year-from/year-to (0.00s)
+    --- PASS: TestModelQuery_Validate/incorrect_year-from_>_year-to (0.00s)
+    --- PASS: TestModelQuery_Validate/year-from_<_0 (0.00s)
+    --- PASS: TestModelQuery_Validate/year-to_<_0 (0.00s)
+    --- PASS: TestModelQuery_Validate/correct_ppi-from/ppi-to (0.00s)
+    --- PASS: TestModelQuery_Validate/incorrect_ppi-from_>_ppi-to (0.00s)
+    --- PASS: TestModelQuery_Validate/ppi-from_<_0 (0.00s)
+    --- PASS: TestModelQuery_Validate/ppi-to_<_0 (0.00s)
+    --- PASS: TestModelQuery_Validate/correct_size-from/size-to (0.00s)
+    --- PASS: TestModelQuery_Validate/size-from_>_size-to (0.00s)
+    --- PASS: TestModelQuery_Validate/size-from_<_0 (0.00s)
+    --- PASS: TestModelQuery_Validate/size-to_<_0 (0.00s)
+    --- PASS: TestModelQuery_Validate/brand_passed,_valid=true (0.00s)
+    --- PASS: TestModelQuery_Validate/empty_brand_passed,_valid=true (0.00s)
+    --- PASS: TestModelQuery_Validate/correct_limit_passed (0.00s)
+    --- PASS: TestModelQuery_Validate/limit_<_0_passed (0.00s)
+    --- PASS: TestModelQuery_Validate/limit_==_0_passed (0.00s)
+PASS
+ok      display_parser/internal/repository      0.002s
+?       display_parser/mocks    [no test files]
+=== RUN   TestBrandsCollector_Run
+=== RUN   TestBrandsCollector_Run/parsing_index_page_for_collect_brand_URLs
+=== NAME  TestBrandsCollector_Run
+    HTTPClient.go:88: PASS:     Do(mock.AnythingOfTypeArgument)
+--- PASS: TestBrandsCollector_Run (0.00s)
+    --- PASS: TestBrandsCollector_Run/parsing_index_page_for_collect_brand_URLs (0.00s)
+=== RUN   TestModelParser_parsePPI
+=== RUN   TestModelParser_parsePPI/parse_correct_PPI
+=== RUN   TestModelParser_parsePPI/parse_incorrect_PPI_--_want_error
+--- PASS: TestModelParser_parsePPI (0.00s)
+    --- PASS: TestModelParser_parsePPI/parse_correct_PPI (0.00s)
+    --- PASS: TestModelParser_parsePPI/parse_incorrect_PPI_--_want_error (0.00s)
+=== RUN   TestModelParser_parse
+=== RUN   TestModelParser_parse/full_page_parse
+--- PASS: TestModelParser_parse (0.00s)
+    --- PASS: TestModelParser_parse/full_page_parse (0.00s)
+=== RUN   TestModelPersister_Run
+=== RUN   TestModelPersister_Run/create_new_entity
+    ModelRepository.go:238: PASS:       Create(mock.AnythingOfTypeArgument,mock.AnythingOfTypeArgument)
+=== RUN   TestModelPersister_Run/update_existing_entity
+    ModelRepository.go:238: PASS:       Update(mock.AnythingOfTypeArgument,mock.AnythingOfTypeArgument)
+--- PASS: TestModelPersister_Run (0.00s)
+    --- PASS: TestModelPersister_Run/create_new_entity (0.00s)
+    --- PASS: TestModelPersister_Run/update_existing_entity (0.00s)
+=== RUN   TestPageCollector_Run
+=== RUN   TestPageCollector_Run/create_new_page
+=== NAME  TestPageCollector_Run
+    PageRepository.go:193: PASS:        Find(mock.AnythingOfTypeArgument,mock.AnythingOfTypeArgument)
+    PageRepository.go:193: PASS:        Create(mock.AnythingOfTypeArgument,mock.AnythingOfTypeArgument)
+    HTTPClient.go:88: PASS:     Do(mock.AnythingOfTypeArgument)
+--- PASS: TestPageCollector_Run (0.00s)
+    --- PASS: TestPageCollector_Run/create_new_page (0.00s)
+PASS
+ok      display_parser/internal/services/pipeline       0.006s
+
+```
+
+
 # OpenAPI
 Веб-интерфейс (Swagger-UI) доступен в рамках отдельного контейнера, запускаемого с помощью **docker-compose**.
 

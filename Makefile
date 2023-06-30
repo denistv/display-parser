@@ -58,6 +58,7 @@ run-swagger-ui:
 ### Dev
 .PHONY: test
 test: vendor
+	go clean -testcache
 	go test -v ./...
 
 .PHONY: lint
