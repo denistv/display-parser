@@ -2,7 +2,10 @@
 FROM golang:1.20 AS build
 COPY . /src
 WORKDIR /src
-RUN make build
+# Для корректной работы требуется https://docs.docker.com/build/buildkit/#getting-started
+# Необходимо для ускорения повторной сборки за счет использования кэша go-пакетов.
+# Либо убрать `--mount=type=cache,target=/go`
+RUN --mount=type=cache,target=/go make build
 
 # Промежуточный образ, на основе которого будет собран финальный
 FROM alpine:latest AS bin-image

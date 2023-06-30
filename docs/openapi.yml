@@ -14,6 +14,8 @@ paths:
     get:
       summary: Returns a list of models.
       description: Optional extended description in Markdown.
+      tags:
+        - Models
       produces:
         - application/json
       parameters:

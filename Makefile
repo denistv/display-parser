@@ -3,8 +3,8 @@ NAME=display_parser
 ### Build
 .PHONY: image
 image:
-	sudo docker build -t ${NAME}-app:latest --target=app-image -f Dockerfile .
-	sudo docker build -t ${NAME}-http:latest --target=http-image -f Dockerfile .
+	sudo DOCKER_BUILDKIT=1 docker build -t ${NAME}-app:latest --target=app-image -f Dockerfile .
+	sudo DOCKER_BUILDKIT=1 docker build -t ${NAME}-http:latest --target=http-image -f Dockerfile .
 
 .PHONY: vendor
 vendor:
