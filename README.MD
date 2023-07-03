@@ -1,9 +1,9 @@
 # Дисклеймер
 Проект представляет собой всего лишь пример кода и не претендует на то, чтобы выступать в роли эталонного проекта или примером того, как нужно делать. Ту же задачу можно решить множеством иных более простых/сложных способов. Может содержать ошибки и неоптимальные решения, которые исправляются по мере моего интереса и возможности.
 
-Если уйти в сторону от пайплайнов и обратить внимание на структуру проекта, то примерно так я бы начал строить его с чистого листа, учитывая особенности и требования.
 #### Про пайплайны.
 В реализации применяется подход с пайплайнами, но от себя скажу, что он заходит далеко не во всех задачах и за все время я сталкивался буквально с несколькими ситуациями, где его применение было действительно оправдано и не приводило к усложнению архитектуры. Поскольку данный проект носит больше учебно-развлекательный характер, здесь можно встретить различные решения, которые могут не подходить тому или иному проекту.
+
 # Предыстория
 Это реализация простого парсера сайта с моделями мониторов **displayspecifications.com**.
 
@@ -106,30 +106,17 @@ REPOSITORY               TAG       IMAGE ID       CREATED             SIZE
 display_parser-http      latest    dae82e78ed10   4 minutes ago       15.3MB
 display_parser-app       latest    514a5debf071   4 minutes ago       20.6MB
 ```
-
-# Используемые пакеты
-* mockery
-* testify
-* goqu
-* sql-migrate
-* cobra
-* zap
-* pq
-
 # TODO
 #### High:
-3. cmd's
 4. использовать ID модели в качестве PK вместо URL
-5. 
 
 #### Average
-1. REST API
-2. Swagger
 1. реализовать враппер для логгера
 2. сделать хранение параметров логгера в гошном контексте
-3. config (env, command line params)
 
 #### Low:
+- https://github.com/golang-migrate/migrate
+- функциональный тест на http-endpoint с мокнутым веб-сервером
 
 # Q&A по реализации:
 **Почему задействован пайплайн, когда можно было бы написать последовательный код, это же просто парсер?**
@@ -155,21 +142,37 @@ go test -v ./...
 ?       display_parser/internal/domain  [no test files]
 ?       display_parser/internal/iface   [no test files]
 ?       display_parser/internal/iface/db        [no test files]
-?       display_parser/internal/services        [no test files]
 === RUN   Test_parseModelQuery
 === RUN   Test_parseModelQuery/parse_year-from
 === RUN   Test_parseModelQuery/parse_year-to
+=== RUN   Test_parseModelQuery/parse_incorrect_year-from
+=== RUN   Test_parseModelQuery/parse_incorrect_year-to
 === RUN   Test_parseModelQuery/parse_size-from
 === RUN   Test_parseModelQuery/parse_size-to
 === RUN   Test_parseModelQuery/parse_incorrect_size-to
+=== RUN   Test_parseModelQuery/parse_incorrect_size-from
+=== RUN   Test_parseModelQuery/parse_ppi-from
+=== RUN   Test_parseModelQuery/parse_ppi-to
+=== RUN   Test_parseModelQuery/parse_incorrect_ppi-to
+=== RUN   Test_parseModelQuery/parse_incorrect_ppi-from
+=== RUN   Test_parseModelQuery/full_query
 --- PASS: Test_parseModelQuery (0.00s)
     --- PASS: Test_parseModelQuery/parse_year-from (0.00s)
     --- PASS: Test_parseModelQuery/parse_year-to (0.00s)
+    --- PASS: Test_parseModelQuery/parse_incorrect_year-from (0.00s)
+    --- PASS: Test_parseModelQuery/parse_incorrect_year-to (0.00s)
     --- PASS: Test_parseModelQuery/parse_size-from (0.00s)
     --- PASS: Test_parseModelQuery/parse_size-to (0.00s)
     --- PASS: Test_parseModelQuery/parse_incorrect_size-to (0.00s)
+    --- PASS: Test_parseModelQuery/parse_incorrect_size-from (0.00s)
+    --- PASS: Test_parseModelQuery/parse_ppi-from (0.00s)
+    --- PASS: Test_parseModelQuery/parse_ppi-to (0.00s)
+    --- PASS: Test_parseModelQuery/parse_incorrect_ppi-to (0.00s)
+    --- PASS: Test_parseModelQuery/parse_incorrect_ppi-from (0.00s)
+    --- PASS: Test_parseModelQuery/full_query (0.00s)
 PASS
-ok      display_parser/cmd/http/controllers     0.002s
+ok      display_parser/cmd/http/controllers     0.003s
+?       display_parser/internal/services        [no test files]
 === RUN   TestModelQuery_Validate
 === RUN   TestModelQuery_Validate/correct_year-from/year-to
 === RUN   TestModelQuery_Validate/incorrect_year-from_>_year-to
@@ -242,7 +245,7 @@ ok      display_parser/internal/repository      0.002s
 --- PASS: TestPageCollector_Run (0.00s)
     --- PASS: TestPageCollector_Run/create_new_page (0.00s)
 PASS
-ok      display_parser/internal/services/pipeline       0.006s
+ok      display_parser/internal/services/pipeline       0.007s
 
 ```
 

@@ -10,6 +10,42 @@ services:
     expose:
       - 5432
 
+  sql-migrate:
+    image: display_parser-dev-tools
+    build:
+      context: .
+      dockerfile: Dockerfile-dev-tools
+      target: sql-migrate-image
+    depends_on:
+      - postgres
+    volumes:
+      - ./dbconfig.yml:/dbconfig.yml
+      - ./migrations:/usr/local/share/migrations
+    working_dir: /usr/local/share
+    command:
+      - sql-migrate
+      - up
+      - -config=/dbconfig.yml
+
+  app:
+    image: display_parser-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: app-image
+    depends_on:
+      - postgres
+      - sql-migrate
+    links:
+      - postgres:postgres
+    command:
+      - /usr/local/bin/app
+      - --db-user=display_parser
+      - --db-password=display_parser
+      - --db-hostname=postgres
+      - --db-port=5432
+      - --db-name=display_parser
+
   http:
     image: display_parser-http
     build:
@@ -18,12 +54,13 @@ services:
       target: http-image
     depends_on:
       - postgres
+      - sql-migrate
     links:
       - postgres:postgres
     ports:
       - "3000:3000"
     command:
-      - bin/http
+      - /usr/local/bin/http
       - --db-user=display_parser
       - --db-password=display_parser
       - --db-hostname=postgres
@@ -33,22 +70,11 @@ services:
 
   swagger-ui:
     image: swaggerapi/swagger-ui
+    depends_on:
+      - http
     volumes:
       - ./docs/openapi.yml:/openapi.yml
     environment:
       SWAGGER_JSON: /openapi.yml
     ports:
       - 8080:8080
-#  app:
-#    image: display_parser-app
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#      target: app-image
-#    depends_on:
-#      - postgres
-#    links:
-#      - postgres:postgres
-#    command:
-#      - make
-#      - run

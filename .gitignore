@@ -4,6 +4,6 @@
 vendor
 *.zip
 display_parser
-docs/.$diagram.drawio.bkp
-docs/.$diagram.drawio.dtmp
+docs/.$*.bkp
+docs/.$*.dtmp
 bin

@@ -6,12 +6,16 @@ image:
 	sudo DOCKER_BUILDKIT=1 docker build -t ${NAME}-app:latest --target=app-image -f Dockerfile .
 	sudo DOCKER_BUILDKIT=1 docker build -t ${NAME}-http:latest --target=http-image -f Dockerfile .
 
+.PHONY: image-dev-tools
+image-dev-tools:
+	sudo DOCKER_BUILDKIT=1 docker build -f Dockerfile-dev-tools -t display_parser-dev-tools .
+
 .PHONY: vendor
 vendor:
 	go mod vendor
 
 .PHONY: build
-build: vendor test
+build: test
 	go build -o bin/app ./cmd/app
 	go build -o bin/http ./cmd/http
 
@@ -82,5 +86,5 @@ run-docker:
 
 .PHONY: migrate
 migrate:
-	sql-migrate up
+	sudo docker-compose run sql-migrate
 

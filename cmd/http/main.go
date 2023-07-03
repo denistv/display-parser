@@ -49,7 +49,8 @@ func main() {
 	r.Use(middleware.Logger)
 
 	if cfg.CORSAllowedOrigin != "" {
-		// Для корректной работы swagger-ui, который работает в браузере на другом порту
+		// Можем прописать URL для соответствующих CORS-заголовков для корректной работы swagger-ui, поскольку
+		// они работают на разных портах.
 		r.Use(cors.Handler(cors.Options{
 			AllowedOrigins: []string{cfg.CORSAllowedOrigin},
 			AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},

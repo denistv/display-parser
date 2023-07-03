@@ -1,7 +1,0 @@
-FROM golang:latest AS go-tools
-COPY Makefile /src/Makefile
-WORKDIR /src
-RUN make install-dev-tools
-
-FROM golang:latest AS sql-migrate
-COPY --from=go-tools /go/bin/sql-migrate /go/bin/sql-migrate

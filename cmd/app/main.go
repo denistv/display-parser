@@ -73,4 +73,6 @@ func main() {
 	)
 
 	<-pp.Run(ctx)
+
+	logger.Info("exiting")
 }
