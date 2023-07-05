@@ -2,24 +2,22 @@ package config
 
 import (
 	"fmt"
-
-	"display_parser/internal/config/service_cfg"
 )
 
 // UNIXDefaultErrCode unexpected error
 const UNIXDefaultErrCode = 255
 
-func NewAppConfig() AppConfig {
-	return AppConfig{}
+func NewCmdApp() CmdApp {
+	return CmdApp{}
 }
 
-type AppConfig struct {
-	HTTP     service_cfg.HTTP
-	DB       service_cfg.DB
-	Pipeline service_cfg.Pipeline
+type CmdApp struct {
+	HTTP     HTTP
+	DB       DB
+	Pipeline Pipeline
 }
 
-func (c *AppConfig) Validate() error {
+func (c *CmdApp) Validate() error {
 	if err := c.DB.Validate(); err != nil {
 		return fmt.Errorf("validating db config: %w", err)
 	}

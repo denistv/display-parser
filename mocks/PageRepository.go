@@ -180,6 +180,58 @@ func (_c *PageRepository_Find_Call) RunAndReturn(run func(context.Context, strin
 	return _c
 }
 
+// PageIsExists provides a mock function with given fields: pageURL
+func (_m *PageRepository) PageIsExists(pageURL string) (domain.PageEntity, bool) {
+	ret := _m.Called(pageURL)
+
+	var r0 domain.PageEntity
+	var r1 bool
+	if rf, ok := ret.Get(0).(func(string) (domain.PageEntity, bool)); ok {
+		return rf(pageURL)
+	}
+	if rf, ok := ret.Get(0).(func(string) domain.PageEntity); ok {
+		r0 = rf(pageURL)
+	} else {
+		r0 = ret.Get(0).(domain.PageEntity)
+	}
+
+	if rf, ok := ret.Get(1).(func(string) bool); ok {
+		r1 = rf(pageURL)
+	} else {
+		r1 = ret.Get(1).(bool)
+	}
+
+	return r0, r1
+}
+
+// PageRepository_PageIsExists_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PageIsExists'
+type PageRepository_PageIsExists_Call struct {
+	*mock.Call
+}
+
+// PageIsExists is a helper method to define mock.On call
+//   - pageURL string
+func (_e *PageRepository_Expecter) PageIsExists(pageURL interface{}) *PageRepository_PageIsExists_Call {
+	return &PageRepository_PageIsExists_Call{Call: _e.mock.On("PageIsExists", pageURL)}
+}
+
+func (_c *PageRepository_PageIsExists_Call) Run(run func(pageURL string)) *PageRepository_PageIsExists_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(string))
+	})
+	return _c
+}
+
+func (_c *PageRepository_PageIsExists_Call) Return(_a0 domain.PageEntity, _a1 bool) *PageRepository_PageIsExists_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *PageRepository_PageIsExists_Call) RunAndReturn(run func(string) (domain.PageEntity, bool)) *PageRepository_PageIsExists_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 type mockConstructorTestingTNewPageRepository interface {
 	mock.TestingT
 	Cleanup(func())

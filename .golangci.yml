@@ -19,7 +19,6 @@ linters-settings:
       - ifElseChain
       - octalLiteral
       - whyNoLint
-    ruleguard:
       - hugeParam
   gocyclo:
     min-complexity: 15
@@ -125,3 +124,7 @@ run:
     - pkg
     - mocks
     - migrations
+    - docs
+    - bin
+  tests: false
+  go: "1.20"

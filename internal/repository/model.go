@@ -2,14 +2,16 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"time"
 
-	"display_parser/internal/domain"
-	"display_parser/internal/iface/db"
 	"github.com/doug-martin/goqu/v9"
 	"gopkg.in/guregu/null.v4"
+
+	"display_parser/internal/domain"
+	"display_parser/internal/iface/db"
 )
 
 type ModelRepository interface {
@@ -32,7 +34,7 @@ type Model struct {
 }
 
 func selectFields() []any {
-	return []any{"id", "url", "brand", "series", "name", "year", "size", "ppi", "created_at", "updated_at"}
+	return []any{"id", "entity_id", "url", "brand", "series", "name", "year", "size", "ppi", "created_at", "updated_at"}
 }
 
 func (d *Model) Find(ctx context.Context, url string) (domain.ModelEntity, bool, error) {
@@ -48,20 +50,38 @@ func (d *Model) Find(ctx context.Context, url string) (domain.ModelEntity, bool,
 	}
 
 	row := d.db.QueryRow(ctx, query, params...)
-	err = row.Scan(&model.ID, &model.URL, &model.Brand, &model.Series, &model.Name, &model.Year, &model.Size, &model.PPI, &model.CreatedAt, &model.UpdatedAt)
+	err = row.Scan(
+		&model.ID,
+		&model.EntityID,
+		&model.URL,
+		&model.Brand,
+		&model.Series,
+		&model.Name,
+		&model.Year,
+		&model.Size,
+		&model.PPI,
+		&model.CreatedAt,
+		&model.UpdatedAt,
+	)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return domain.ModelEntity{}, false, nil
+		}
 		return domain.ModelEntity{}, false, fmt.Errorf("scan: %w", err)
 	}
 
-	return model, false, nil
+	return model, true, nil
 }
 
-//nolint:gocritic
 func (d *Model) Create(ctx context.Context, item domain.ModelEntity) error {
 	item.CreatedAt = time.Now()
 	item.UpdatedAt = item.CreatedAt
 
-	query, params, err := goqu.Insert(d.table).Rows(item).ToSQL()
+	query, params, err := goqu.
+		Insert(d.table).
+		Rows(item).
+		OnConflict(goqu.DoUpdate("entity_id", item)).
+		ToSQL()
 	if err != nil {
 		return fmt.Errorf("make query: %w", err)
 	}
@@ -78,6 +98,7 @@ func (d *Model) Update(ctx context.Context, item domain.ModelEntity) error {
 
 	query, params, err := goqu.
 		Update(d.table).
+		Set(item).
 		Where(
 			goqu.C("url").Eq(item.URL),
 		).ToSQL()
@@ -116,6 +137,9 @@ type ModelQuery struct {
 	YearTo   null.Int
 }
 
+// Validate
+// nolint: gocyclo
+// ^^^^^^ мы не можем упростить портянку с парсингом параметров. Портянка хоть и длинная, но зато простая для понимания
 func (m *ModelQuery) Validate() error {
 	if m.Limit.Valid && m.Limit.Int64 <= 0 {
 		return errors.New("limit must be > 0")
@@ -213,7 +237,19 @@ func (d *Model) All(ctx context.Context, mq ModelQuery) ([]domain.ModelEntity, e
 
 	for rows.Next() {
 		item := domain.ModelEntity{}
-		err = rows.Scan(&item.ID, &item.URL, &item.Brand, &item.Series, &item.Name, &item.Year, &item.Size, &item.PPI, &item.UpdatedAt, &item.CreatedAt)
+		err = rows.Scan(
+			&item.ID,
+			&item.EntityID,
+			&item.URL,
+			&item.Brand,
+			&item.Series,
+			&item.Name,
+			&item.Year,
+			&item.Size,
+			&item.PPI,
+			&item.UpdatedAt,
+			&item.CreatedAt,
+		)
 		if err != nil {
 			return nil, fmt.Errorf("scanning item: %w", err)
 		}

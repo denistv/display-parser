@@ -28,6 +28,8 @@ services:
       - -config=/dbconfig.yml
 
   app:
+    profiles:
+      - disabled
     image: display_parser-app
     build:
       context: .

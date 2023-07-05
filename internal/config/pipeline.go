@@ -1,4 +1,4 @@
-package service_cfg
+package config
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 
 type Pipeline struct {
 	ModelParserCount int
-	PageCollector    PagesCollectorCfg
+	PageCollector    PagesCollector
 }
 
 func (c *Pipeline) Validate() error {

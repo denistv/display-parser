@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/doug-martin/goqu/v9"
 
@@ -13,15 +14,21 @@ import (
 )
 
 func NewPage(dbConn db.Pool) *Page {
-	return &Page{
+	p := Page{
 		dbConn: dbConn,
 		table:  "pages",
 	}
+	p.initCache(nil)
+
+	return &p
 }
 
 type Page struct {
 	dbConn db.Pool
 	table  string
+
+	pagesCacheMu sync.RWMutex
+	pagesCache   map[string]domain.PageEntity
 }
 
 func (p *Page) All(ctx context.Context) ([]domain.PageEntity, error) {
@@ -50,10 +57,42 @@ func (p *Page) All(ctx context.Context) ([]domain.PageEntity, error) {
 		pages = append(pages, p)
 	}
 
+	p.initCache(pages)
+
 	return pages, nil
 }
 
+func (p *Page) PageIsExists(pageURL string) (domain.PageEntity, bool) {
+	p.pagesCacheMu.RLock()
+	page, ok := p.pagesCache[pageURL]
+	p.pagesCacheMu.RUnlock()
+
+	return page, ok
+}
+
+func (p *Page) initCache(pages []domain.PageEntity) {
+	p.pagesCacheMu.Lock()
+	p.pagesCache = make(map[string]domain.PageEntity, len(pages))
+
+	for _, page := range pages {
+		p.pagesCache[page.URL] = page
+	}
+
+	p.pagesCacheMu.Unlock()
+}
+
+func (p *Page) addToCache(page domain.PageEntity) {
+	p.pagesCacheMu.Lock()
+	p.pagesCache[page.URL] = page
+	p.pagesCacheMu.Unlock()
+}
+
 func (p *Page) Find(ctx context.Context, pageURL string) (domain.PageEntity, bool, error) {
+	item, ok := p.PageIsExists(pageURL)
+	if ok {
+		return item, true, nil
+	}
+
 	query, params, err := goqu.
 		From(p.table).
 		Where(goqu.C("url").Eq(pageURL)).
@@ -67,11 +106,14 @@ func (p *Page) Find(ctx context.Context, pageURL string) (domain.PageEntity, boo
 		return domain.PageEntity{}, false, fmt.Errorf("exec query: %w", err)
 	}
 
-	item := domain.PageEntity{}
+	item = domain.PageEntity{}
+
 	row := p.dbConn.QueryRow(ctx, query, params...)
 	if err = row.Scan(&item.URL, &item.Body, &item.CreatedAt); err != nil {
 		return domain.PageEntity{}, false, fmt.Errorf("scan item: %w", err)
 	}
+
+	p.addToCache(item)
 
 	return item, true, nil
 }
@@ -88,6 +130,8 @@ func (p *Page) Create(ctx context.Context, page domain.PageEntity) error {
 	if _, err = p.dbConn.Exec(ctx, query, params...); err != nil {
 		return fmt.Errorf("exec query: %w", err)
 	}
+
+	p.addToCache(page)
 
 	return nil
 }

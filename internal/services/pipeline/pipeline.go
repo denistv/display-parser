@@ -7,12 +7,12 @@ import (
 
 	"go.uber.org/zap"
 
-	"display_parser/internal/config/service_cfg"
+	"display_parser/internal/config"
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
 )
 
-func NewPipeline(cfg service_cfg.Pipeline, brandsCollector *BrandsCollector, pagesColl *PageCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger, pageRepo *repository.Page, modelPersister *ModelPersister) *Pipeline {
+func NewPipeline(cfg config.Pipeline, brandsCollector *BrandsCollector, pagesColl *PageCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger, pageRepo *repository.Page, modelPersister *ModelPersister) *Pipeline {
 	return &Pipeline{
 		cfg:            cfg,
 		logger:         logger,
@@ -28,7 +28,7 @@ func NewPipeline(cfg service_cfg.Pipeline, brandsCollector *BrandsCollector, pag
 // Pipeline представляет собой сущность, которая связывает шаги пайплайна и централизовано управляет его жизненным циклом.
 type Pipeline struct {
 	logger         *zap.Logger
-	cfg            service_cfg.Pipeline
+	cfg            config.Pipeline
 	brandsColl     *BrandsCollector
 	modelsURLColl  *ModelsURLCollector
 	pagesColl      *PageCollector
@@ -119,17 +119,17 @@ func (p *Pipeline) loadPagesFromCache(ctx context.Context) []<-chan domain.PageE
 	out := make(chan domain.PageEntity)
 
 	go func() {
+		defer close(out)
+
 		pages, err := p.pageRepo.All(ctx) // помним про то, что в настоящем проекте так делать не нужно
 		if err != nil {
 			p.logger.Error(err.Error())
-			// todo cancel
+			return
 		}
 
 		for _, page := range pages {
 			out <- page
 		}
-
-		close(out)
 	}()
 
 	return []<-chan domain.PageEntity{out}

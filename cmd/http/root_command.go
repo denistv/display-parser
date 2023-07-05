@@ -8,7 +8,7 @@ import (
 )
 
 // nolint
-func newRootCommand(cfg *config.HTTPConfig) *cobra.Command {
+func newRootCommand(cfg *config.CmdHTTP) *cobra.Command {
 	rootCmd := cobra.Command{}
 
 	// Database

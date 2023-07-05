@@ -2,9 +2,18 @@ package domain
 
 import "time"
 
+func NewModelEntity(page PageEntity) ModelEntity {
+	return ModelEntity{
+		EntityID: page.EntityID,
+		URL:      page.URL,
+	}
+}
+
 // ModelEntity сущность, представляющая разобранную модель монитора.
 type ModelEntity struct {
-	ID int64 `db:"id" goqu:"defaultifempty"`
+	ID       int64  `db:"id" goqu:"defaultifempty"`
+	EntityID string `db:"entity_id"`
+
 	// URL страницы с монитором
 	URL    string `db:"url"`
 	Brand  string `db:"brand"`

@@ -9,5 +9,6 @@ import "time"
 type PageEntity struct {
 	URL       string    `db:"url"`
 	Body      string    `db:"body"`
+	EntityID  string    `db:"entity_id"`
 	CreatedAt time.Time `db:"created_at"`
 }

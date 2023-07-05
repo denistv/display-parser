@@ -12,7 +12,7 @@ import (
 // В этом проекте не задействуется вся функциональность cobra.
 // На данном этапе мне достаточно возможности удобной работы с параметрами (отображение справки, парсинг флагов из CLI и ENV)
 // nolint
-func newRootCommand(cfg *config.AppConfig) *cobra.Command {
+func newRootCommand(cfg *config.CmdApp) *cobra.Command {
 	rootCmd := cobra.Command{}
 
 	// Common flags

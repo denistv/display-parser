@@ -1,4 +1,4 @@
-package service_cfg
+package config
 
 import (
 	"errors"
@@ -42,7 +42,6 @@ func (d *DB) Validate() error {
 	return nil
 }
 
-// postgres://jack:secret@pg.example.com:5432/mydb?sslmode=verify-ca&pool_max_conns=10
 func (d *DB) ConnString() string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s?pool_max_conns=%d",

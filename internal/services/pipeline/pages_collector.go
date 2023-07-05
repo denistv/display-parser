@@ -9,13 +9,13 @@ import (
 
 	"go.uber.org/zap"
 
-	"display_parser/internal/config/service_cfg"
+	"display_parser/internal/config"
 	"display_parser/internal/domain"
 	"display_parser/internal/iface"
 	"display_parser/internal/iface/db"
 )
 
-func NewPageCollector(logger *zap.Logger, pageRepo db.PageRepository, httpClient iface.HTTPClient, cfg service_cfg.PagesCollectorCfg) *PageCollector {
+func NewPageCollector(logger *zap.Logger, pageRepo db.PageRepository, httpClient iface.HTTPClient, cfg config.PagesCollector) *PageCollector {
 	return &PageCollector{
 		logger:     logger,
 		pageRepo:   pageRepo,
@@ -29,7 +29,7 @@ type PageCollector struct {
 	logger     *zap.Logger
 	pageRepo   db.PageRepository
 	httpClient iface.HTTPClient
-	cfg        service_cfg.PagesCollectorCfg
+	cfg        config.PagesCollector
 }
 
 func (d *PageCollector) Run(ctx context.Context, in <-chan string) <-chan domain.PageEntity {
@@ -66,6 +66,13 @@ func (d *PageCollector) Run(ctx context.Context, in <-chan string) <-chan domain
 						URL:  pageURL,
 						Body: body,
 					}
+
+					entityID, err := domain.EntityID(pageURL)
+					if err != nil {
+						d.logger.Error(fmt.Errorf("getting entityID: %w", err).Error())
+						continue
+					}
+					page.EntityID = entityID
 
 					err = d.pageRepo.Create(ctx, page)
 					if err != nil {

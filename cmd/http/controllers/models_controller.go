@@ -29,6 +29,8 @@ type ModelsController struct {
 // Более высокоуровневый пакет содержащий репозитории БД ничего не знает про низкоуровневый пакет с HTTP-контроллераи,
 // но пакет с http-контроллерами использует структуры пакета репозиториев и знает как заполнить его структуры
 // запросов данными.
+//
+//nolint:gocyclo
 func parseModelQuery(r *http.Request) (repository.ModelQuery, error) {
 	var err error
 

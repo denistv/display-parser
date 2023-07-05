@@ -69,15 +69,14 @@ func (m *ModelParser) Run(ctx context.Context, in <-chan domain.PageEntity) <-ch
 // Здесь не держим какой-то конкретной логики по парсингу того или иного свойства монитора, только вызываем специализированыые методы,
 // чтобы не смешивать все вместе превращая код в дробленку, сохраняя читаемость и прозрачность происходящего.
 func (m *ModelParser) parse(page domain.PageEntity) (domain.ModelEntity, error) {
+	model := domain.NewModelEntity(page)
+
 	ppiInt, err := m.parsePPI(page)
 	if err != nil {
 		return domain.ModelEntity{}, fmt.Errorf("parsing ppi: %w", err)
 	}
 
-	model := domain.ModelEntity{
-		URL: page.URL,
-		PPI: ppiInt,
-	}
+	model.PPI = ppiInt
 
 	buf := bytes.NewBufferString(page.Body)
 

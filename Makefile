@@ -15,45 +15,37 @@ vendor:
 	go mod vendor
 
 .PHONY: build
-build: test
+build:
 	go build -o bin/app ./cmd/app
 	go build -o bin/http ./cmd/http
 
 ### Run
 .PHONY: run
 run:
-	bin/app \
+	sudo docker-compose run app \
+        /usr/local/bin/app \
 		--http-timeout=30s \
 		--http-delay-per-request=3s \
 		--db-user=display_parser \
 		--db-password=display_parser \
-		--db-hostname=localhost \
+		--db-hostname=postgres \
 		--db-port=5432 \
 		--db-name=display_parser \
 		--pipeline-use-stored-pages-only=false \
 		--pipeline-model-parser-count=1 \
 		--pipeline-page-collector-count=1
 
-.PHONY: run-http
-run-http:
-	bin/http \
+.PHONY: run-cached
+run-cached:
+	sudo docker-compose run app \
+        /usr/local/bin/app \
 		--db-user=display_parser \
 		--db-password=display_parser \
-		--db-hostname=localhost \
-		--db-port=5432 \
-		--db-name=display_parser
-
-
-.PHONY: run-page-cache
-run-page-cache:
-	bin/app \
-		--db-user=display_parser \
-		--db-password=display_parser \
-		--db-hostname=localhost \
+		--db-hostname=postgres \
 		--db-port=5432 \
 		--db-name=display_parser \
 		--pipeline-use-stored-pages-only=true \
-		--pipeline-model-parser-count=1 \
+		--pipeline-model-parser-count=8 \
 		--pipeline-page-collector-count=1
 
 .PHONY: run-swagger-ui
@@ -61,13 +53,22 @@ run-swagger-ui:
 	sudo docker run --rm -p 80:8080 -e SWAGGER_JSON=/openapi.yml -v $$(pwd)/docs/openapi.yml:/openapi.yml swaggerapi/swagger-ui
 ### Dev
 .PHONY: test
-test: vendor
-	go clean -testcache
+test:
 	go test -v ./...
 
 .PHONY: lint
 lint:
-	golangci-lint run -v
+	mkdir -p ~/.cache/golangci-lint
+	sudo docker run \
+		--rm \
+		-v ${HOME}/.cache/golangci-lint:/home/$$(id -u -n)/.cache/golangci-lint \
+		-v $$(pwd):/src \
+		-w /src \
+		-t \
+		--user $$(id -u):$$(id -g) \
+		-e HOME=/home/$$(id -u -n) \
+		golangci/golangci-lint:v1.53.3 \
+		mkdir -p /home/$$(id -u -n) && golangci-lint run -v
 
 .PHONY: install-dev-tools
 install-dev-tools:
@@ -88,3 +89,5 @@ run-docker:
 migrate:
 	sudo docker-compose run sql-migrate
 
+.PHONY: all
+all: mock lint test image

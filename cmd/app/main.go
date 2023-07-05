@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	cfg := config.NewAppConfig()
+	cfg := config.NewCmdApp()
 	rootCmd := newRootCommand(&cfg)
 
 	err := rootCmd.Execute()

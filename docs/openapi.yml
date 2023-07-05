@@ -92,6 +92,8 @@ components:
       properties:
         ID:
           type: integer
+        EntityID:
+          type: string
         URL:
           type: string
           format: uri
@@ -115,6 +117,7 @@ components:
           format: time
       example:
         ID: 51360
+        EntityID: "ef652ae9"
         URL: "https://www.displayspecifications.com/en/model/ef652ae9"
         Brand: "Apple"
         Series: ""

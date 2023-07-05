@@ -19,7 +19,7 @@ import (
 )
 
 func main() {
-	cfg := config.NewHTTPConfig()
+	cfg := config.NewCmdHTTP()
 
 	logger, err := zap.NewDevelopment()
 	if err != nil {
@@ -32,7 +32,7 @@ func main() {
 		log.Fatal(fmt.Errorf("executing command: %w", err))
 	}
 
-	if err := cfg.Validate(); err != nil {
+	if err = cfg.Validate(); err != nil {
 		logger.Fatal(err.Error())
 	}
 

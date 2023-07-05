@@ -17,8 +17,6 @@ func NewModelPersister(logger *zap.Logger, modelRepo repository.ModelRepository)
 	}
 }
 
-// ModelPersister определяет, требуется ли создать новую сущность или обновить уже существующую и вызывает
-// соответствующий метод репозитория
 type ModelPersister struct {
 	logger    *zap.Logger
 	modelRepo repository.ModelRepository

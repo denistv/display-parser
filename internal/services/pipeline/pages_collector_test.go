@@ -3,7 +3,7 @@ package pipeline
 import (
 	"bytes"
 	"context"
-	"display_parser/internal/config/service_cfg"
+	"display_parser/internal/config"
 	"io"
 	"net/http"
 	"os"
@@ -36,7 +36,7 @@ func TestPageCollector_Run(t *testing.T) {
 	pageRepo := mocks.NewPageRepository(t)
 	pageRepo.
 		On("Find", mock.AnythingOfType("*context.emptyCtx"), mock.AnythingOfType("string")).
-		Return(domain.PageEntity{URL: "https://example.com", Body: string(page)}, false, nil)
+		Return(domain.PageEntity{URL: "https://example.com/en/model/4e4a322f", Body: string(page), EntityID: "4e4a322f"}, false, nil)
 	pageRepo.On(
 		"Create",
 		mock.AnythingOfType("*context.emptyCtx"),
@@ -48,7 +48,7 @@ func TestPageCollector_Run(t *testing.T) {
 		logger     *zap.Logger
 		pageRepo   db.PageRepository
 		httpClient iface.HTTPClient
-		cfg        service_cfg.PagesCollectorCfg
+		cfg        config.PagesCollector
 	}
 
 	tests := []struct {
@@ -62,12 +62,13 @@ func TestPageCollector_Run(t *testing.T) {
 				logger:     zap.NewNop(),
 				pageRepo:   pageRepo,
 				httpClient: c,
-				cfg:        service_cfg.PagesCollectorCfg{},
+				cfg:        config.PagesCollector{},
 			},
 			want: []domain.PageEntity{
 				{
-					URL:  "https://example.com",
-					Body: string(page),
+					URL:      "https://example.com/en/model/4e4a322f",
+					Body:     string(page),
+					EntityID: "4e4a322f",
 				},
 			},
 		},
@@ -98,7 +99,7 @@ func TestPageCollector_Run(t *testing.T) {
 			}
 
 			in := make(chan string, 1)
-			in <- "https://example.com"
+			in <- "https://example.com/en/model/4e4a322f"
 			close(in)
 
 			out := make([]domain.PageEntity, 0)
