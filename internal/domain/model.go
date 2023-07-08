@@ -1,6 +1,11 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+
+	"gopkg.in/guregu/null.v4"
+)
 
 func NewModelEntity(page PageEntity) ModelEntity {
 	return ModelEntity{
@@ -21,8 +26,18 @@ type ModelEntity struct {
 	Name   string `db:"name"`
 	Year   int64  `db:"year"`
 	// Диагональ (опционально),может быть дробным числом
-	Size      float64   `db:"size"`
-	PPI       int64     `db:"ppi"`
+	Size          float64  `db:"size"`
+	PPI           int64    `db:"ppi"`
+	PanelBitDepth null.Int `db:"panel_bit_depth"`
+
 	CreatedAt time.Time `db:"created_at"`
 	UpdatedAt time.Time `db:"updated_at"`
+}
+
+func (m *ModelEntity) Validate() error {
+	if m.EntityID == "" {
+		return errors.New("entity_id cannot be empty")
+	}
+
+	return nil
 }

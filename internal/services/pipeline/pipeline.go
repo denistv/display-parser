@@ -128,6 +128,13 @@ func (p *Pipeline) loadPagesFromCache(ctx context.Context) []<-chan domain.PageE
 		}
 
 		for _, page := range pages {
+			entityID, err := domain.EntityID(page.URL)
+			if err != nil {
+				p.logger.Error(fmt.Errorf("getting entityID: %w", err).Error())
+				continue
+			}
+			page.EntityID = entityID
+
 			out <- page
 		}
 	}()

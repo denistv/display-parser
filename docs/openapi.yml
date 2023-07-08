@@ -72,6 +72,13 @@ paths:
           required: false
           schema:
             type: number
+        - name: panel-bit-depth
+          in: query
+          description: Битность матрицы (6, 8 bit)
+          required: false
+          schema:
+            type: integer
+            "$ref": "#/components/schemas/panel_bit_depth"
       responses:
         200:
           description: OK
@@ -92,6 +99,7 @@ components:
       properties:
         ID:
           type: integer
+          format: int64
         EntityID:
           type: string
         URL:
@@ -105,10 +113,16 @@ components:
           type: string
         Year:
           type: integer
+          format: int64
         PPI:
           type: integer
+          format: int64
         Size:
+          type: number
+          format: float
+        PanelBitDepth:
           type: integer
+          $ref: "#/components/schemas/panel_bit_depth"
         CreatedAt:
           type: string
           format: time
@@ -125,8 +139,15 @@ components:
         Year: 2022
         Size: 27
         PPI: 217
+        PanelBitDepth: 8
         CreatedAt: "2023-06-23T14:20:07.946822+03:00"
         UpdatedAt: "0001-01-01T02:30:17+02:30"
+    panel_bit_depth:
+      type: integer
+      format: int64
+      enum:
+        - 6
+        - 8
     brand:
       type: string
       enum:

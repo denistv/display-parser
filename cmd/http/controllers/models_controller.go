@@ -87,11 +87,17 @@ func parseModelQuery(r *http.Request) (repository.ModelQuery, error) {
 		mq.SizeTo.Valid = true
 	}
 
+	if v := r.URL.Query().Get("panel-bit-depth"); v != "" {
+		if mq.PanelBitDepth.Int64, err = strconv.ParseInt(v, 10, 64); err != nil {
+			return repository.ModelQuery{}, fmt.Errorf("parse panel-bit-depth: %w", err)
+		}
+		mq.PanelBitDepth.Valid = true
+	}
+
 	return mq, nil
 }
 
 func (m *ModelsController) ModelsIndex(w http.ResponseWriter, r *http.Request) {
-	// todo populate params
 	mq, err := parseModelQuery(r)
 	if err != nil {
 		m.logger.Error(err.Error())
@@ -121,6 +127,11 @@ func (m *ModelsController) ModelsIndex(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	_, _ = w.Write(data)
+	_, err = w.Write(data)
+	if err != nil {
+		m.logger.Error(fmt.Errorf("error while writing response: %w", err).Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
 	w.WriteHeader(http.StatusOK)
 }

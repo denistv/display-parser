@@ -34,7 +34,7 @@ type Model struct {
 }
 
 func selectFields() []any {
-	return []any{"id", "entity_id", "url", "brand", "series", "name", "year", "size", "ppi", "created_at", "updated_at"}
+	return []any{"id", "entity_id", "url", "brand", "series", "name", "year", "size", "ppi", "panel_bit_depth", "created_at", "updated_at"}
 }
 
 func (d *Model) Find(ctx context.Context, url string) (domain.ModelEntity, bool, error) {
@@ -60,6 +60,7 @@ func (d *Model) Find(ctx context.Context, url string) (domain.ModelEntity, bool,
 		&model.Year,
 		&model.Size,
 		&model.PPI,
+		&model.PanelBitDepth,
 		&model.CreatedAt,
 		&model.UpdatedAt,
 	)
@@ -74,6 +75,10 @@ func (d *Model) Find(ctx context.Context, url string) (domain.ModelEntity, bool,
 }
 
 func (d *Model) Create(ctx context.Context, item domain.ModelEntity) error {
+	if err := item.Validate(); err != nil {
+		return fmt.Errorf("validating item: %w", err)
+	}
+
 	item.CreatedAt = time.Now()
 	item.UpdatedAt = item.CreatedAt
 
@@ -94,6 +99,10 @@ func (d *Model) Create(ctx context.Context, item domain.ModelEntity) error {
 }
 
 func (d *Model) Update(ctx context.Context, item domain.ModelEntity) error {
+	if err := item.Validate(); err != nil {
+		return fmt.Errorf("validating item: %w", err)
+	}
+
 	item.UpdatedAt = time.Now()
 
 	query, params, err := goqu.
@@ -114,15 +123,16 @@ func (d *Model) Update(ctx context.Context, item domain.ModelEntity) error {
 	return nil
 }
 
-const selectLimitDefault = 100
+const limitMax = 1000
+const limitDefault = 10
 
 func NewModelQuery() ModelQuery {
 	return ModelQuery{
-		Limit: null.NewInt(selectLimitDefault, true),
+		Limit: null.NewInt(limitDefault, true),
 	}
 }
 
-// ModelQuery Позволяет кастомизовать запрос в репозиторий, например, из http-контроллера
+// ModelQuery Позволяет кастомизовать запрос в репозиторий, например, из http-контроллераили другого сервиса
 type ModelQuery struct {
 	Limit null.Int
 	Brand null.String
@@ -135,14 +145,21 @@ type ModelQuery struct {
 
 	YearFrom null.Int
 	YearTo   null.Int
+
+	PanelBitDepth null.Int
 }
 
 // Validate
 // nolint: gocyclo
 // ^^^^^^ мы не можем упростить портянку с парсингом параметров. Портянка хоть и длинная, но зато простая для понимания
 func (m *ModelQuery) Validate() error {
-	if m.Limit.Valid && m.Limit.Int64 <= 0 {
-		return errors.New("limit must be > 0")
+	if m.Limit.Valid {
+		if m.Limit.Int64 <= 0 {
+			return errors.New("limit must be > 0")
+		}
+		if m.Limit.Int64 > limitMax {
+			return fmt.Errorf("limit must be <= %d", limitMax)
+		}
 	}
 
 	if m.Brand.Valid && m.Brand.String == "" {
@@ -180,6 +197,10 @@ func (m *ModelQuery) Validate() error {
 	}
 	if (m.PPIFrom.Valid && m.PPITo.Valid) && m.PPITo.Int64 < m.PPIFrom.Int64 {
 		return errors.New("ppi-to must greater than ppi-from")
+	}
+
+	if m.PanelBitDepth.Valid && m.PanelBitDepth.Int64 <= 0 {
+		return errors.New("panel-bit-depth must be > 0")
 	}
 
 	return nil
@@ -223,6 +244,10 @@ func (d *Model) All(ctx context.Context, mq ModelQuery) ([]domain.ModelEntity, e
 		q = q.Where(goqu.C("ppi").Lte(mq.PPITo.Int64))
 	}
 
+	if mq.PanelBitDepth.Valid {
+		q = q.Where(goqu.C("panel_bit_depth").Eq(mq.PanelBitDepth.Int64))
+	}
+
 	query, params, err := q.ToSQL()
 	if err != nil {
 		return nil, fmt.Errorf("make query: %w", err)
@@ -247,6 +272,7 @@ func (d *Model) All(ctx context.Context, mq ModelQuery) ([]domain.ModelEntity, e
 			&item.Year,
 			&item.Size,
 			&item.PPI,
+			&item.PanelBitDepth,
 			&item.UpdatedAt,
 			&item.CreatedAt,
 		)

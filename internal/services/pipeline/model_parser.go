@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"go.uber.org/zap"
-
 	"github.com/PuerkitoBio/goquery"
+	"go.uber.org/zap"
+	"gopkg.in/guregu/null.v4"
 
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
@@ -133,21 +133,37 @@ func (m *ModelParser) parseBrandSeriesModel(doc *goquery.Document, model *domain
 		})
 }
 
+var panelBitDepthRegexp = regexp.MustCompile(`(?P<bits_sum>\d+) bits \((?P<bits>\d+) bits \+ FRC\)`)
+
 func (m *ModelParser) parseDisplay(doc *goquery.Document, model *domain.ModelEntity) {
 	doc.Find("#main > div:nth-child(6) > table:nth-child(4) > tbody > tr").
 		Each(func(i int, s *goquery.Selection) {
 			label := s.Find("td:nth-child(1)").Text()
 			value := s.Find("td:nth-child(2)").Text()
 
-			//nolint
-			const sizeExistsPattern = "Size classSize class of the display as declared by the manufacturer. Often this is the rounded value of the actual size of the diagonal in inches."
-
-			//nolint:gocritic
 			switch label {
-			case sizeExistsPattern:
+			case "Size classSize class of the display as declared by the manufacturer. Often this is the rounded value of the actual size of the diagonal in inches.":
 				sizeRaw := strings.TrimSuffix(value, " in (inches)")
 				size, _ := strconv.ParseFloat(sizeRaw, 64)
 				model.Size = size
+			case "Panel bit depthThe most widely used panels are those with 6, 8, and 10 bits for each of the RGB components of the pixel. They provide 18-, 24-, and 30-bit color, respectively.":
+				matches := panelBitDepthRegexp.FindStringSubmatch(value)
+				if len(matches) == 0 {
+					return
+				}
+
+				i := panelBitDepthRegexp.SubexpIndex("bits")
+				if i == -1 {
+					return
+				}
+
+				bitParsed, err := strconv.ParseInt(matches[i], 10, 64)
+				if err != nil {
+					m.logger.Error(fmt.Errorf("parsing bit: %w", err).Error())
+					return
+				}
+
+				model.PanelBitDepth = null.NewInt(bitParsed, true)
 			}
 		})
 }
