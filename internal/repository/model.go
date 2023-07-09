@@ -132,7 +132,7 @@ func NewModelQuery() ModelQuery {
 	}
 }
 
-// ModelQuery Позволяет кастомизовать запрос в репозиторий, например, из http-контроллераили другого сервиса
+// ModelQuery Позволяет кастомизовать запрос в репозиторий, например, из http-контроллер аили другого сервиса
 type ModelQuery struct {
 	Limit null.Int
 	Brand null.String
@@ -155,52 +155,52 @@ type ModelQuery struct {
 func (m *ModelQuery) Validate() error {
 	if m.Limit.Valid {
 		if m.Limit.Int64 <= 0 {
-			return errors.New("limit must be > 0")
+			return domain.NewValidationError("limit must be > 0")
 		}
 		if m.Limit.Int64 > limitMax {
-			return fmt.Errorf("limit must be <= %d", limitMax)
+			return domain.NewValidationError(fmt.Sprintf("limit must be <= %d", limitMax))
 		}
 	}
 
 	if m.Brand.Valid && m.Brand.String == "" {
-		return errors.New("brand cannot be empty string")
+		return domain.NewValidationError("brand cannot be empty string")
 	}
 
 	// Size
 	if m.SizeFrom.Valid && m.SizeFrom.Float64 <= 0 {
-		return errors.New("size-from must be > 0.0")
+		return domain.NewValidationError("size-from must be > 0.0")
 	}
 	if m.SizeTo.Valid && m.SizeTo.Float64 <= 0 {
-		return errors.New("size-to must be > 0.0")
+		return domain.NewValidationError("size-to must be > 0.0")
 	}
 	if (m.SizeFrom.Valid && m.SizeTo.Valid) && m.SizeTo.Float64 < m.SizeFrom.Float64 {
-		return errors.New("size-to must greater than size-from")
+		return domain.NewValidationError("size-to must greater than size-from")
 	}
 
 	// Year
 	if m.YearFrom.Valid && m.YearFrom.Int64 <= 0 {
-		return errors.New("year-from must be > 0")
+		return domain.NewValidationError("year-from must be > 0")
 	}
 	if m.YearTo.Valid && m.YearTo.Int64 <= 0 {
-		return errors.New("year-to must be > 0")
+		return domain.NewValidationError("year-to must be > 0")
 	}
 	if (m.YearFrom.Valid && m.YearTo.Valid) && m.YearTo.Int64 < m.YearFrom.Int64 {
-		return errors.New("year-to must greater than year-from")
+		return domain.NewValidationError("year-to must greater than year-from")
 	}
 
 	// PPI
 	if m.PPIFrom.Valid && m.PPIFrom.Int64 <= 0 {
-		return errors.New("ppi-from must be > 0")
+		return domain.NewValidationError("ppi-from must be > 0")
 	}
 	if m.PPITo.Valid && m.PPITo.Int64 <= 0 {
-		return errors.New("ppi-to must be > 0")
+		return domain.NewValidationError("ppi-to must be > 0")
 	}
 	if (m.PPIFrom.Valid && m.PPITo.Valid) && m.PPITo.Int64 < m.PPIFrom.Int64 {
-		return errors.New("ppi-to must greater than ppi-from")
+		return domain.NewValidationError("ppi-to must greater than ppi-from")
 	}
 
 	if m.PanelBitDepth.Valid && m.PanelBitDepth.Int64 <= 0 {
-		return errors.New("panel-bit-depth must be > 0")
+		return domain.NewValidationError("panel-bit-depth must be > 0")
 	}
 
 	return nil

@@ -38,7 +38,7 @@ func parseModelQuery(r *http.Request) (repository.ModelQuery, error) {
 
 	if v := r.URL.Query().Get("limit"); v != "" {
 		if mq.Limit.Int64, err = strconv.ParseInt(v, 10, 64); err != nil {
-			return repository.ModelQuery{}, fmt.Errorf("parse limit: %w", err)
+			return repository.ModelQuery{}, NewParseError(fmt.Errorf("parse limit: %w", err).Error())
 		}
 		mq.Limit.Valid = true
 	}
@@ -50,46 +50,46 @@ func parseModelQuery(r *http.Request) (repository.ModelQuery, error) {
 
 	if v := r.URL.Query().Get("ppi-from"); v != "" {
 		if mq.PPIFrom.Int64, err = strconv.ParseInt(v, 10, 64); err != nil {
-			return repository.ModelQuery{}, fmt.Errorf("parse ppi-from: %w", err)
+			return repository.ModelQuery{}, NewParseError(fmt.Errorf("parse ppi-from: %w", err).Error())
 		}
 		mq.PPIFrom.Valid = true
 	}
 	if v := r.URL.Query().Get("ppi-to"); v != "" {
 		if mq.PPITo.Int64, err = strconv.ParseInt(v, 10, 64); err != nil {
-			return repository.ModelQuery{}, fmt.Errorf("parse ppi-to: %w", err)
+			return repository.ModelQuery{}, NewParseError(fmt.Errorf("parse ppi-to: %w", err).Error())
 		}
 		mq.PPITo.Valid = true
 	}
 
 	if v := r.URL.Query().Get("year-from"); v != "" {
 		if mq.YearFrom.Int64, err = strconv.ParseInt(v, 10, 64); err != nil {
-			return repository.ModelQuery{}, fmt.Errorf("parse year: %w", err)
+			return repository.ModelQuery{}, NewParseError(fmt.Errorf("parse year: %w", err).Error())
 		}
 		mq.YearFrom.Valid = true
 	}
 	if v := r.URL.Query().Get("year-to"); v != "" {
 		if mq.YearTo.Int64, err = strconv.ParseInt(v, 10, 64); err != nil {
-			return repository.ModelQuery{}, fmt.Errorf("parse year-to: %w", err)
+			return repository.ModelQuery{}, NewParseError(fmt.Errorf("parse year-to: %w", err).Error())
 		}
 		mq.YearTo.Valid = true
 	}
 
 	if v := r.URL.Query().Get("size-from"); v != "" {
 		if mq.SizeFrom.Float64, err = strconv.ParseFloat(v, 64); err != nil {
-			return repository.ModelQuery{}, fmt.Errorf("parse size-from: %w", err)
+			return repository.ModelQuery{}, NewParseError(fmt.Errorf("parse size-from: %w", err).Error())
 		}
 		mq.SizeFrom.Valid = true
 	}
 	if v := r.URL.Query().Get("size-to"); v != "" {
 		if mq.SizeTo.Float64, err = strconv.ParseFloat(v, 64); err != nil {
-			return repository.ModelQuery{}, fmt.Errorf("parse size-to: %w", err)
+			return repository.ModelQuery{}, NewParseError(fmt.Errorf("parse size-to: %w", err).Error())
 		}
 		mq.SizeTo.Valid = true
 	}
 
 	if v := r.URL.Query().Get("panel-bit-depth"); v != "" {
 		if mq.PanelBitDepth.Int64, err = strconv.ParseInt(v, 10, 64); err != nil {
-			return repository.ModelQuery{}, fmt.Errorf("parse panel-bit-depth: %w", err)
+			return repository.ModelQuery{}, NewParseError(fmt.Errorf("parse panel-bit-depth: %w", err).Error())
 		}
 		mq.PanelBitDepth.Valid = true
 	}
@@ -101,27 +101,27 @@ func (m *ModelsController) ModelsIndex(w http.ResponseWriter, r *http.Request) {
 	mq, err := parseModelQuery(r)
 	if err != nil {
 		m.logger.Error(err.Error())
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		handleError(w, err)
 		return
 	}
 
 	if err = mq.Validate(); err != nil {
 		m.logger.Error(err.Error())
-		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		handleError(w, err)
 		return
 	}
 
 	all, err := m.repo.All(r.Context(), mq)
 	if err != nil {
 		m.logger.Error(err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		handleError(w, err)
 		return
 	}
 
 	data, err := json.Marshal(all)
 	if err != nil {
 		m.logger.Error(err.Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		handleError(w, err)
 		return
 	}
 
@@ -130,7 +130,8 @@ func (m *ModelsController) ModelsIndex(w http.ResponseWriter, r *http.Request) {
 	_, err = w.Write(data)
 	if err != nil {
 		m.logger.Error(fmt.Errorf("error while writing response: %w", err).Error())
-		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		handleError(w, err)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
