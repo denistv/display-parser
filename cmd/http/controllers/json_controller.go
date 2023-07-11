@@ -12,19 +12,28 @@ func newJSONController(logger *zap.Logger) jsonController {
 	return jsonController{logger: logger}
 }
 
+// jsonController можно встроить в структуру контроллера для придания ему нужного поведения
 type jsonController struct {
 	logger *zap.Logger
 }
 
-func (j *jsonController) writeJSONResponse(w http.ResponseWriter, v any) {
+func (j *jsonController) writeHeaders(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.WriteHeader(http.StatusOK)
+}
 
-	if err := json.NewEncoder(w).Encode(v); err != nil {
-		j.logger.Error(fmt.Errorf("error while encoding json response: %w", err).Error())
+// handleError решает, как будет сформирована ошибка и отправлена клиенту.
+// Если ошибка относится к 400 http-кодам, то будет взято ее текстовое описание и отправлено клиенту.
+// Другие ошибки будут отправлены клиенту как обезличенные "internal server error", чтобы не светить лишнего в целях безопасности.
+func (j *jsonController) handleError(w http.ResponseWriter, err error) {
+	if is400Err(err) {
+		j.logger.Debug(fmt.Errorf("bad request: %w", err).Error())
+		j.writeJSONError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	j.logger.Error(err.Error())
+	j.writeJSONError(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }
 
 func newErrorResponse(err string) errorResponse {
@@ -36,8 +45,7 @@ type errorResponse struct {
 }
 
 func (j *jsonController) writeJSONError(w http.ResponseWriter, err string, code int) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
+	j.writeHeaders(w)
 	w.WriteHeader(code)
 
 	e := newErrorResponse(err)
@@ -47,16 +55,12 @@ func (j *jsonController) writeJSONError(w http.ResponseWriter, err string, code 
 	}
 }
 
-// handleError решает, как будет сформирована ошибка и отправлена клиенту.
-// Если ошибка относится к 400 http-кодам, то будет взято ее текстовое описание и отправлено клиенту.
-// Другие ошибки будут отправлены клиенту как обезличенные "internal server error", чтобы не светить лишнего в целях безопасности.
-func (j *jsonController) handleError(w http.ResponseWriter, err error) {
-	j.logger.Error(err.Error())
+func (j *jsonController) writeJSON(w http.ResponseWriter, v any) {
+	j.writeHeaders(w)
+	w.WriteHeader(http.StatusOK)
 
-	if is400Err(err) {
-		j.writeJSONError(w, err.Error(), http.StatusBadRequest)
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		j.logger.Error(fmt.Errorf("error while encoding json response: %w", err).Error())
 		return
 	}
-
-	j.writeJSONError(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 }

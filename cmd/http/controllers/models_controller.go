@@ -15,7 +15,6 @@ func NewModelsController(logger *zap.Logger, repo repository.ModelRepository) *M
 
 	return &ModelsController{
 		jsonController: j,
-		logger:         logger,
 		repo:           repo,
 	}
 }
@@ -23,8 +22,7 @@ func NewModelsController(logger *zap.Logger, repo repository.ModelRepository) *M
 type ModelsController struct {
 	jsonController
 
-	logger *zap.Logger
-	repo   repository.ModelRepository
+	repo repository.ModelRepository
 }
 
 // parseModelQuery создает экземпляр структуры, заполняя ее данными из параметров запроса
@@ -119,5 +117,5 @@ func (m *ModelsController) ModelsIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m.writeJSONResponse(w, all)
+	m.writeJSON(w, all)
 }

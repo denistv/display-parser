@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"display_parser/internal/domain"
 	"errors"
 	"fmt"
+
+	"display_parser/internal/domain"
 )
 
 func NewParseError(s string) error {

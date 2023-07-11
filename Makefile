@@ -44,7 +44,7 @@ run-cached:
 		--db-hostname=postgres \
 		--db-port=5432 \
 		--db-name=display_parser \
-		--pipeline-use-stored-pages-only=true \
+		--pipeline-pages-cache=true \
 		--pipeline-model-parser-count=8 \
 		--pipeline-page-collector-count=1
 
