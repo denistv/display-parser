@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -12,13 +11,18 @@ import (
 )
 
 func NewModelsController(logger *zap.Logger, repo repository.ModelRepository) *ModelsController {
+	j := newJSONController(logger)
+
 	return &ModelsController{
-		logger: logger,
-		repo:   repo,
+		jsonController: j,
+		logger:         logger,
+		repo:           repo,
 	}
 }
 
 type ModelsController struct {
+	jsonController
+
 	logger *zap.Logger
 	repo   repository.ModelRepository
 }
@@ -100,39 +104,20 @@ func parseModelQuery(r *http.Request) (repository.ModelQuery, error) {
 func (m *ModelsController) ModelsIndex(w http.ResponseWriter, r *http.Request) {
 	mq, err := parseModelQuery(r)
 	if err != nil {
-		m.logger.Error(err.Error())
-		handleError(w, err)
+		m.handleError(w, err)
 		return
 	}
 
 	if err = mq.Validate(); err != nil {
-		m.logger.Error(err.Error())
-		handleError(w, err)
+		m.handleError(w, err)
 		return
 	}
 
 	all, err := m.repo.All(r.Context(), mq)
 	if err != nil {
-		m.logger.Error(err.Error())
-		handleError(w, err)
+		m.handleError(w, err)
 		return
 	}
 
-	data, err := json.Marshal(all)
-	if err != nil {
-		m.logger.Error(err.Error())
-		handleError(w, err)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	_, err = w.Write(data)
-	if err != nil {
-		m.logger.Error(fmt.Errorf("error while writing response: %w", err).Error())
-		handleError(w, err)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
+	m.writeJSONResponse(w, all)
 }
