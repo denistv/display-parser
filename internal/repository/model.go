@@ -109,7 +109,7 @@ func (d *Model) Update(ctx context.Context, item domain.ModelEntity) error {
 		Update(d.table).
 		Set(item).
 		Where(
-			goqu.C("url").Eq(item.URL),
+			goqu.C("entity_id").Eq(item.EntityID.String()),
 		).ToSQL()
 	if err != nil {
 		return fmt.Errorf("making sql query: %w", err)

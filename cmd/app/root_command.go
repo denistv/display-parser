@@ -21,7 +21,7 @@ func newRootCommand(cfg *config.CmdApp) *cobra.Command {
 
 	// Pipeline
 	rootCmd.PersistentFlags().IntVar(&cfg.Pipeline.ModelParserCount, "pipeline-model-parser-count", 1, "")
-	rootCmd.PersistentFlags().BoolVar(&cfg.Pipeline.PageCollector.UseStoredPagesOnly, "pipeline-use-stored-pages-only", false, "use for rebuild database models only. If this flag enabled, parser will not going to site and using db-cache.")
+	rootCmd.PersistentFlags().BoolVar(&cfg.Pipeline.PageCollector.PagesCache, "pipeline-pages-cache", false, "use for rebuild database models only. If this flag enabled, parser will not going to site and using db-cache.")
 	rootCmd.PersistentFlags().IntVar(&cfg.Pipeline.PageCollector.Count, "pipeline-page-collector-count", 1, "")
 
 	// Database

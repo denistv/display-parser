@@ -44,7 +44,7 @@ func (p *Pipeline) Run(ctx context.Context) chan struct{} {
 
 	var pageCh []<-chan domain.PageEntity
 
-	if p.cfg.PageCollector.UseStoredPagesOnly {
+	if p.cfg.PageCollector.PagesCache {
 		// используем кэш страниц в базе. Подходит для второго и последующих запусков или когда у сущности модели
 		// появился новый параметр, который необходимо быстро перепарсить без хождения в сеть
 		pageCh = p.loadPagesFromCache(ctx)
@@ -128,7 +128,7 @@ func (p *Pipeline) loadPagesFromCache(ctx context.Context) []<-chan domain.PageE
 		}
 
 		for _, page := range pages {
-			entityID, err := domain.EntityID(page.URL)
+			entityID, err := domain.NewEntityIDFromURL(page.URL)
 			if err != nil {
 				p.logger.Error(fmt.Errorf("getting entityID: %w", err).Error())
 				continue

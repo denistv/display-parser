@@ -16,8 +16,8 @@ func NewModelEntity(page PageEntity) ModelEntity {
 
 // ModelEntity сущность, представляющая разобранную модель монитора.
 type ModelEntity struct {
-	ID       int64  `db:"id" goqu:"defaultifempty"`
-	EntityID string `db:"entity_id"`
+	ID       int64    `db:"id" goqu:"defaultifempty"`
+	EntityID EntityID `db:"entity_id"`
 
 	// URL страницы с монитором
 	URL    string `db:"url"`

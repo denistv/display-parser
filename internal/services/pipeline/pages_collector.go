@@ -45,14 +45,21 @@ func (d *PageCollector) Run(ctx context.Context, in <-chan string) <-chan domain
 					return
 				}
 
-				page, isExists, err := d.pageRepo.Find(ctx, pageURL)
+				entityID, err := domain.NewEntityIDFromURL(pageURL)
+				if err != nil {
+					d.logger.Error(fmt.Errorf("parsing entity ID: %w", err).Error())
+					continue
+				}
+
+				page, isExists, err := d.pageRepo.Find(ctx, entityID)
 				if err != nil {
 					d.logger.Error("checking model is exists: " + err.Error())
 
 					continue
 				}
 
-				if !d.cfg.UseStoredPagesOnly && !isExists {
+				// скачиваем страницу только в случае, если выключен кеш и ее нет в базе
+				if !d.cfg.PagesCache && !isExists {
 					d.logger.Debug(fmt.Sprintf("downloading page: %s", pageURL))
 
 					body, err := d.download(ctx, pageURL)
@@ -67,11 +74,6 @@ func (d *PageCollector) Run(ctx context.Context, in <-chan string) <-chan domain
 						Body: body,
 					}
 
-					entityID, err := domain.EntityID(pageURL)
-					if err != nil {
-						d.logger.Error(fmt.Errorf("getting entityID: %w", err).Error())
-						continue
-					}
 					page.EntityID = entityID
 
 					err = d.pageRepo.Create(ctx, page)

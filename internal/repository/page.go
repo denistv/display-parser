@@ -28,7 +28,7 @@ type Page struct {
 	table  string
 
 	pagesCacheMu sync.RWMutex
-	pagesCache   map[string]domain.PageEntity
+	pagesCache   map[domain.EntityID]domain.PageEntity
 }
 
 func (p *Page) All(ctx context.Context) ([]domain.PageEntity, error) {
@@ -62,9 +62,9 @@ func (p *Page) All(ctx context.Context) ([]domain.PageEntity, error) {
 	return pages, nil
 }
 
-func (p *Page) PageIsExists(pageURL string) (domain.PageEntity, bool) {
+func (p *Page) PageIsExists(entityID domain.EntityID) (domain.PageEntity, bool) {
 	p.pagesCacheMu.RLock()
-	page, ok := p.pagesCache[pageURL]
+	page, ok := p.pagesCache[entityID]
 	p.pagesCacheMu.RUnlock()
 
 	return page, ok
@@ -72,10 +72,10 @@ func (p *Page) PageIsExists(pageURL string) (domain.PageEntity, bool) {
 
 func (p *Page) initCache(pages []domain.PageEntity) {
 	p.pagesCacheMu.Lock()
-	p.pagesCache = make(map[string]domain.PageEntity, len(pages))
+	p.pagesCache = make(map[domain.EntityID]domain.PageEntity, len(pages))
 
 	for _, page := range pages {
-		p.pagesCache[page.URL] = page
+		p.pagesCache[page.EntityID] = page
 	}
 
 	p.pagesCacheMu.Unlock()
@@ -83,19 +83,19 @@ func (p *Page) initCache(pages []domain.PageEntity) {
 
 func (p *Page) addToCache(page domain.PageEntity) {
 	p.pagesCacheMu.Lock()
-	p.pagesCache[page.URL] = page
+	p.pagesCache[page.EntityID] = page
 	p.pagesCacheMu.Unlock()
 }
 
-func (p *Page) Find(ctx context.Context, pageURL string) (domain.PageEntity, bool, error) {
-	item, ok := p.PageIsExists(pageURL)
+func (p *Page) Find(ctx context.Context, entityID domain.EntityID) (domain.PageEntity, bool, error) {
+	item, ok := p.PageIsExists(entityID)
 	if ok {
 		return item, true, nil
 	}
 
 	query, params, err := goqu.
 		From(p.table).
-		Where(goqu.C("url").Eq(pageURL)).
+		Where(goqu.C("entity_id").Eq(entityID.String())).
 		Limit(1).
 		ToSQL()
 	if err != nil {
@@ -119,9 +119,13 @@ func (p *Page) Find(ctx context.Context, pageURL string) (domain.PageEntity, boo
 }
 
 func (p *Page) Create(ctx context.Context, page domain.PageEntity) error {
+	if err := page.Validate(); err != nil {
+		return fmt.Errorf("validating page: %w", err)
+	}
+
 	query, params, err := goqu.
 		Insert(p.table).
-		Rows(page).OnConflict(goqu.DoUpdate("url", page)).
+		Rows(page).OnConflict(goqu.DoUpdate("entity_id", page)).
 		ToSQL()
 	if err != nil {
 		return fmt.Errorf("make query: %w", err)

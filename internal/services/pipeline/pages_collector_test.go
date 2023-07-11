@@ -31,11 +31,11 @@ func TestPageCollector_Run(t *testing.T) {
 	}
 
 	c := mocks.NewHTTPClient(t)
-	c.On("Do", mock.AnythingOfType("*http.Request")).Return(&res, nil)
+	c.On("Do", mock.IsType(&http.Request{})).Return(&res, nil)
 
 	pageRepo := mocks.NewPageRepository(t)
 	pageRepo.
-		On("Find", mock.AnythingOfType("*context.emptyCtx"), mock.AnythingOfType("string")).
+		On("Find", mock.AnythingOfType("*context.emptyCtx"), mock.IsType(domain.EntityID(""))).
 		Return(domain.PageEntity{URL: "https://example.com/en/model/4e4a322f", Body: string(page), EntityID: "4e4a322f"}, false, nil)
 	pageRepo.On(
 		"Create",
@@ -68,7 +68,7 @@ func TestPageCollector_Run(t *testing.T) {
 				{
 					URL:      "https://example.com/en/model/4e4a322f",
 					Body:     string(page),
-					EntityID: "4e4a322f",
+					EntityID: domain.EntityID("4e4a322f"),
 				},
 			},
 		},

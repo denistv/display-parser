@@ -8,7 +8,7 @@ import (
 
 type PageRepository interface {
 	All(ctx context.Context) ([]domain.PageEntity, error)
-	Find(ctx context.Context, pageURL string) (domain.PageEntity, bool, error)
+	Find(ctx context.Context, entityID domain.EntityID) (domain.PageEntity, bool, error)
 	Create(ctx context.Context, page domain.PageEntity) error
-	PageIsExists(pageURL string) (domain.PageEntity, bool)
+	PageIsExists(entityID domain.EntityID) (domain.PageEntity, bool)
 }

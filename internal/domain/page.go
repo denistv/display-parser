@@ -1,6 +1,9 @@
 package domain
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // PageEntity представляет собой сущность страницы с описанием монитора на сайте.
 // Страница содержит Body, который можно многократно парсить (при необходимости расширения сущности ModelEntity),
@@ -9,6 +12,14 @@ import "time"
 type PageEntity struct {
 	URL       string    `db:"url"`
 	Body      string    `db:"body"`
-	EntityID  string    `db:"entity_id"`
+	EntityID  EntityID  `db:"entity_id"`
 	CreatedAt time.Time `db:"created_at"`
+}
+
+func (p *PageEntity) Validate() error {
+	if err := p.EntityID.Validate(); err != nil {
+		return fmt.Errorf("validating page entity ID: %w", err)
+	}
+
+	return nil
 }

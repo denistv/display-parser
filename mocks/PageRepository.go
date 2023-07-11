@@ -120,30 +120,30 @@ func (_c *PageRepository_Create_Call) RunAndReturn(run func(context.Context, dom
 	return _c
 }
 
-// Find provides a mock function with given fields: ctx, pageURL
-func (_m *PageRepository) Find(ctx context.Context, pageURL string) (domain.PageEntity, bool, error) {
-	ret := _m.Called(ctx, pageURL)
+// Find provides a mock function with given fields: ctx, entityID
+func (_m *PageRepository) Find(ctx context.Context, entityID domain.EntityID) (domain.PageEntity, bool, error) {
+	ret := _m.Called(ctx, entityID)
 
 	var r0 domain.PageEntity
 	var r1 bool
 	var r2 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) (domain.PageEntity, bool, error)); ok {
-		return rf(ctx, pageURL)
+	if rf, ok := ret.Get(0).(func(context.Context, domain.EntityID) (domain.PageEntity, bool, error)); ok {
+		return rf(ctx, entityID)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string) domain.PageEntity); ok {
-		r0 = rf(ctx, pageURL)
+	if rf, ok := ret.Get(0).(func(context.Context, domain.EntityID) domain.PageEntity); ok {
+		r0 = rf(ctx, entityID)
 	} else {
 		r0 = ret.Get(0).(domain.PageEntity)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string) bool); ok {
-		r1 = rf(ctx, pageURL)
+	if rf, ok := ret.Get(1).(func(context.Context, domain.EntityID) bool); ok {
+		r1 = rf(ctx, entityID)
 	} else {
 		r1 = ret.Get(1).(bool)
 	}
 
-	if rf, ok := ret.Get(2).(func(context.Context, string) error); ok {
-		r2 = rf(ctx, pageURL)
+	if rf, ok := ret.Get(2).(func(context.Context, domain.EntityID) error); ok {
+		r2 = rf(ctx, entityID)
 	} else {
 		r2 = ret.Error(2)
 	}
@@ -158,14 +158,14 @@ type PageRepository_Find_Call struct {
 
 // Find is a helper method to define mock.On call
 //   - ctx context.Context
-//   - pageURL string
-func (_e *PageRepository_Expecter) Find(ctx interface{}, pageURL interface{}) *PageRepository_Find_Call {
-	return &PageRepository_Find_Call{Call: _e.mock.On("Find", ctx, pageURL)}
+//   - entityID domain.EntityID
+func (_e *PageRepository_Expecter) Find(ctx interface{}, entityID interface{}) *PageRepository_Find_Call {
+	return &PageRepository_Find_Call{Call: _e.mock.On("Find", ctx, entityID)}
 }
 
-func (_c *PageRepository_Find_Call) Run(run func(ctx context.Context, pageURL string)) *PageRepository_Find_Call {
+func (_c *PageRepository_Find_Call) Run(run func(ctx context.Context, entityID domain.EntityID)) *PageRepository_Find_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(string))
+		run(args[0].(context.Context), args[1].(domain.EntityID))
 	})
 	return _c
 }
@@ -175,28 +175,28 @@ func (_c *PageRepository_Find_Call) Return(_a0 domain.PageEntity, _a1 bool, _a2 
 	return _c
 }
 
-func (_c *PageRepository_Find_Call) RunAndReturn(run func(context.Context, string) (domain.PageEntity, bool, error)) *PageRepository_Find_Call {
+func (_c *PageRepository_Find_Call) RunAndReturn(run func(context.Context, domain.EntityID) (domain.PageEntity, bool, error)) *PageRepository_Find_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// PageIsExists provides a mock function with given fields: pageURL
-func (_m *PageRepository) PageIsExists(pageURL string) (domain.PageEntity, bool) {
-	ret := _m.Called(pageURL)
+// PageIsExists provides a mock function with given fields: entityID
+func (_m *PageRepository) PageIsExists(entityID domain.EntityID) (domain.PageEntity, bool) {
+	ret := _m.Called(entityID)
 
 	var r0 domain.PageEntity
 	var r1 bool
-	if rf, ok := ret.Get(0).(func(string) (domain.PageEntity, bool)); ok {
-		return rf(pageURL)
+	if rf, ok := ret.Get(0).(func(domain.EntityID) (domain.PageEntity, bool)); ok {
+		return rf(entityID)
 	}
-	if rf, ok := ret.Get(0).(func(string) domain.PageEntity); ok {
-		r0 = rf(pageURL)
+	if rf, ok := ret.Get(0).(func(domain.EntityID) domain.PageEntity); ok {
+		r0 = rf(entityID)
 	} else {
 		r0 = ret.Get(0).(domain.PageEntity)
 	}
 
-	if rf, ok := ret.Get(1).(func(string) bool); ok {
-		r1 = rf(pageURL)
+	if rf, ok := ret.Get(1).(func(domain.EntityID) bool); ok {
+		r1 = rf(entityID)
 	} else {
 		r1 = ret.Get(1).(bool)
 	}
@@ -210,14 +210,14 @@ type PageRepository_PageIsExists_Call struct {
 }
 
 // PageIsExists is a helper method to define mock.On call
-//   - pageURL string
-func (_e *PageRepository_Expecter) PageIsExists(pageURL interface{}) *PageRepository_PageIsExists_Call {
-	return &PageRepository_PageIsExists_Call{Call: _e.mock.On("PageIsExists", pageURL)}
+//   - entityID domain.EntityID
+func (_e *PageRepository_Expecter) PageIsExists(entityID interface{}) *PageRepository_PageIsExists_Call {
+	return &PageRepository_PageIsExists_Call{Call: _e.mock.On("PageIsExists", entityID)}
 }
 
-func (_c *PageRepository_PageIsExists_Call) Run(run func(pageURL string)) *PageRepository_PageIsExists_Call {
+func (_c *PageRepository_PageIsExists_Call) Run(run func(entityID domain.EntityID)) *PageRepository_PageIsExists_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(string))
+		run(args[0].(domain.EntityID))
 	})
 	return _c
 }
@@ -227,7 +227,7 @@ func (_c *PageRepository_PageIsExists_Call) Return(_a0 domain.PageEntity, _a1 bo
 	return _c
 }
 
-func (_c *PageRepository_PageIsExists_Call) RunAndReturn(run func(string) (domain.PageEntity, bool)) *PageRepository_PageIsExists_Call {
+func (_c *PageRepository_PageIsExists_Call) RunAndReturn(run func(domain.EntityID) (domain.PageEntity, bool)) *PageRepository_PageIsExists_Call {
 	_c.Call.Return(run)
 	return _c
 }
