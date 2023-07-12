@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"gopkg.in/guregu/null.v4"
 	"net/http"
 	"reflect"
 	"testing"
+
+	"gopkg.in/guregu/null.v4"
 
 	"display_parser/internal/repository"
 )
@@ -16,7 +17,7 @@ func Test_parseModelQuery(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    repository.ModelQuery
+		want    *repository.ModelQuery
 		wantErr bool
 	}{
 		// Year
@@ -36,12 +37,12 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want: func() repository.ModelQuery {
+			want: func() *repository.ModelQuery {
 				mq := repository.NewModelQuery()
 
 				mq.YearFrom = null.NewInt(2020, true)
 
-				return mq
+				return &mq
 			}(),
 		},
 		{
@@ -60,12 +61,12 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want: func() repository.ModelQuery {
+			want: func() *repository.ModelQuery {
 				mq := repository.NewModelQuery()
 
 				mq.YearTo = null.NewInt(2020, true)
 
-				return mq
+				return &mq
 			}(),
 		},
 		{
@@ -84,7 +85,7 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want:    repository.ModelQuery{},
+			want:    nil,
 			wantErr: true,
 		},
 		{
@@ -103,7 +104,7 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want:    repository.ModelQuery{},
+			want:    nil,
 			wantErr: true,
 		},
 
@@ -124,12 +125,12 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want: func() repository.ModelQuery {
+			want: func() *repository.ModelQuery {
 				mq := repository.NewModelQuery()
 
 				mq.SizeFrom = null.NewFloat(32.4, true)
 
-				return mq
+				return &mq
 			}(),
 		},
 		{
@@ -148,12 +149,12 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want: func() repository.ModelQuery {
+			want: func() *repository.ModelQuery {
 				mq := repository.NewModelQuery()
 
 				mq.SizeTo = null.NewFloat(32.4, true)
 
-				return mq
+				return &mq
 			}(),
 		},
 		{
@@ -172,7 +173,7 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want:    repository.ModelQuery{},
+			want:    nil,
 			wantErr: true,
 		},
 		{
@@ -191,7 +192,7 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want:    repository.ModelQuery{},
+			want:    nil,
 			wantErr: true,
 		},
 
@@ -212,12 +213,12 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want: func() repository.ModelQuery {
+			want: func() *repository.ModelQuery {
 				mq := repository.NewModelQuery()
 
 				mq.PPIFrom = null.NewInt(100, true)
 
-				return mq
+				return &mq
 			}(),
 		},
 		{
@@ -236,12 +237,12 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want: func() repository.ModelQuery {
+			want: func() *repository.ModelQuery {
 				mq := repository.NewModelQuery()
 
 				mq.PPITo = null.NewInt(100, true)
 
-				return mq
+				return &mq
 			}(),
 		},
 		{
@@ -260,7 +261,7 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want:    repository.ModelQuery{},
+			want:    nil,
 			wantErr: true,
 		},
 		{
@@ -279,7 +280,7 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want:    repository.ModelQuery{},
+			want:    nil,
 			wantErr: true,
 		},
 
@@ -313,7 +314,7 @@ func Test_parseModelQuery(t *testing.T) {
 					return r
 				}(),
 			},
-			want: func() repository.ModelQuery {
+			want: func() *repository.ModelQuery {
 				mq := repository.NewModelQuery()
 
 				mq.Limit = null.NewInt(100, true)
@@ -329,7 +330,7 @@ func Test_parseModelQuery(t *testing.T) {
 
 				mq.Brand = null.NewString("Apple", true)
 
-				return mq
+				return &mq
 			}(),
 			wantErr: false,
 		},

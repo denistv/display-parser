@@ -18,7 +18,7 @@ type ModelRepository interface {
 	Find(ctx context.Context, url string) (domain.ModelEntity, bool, error)
 	Create(ctx context.Context, item domain.ModelEntity) error
 	Update(ctx context.Context, item domain.ModelEntity) error
-	All(ctx context.Context, modelQuery ModelQuery) ([]domain.ModelEntity, error)
+	All(ctx context.Context, modelQuery *ModelQuery) ([]domain.ModelEntity, error)
 }
 
 func NewModel(dbConn db.Pool) *Model {
@@ -206,7 +206,7 @@ func (m *ModelQuery) Validate() error {
 	return nil
 }
 
-func (d *Model) All(ctx context.Context, mq ModelQuery) ([]domain.ModelEntity, error) {
+func (d *Model) All(ctx context.Context, mq *ModelQuery) ([]domain.ModelEntity, error) {
 	if err := mq.Validate(); err != nil {
 		return nil, fmt.Errorf("validating model query: %w", err)
 	}

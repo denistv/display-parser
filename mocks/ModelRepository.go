@@ -25,15 +25,15 @@ func (_m *ModelRepository) EXPECT() *ModelRepository_Expecter {
 }
 
 // All provides a mock function with given fields: ctx, modelQuery
-func (_m *ModelRepository) All(ctx context.Context, modelQuery repository.ModelQuery) ([]domain.ModelEntity, error) {
+func (_m *ModelRepository) All(ctx context.Context, modelQuery *repository.ModelQuery) ([]domain.ModelEntity, error) {
 	ret := _m.Called(ctx, modelQuery)
 
 	var r0 []domain.ModelEntity
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, repository.ModelQuery) ([]domain.ModelEntity, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *repository.ModelQuery) ([]domain.ModelEntity, error)); ok {
 		return rf(ctx, modelQuery)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, repository.ModelQuery) []domain.ModelEntity); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *repository.ModelQuery) []domain.ModelEntity); ok {
 		r0 = rf(ctx, modelQuery)
 	} else {
 		if ret.Get(0) != nil {
@@ -41,7 +41,7 @@ func (_m *ModelRepository) All(ctx context.Context, modelQuery repository.ModelQ
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, repository.ModelQuery) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *repository.ModelQuery) error); ok {
 		r1 = rf(ctx, modelQuery)
 	} else {
 		r1 = ret.Error(1)
@@ -57,14 +57,14 @@ type ModelRepository_All_Call struct {
 
 // All is a helper method to define mock.On call
 //   - ctx context.Context
-//   - modelQuery repository.ModelQuery
+//   - modelQuery *repository.ModelQuery
 func (_e *ModelRepository_Expecter) All(ctx interface{}, modelQuery interface{}) *ModelRepository_All_Call {
 	return &ModelRepository_All_Call{Call: _e.mock.On("All", ctx, modelQuery)}
 }
 
-func (_c *ModelRepository_All_Call) Run(run func(ctx context.Context, modelQuery repository.ModelQuery)) *ModelRepository_All_Call {
+func (_c *ModelRepository_All_Call) Run(run func(ctx context.Context, modelQuery *repository.ModelQuery)) *ModelRepository_All_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(repository.ModelQuery))
+		run(args[0].(context.Context), args[1].(*repository.ModelQuery))
 	})
 	return _c
 }
@@ -74,7 +74,7 @@ func (_c *ModelRepository_All_Call) Return(_a0 []domain.ModelEntity, _a1 error) 
 	return _c
 }
 
-func (_c *ModelRepository_All_Call) RunAndReturn(run func(context.Context, repository.ModelQuery) ([]domain.ModelEntity, error)) *ModelRepository_All_Call {
+func (_c *ModelRepository_All_Call) RunAndReturn(run func(context.Context, *repository.ModelQuery) ([]domain.ModelEntity, error)) *ModelRepository_All_Call {
 	_c.Call.Return(run)
 	return _c
 }
