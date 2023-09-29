@@ -53,17 +53,17 @@ func (p *Pipeline) Run(ctx context.Context) chan struct{} {
 		// Подходит для первого запуска.
 		brandURLsChan := p.brandsColl.Run(ctx)
 		modelURLChan := p.modelsURLColl.Run(ctx, brandURLsChan)
-		pageCh = p.spawnPageCollectors(ctx, modelURLChan)
+		pageCh = p.runPageCollectors(ctx, modelURLChan)
 	}
 
-	modelsCh := p.spawnParsers(ctx, mergeCh(pageCh...))
+	modelsCh := p.runParsers(ctx, mergeCh(pageCh...))
 	done := p.modelPersister.Run(ctx, mergeCh(modelsCh...))
 
 	return done
 }
 
-// spawnPageCollectors запускает нужное число воркеров PageCollector
-func (p *Pipeline) spawnPageCollectors(ctx context.Context, modelURLChan <-chan string) []<-chan domain.PageEntity {
+// runPageCollectors запускает нужное число воркеров PageCollector
+func (p *Pipeline) runPageCollectors(ctx context.Context, modelURLChan <-chan string) []<-chan domain.PageEntity {
 	pageCh := make([]<-chan domain.PageEntity, 0, p.cfg.ModelParserCount)
 
 	for i := 0; i < p.cfg.PageCollector.Count; i++ {
@@ -76,8 +76,8 @@ func (p *Pipeline) spawnPageCollectors(ctx context.Context, modelURLChan <-chan 
 	return pageCh
 }
 
-// spawnParsers запускает нужное число ModelParser
-func (p *Pipeline) spawnParsers(ctx context.Context, pageCh chan domain.PageEntity) []<-chan domain.ModelEntity {
+// runParsers запускает нужное число ModelParser
+func (p *Pipeline) runParsers(ctx context.Context, pageCh chan domain.PageEntity) []<-chan domain.ModelEntity {
 	modelsCh := make([]<-chan domain.ModelEntity, 0, p.cfg.ModelParserCount)
 
 	for i := 0; i < p.cfg.ModelParserCount; i++ {
