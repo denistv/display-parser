@@ -16,8 +16,8 @@ vendor:
 
 .PHONY: build
 build:
-	go build -o bin/app ./cmd/app
-	go build -o bin/http ./cmd/http
+	go build -race -o bin/app ./cmd/app
+	go build -race -o bin/http ./cmd/http
 
 ### Run
 .PHONY: run
@@ -54,7 +54,7 @@ run-swagger-ui:
 ### Dev
 .PHONY: test
 test:
-	go test -v ./...
+	go test -race -v ./...
 
 .PHONY: lint
 lint:
