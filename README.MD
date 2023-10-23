@@ -86,7 +86,7 @@ $ docker-compose run app
 2. Сборщик URL страниц, на которых содержатся ссылки на модели мониторов (**internal/services/pipeline/pages_collector.go**)
 3. Сборщик URL на модели мониторов бренда (**internal/services/pipeline/models_url_collector.go**)
 4. Парсер страницы с описанием монитора (**internal/services/pipeline/model_parser.go**)
-
+5. Model persister. Сохраняет новую сущность модели монитора в базу или обновляет существующую. (**internal/services/pipeline/model_persister.go**)
 ![alt Схема пайплайна](./docs/diagram.png)
 
 # Описание команд
