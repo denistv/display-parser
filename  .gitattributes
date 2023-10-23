@@ -1,2 +1,2 @@
-docs/* linguist-vendored
-internal/services/pipeline/test_data/* linguist-vendored
+docs/** linguist-vendored
+internal/services/pipeline/test_data/** linguist-vendored
