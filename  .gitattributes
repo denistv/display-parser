@@ -1,2 +1,1 @@
-docs/* linguist-vendored
-internal/services/pipeline/test_data/* linguist-vendored
+*.html linguist-vendored
