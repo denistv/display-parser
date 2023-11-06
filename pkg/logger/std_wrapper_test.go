@@ -23,7 +23,18 @@ func Test_newMsg(t *testing.T) {
 			want: "[Debug] debug message",
 		},
 		{
-			name: "debug message with fields",
+			name: "debug message with one field (no comma)",
+			args: args{
+				level:  debugLevel,
+				msg:    "debug message",
+				fields: []Field{
+					NewInt64Field("int64_field", int64(12345)),
+				},
+			},
+			want: "[Debug] debug message {int64_field 12345}",
+		},
+		{
+			name: "debug message with two fields (with comma)",
 			args: args{
 				level:  debugLevel,
 				msg:    "debug message",
