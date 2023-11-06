@@ -45,11 +45,11 @@ func (s *STDWrapper) Error(msg string, fields ...Field) {
 }
 
 func (s *STDWrapper) Panic(msg string, fields ...Field) {
-	s.logger.Printf(newMsg(Panic, msg, fields...))
+	s.logger.Panic(newMsg(Panic, msg, fields...))
 }
 
 func (s *STDWrapper) Fatal(msg string, fields ...Field) {
-	s.logger.Printf(newMsg(Fatal, msg, fields...))
+	s.logger.Fatal(newMsg(Fatal, msg, fields...))
 }
 
 func newMsg(level LogLevel, msg string, fields ...Field) string {
