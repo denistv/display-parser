@@ -6,15 +6,15 @@ import (
 	"strings"
 )
 
-type LogLevel string
+type logLevel string
 
 const (
-	Debug LogLevel = "Debug"
-	Info  LogLevel = "Info"
-	Warn  LogLevel = "Warn"
-	Error LogLevel = "Error"
-	Panic LogLevel = "Panic"
-	Fatal LogLevel = "Fatal"
+	debugLevel logLevel = "Debug"
+	infoLevel  logLevel = "Info"
+	warnLevel  logLevel = "Warn"
+	errorLevel logLevel = "Error"
+	panicLevel logLevel = "Panic"
+	fatalLevel logLevel = "Fatal"
 )
 
 func NewStdWrapper() *STDWrapper {
@@ -29,38 +29,46 @@ type STDWrapper struct {
 }
 
 func (s *STDWrapper) Debug(msg string, fields ...Field) {
-	s.logger.Printf(newMsg(Debug, msg, fields...))
+	s.logger.Printf(newMsg(debugLevel, msg, fields...))
 }
 
 func (s *STDWrapper) Info(msg string, fields ...Field) {
-	s.logger.Printf(newMsg(Info, msg, fields...))
+	s.logger.Printf(newMsg(infoLevel, msg, fields...))
 }
 
 func (s *STDWrapper) Warn(msg string, fields ...Field) {
-	s.logger.Printf(newMsg(Warn, msg, fields...))
+	s.logger.Printf(newMsg(warnLevel, msg, fields...))
 }
 
 func (s *STDWrapper) Error(msg string, fields ...Field) {
-	s.logger.Printf(newMsg(Error, msg, fields...))
+	s.logger.Printf(newMsg(errorLevel, msg, fields...))
 }
 
 func (s *STDWrapper) Panic(msg string, fields ...Field) {
-	s.logger.Panic(newMsg(Panic, msg, fields...))
+	s.logger.Panic(newMsg(panicLevel, msg, fields...))
 }
 
 func (s *STDWrapper) Fatal(msg string, fields ...Field) {
-	s.logger.Fatal(newMsg(Fatal, msg, fields...))
+	s.logger.Fatal(newMsg(fatalLevel, msg, fields...))
 }
 
-func newMsg(level LogLevel, msg string, fields ...Field) string {
+func newMsg(level logLevel, msg string, fields ...Field) string {
 	sb := strings.Builder{}
 
 	sb.WriteString(fmt.Sprintf("[%s] %s", level, msg))
 
 	if len(fields) > 0 {
 		sb.WriteString(" ")
-		for _, v := range fields {
-			sb.WriteString(fmt.Sprintf(`{key: "%s", value: %q}`, v.Key, v.Value))
+
+		for i, v := range fields {
+			sb.WriteString(fmt.Sprintf(`%v`, v))
+
+			if i == len(fields)-1 {
+				continue
+			}
+
+			// Разделяем поля запятой и пробелом
+			sb.WriteString(", ")
 		}
 	}
 
