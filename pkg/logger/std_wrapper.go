@@ -57,7 +57,7 @@ func newMsg(level logLevel, msg string, fields ...Field) string {
 
 	sb.WriteString(fmt.Sprintf("[%s] %s", level, msg))
 
-	if len(fields) > 0 {
+	if len(fields) > 1 {
 		sb.WriteString(" ")
 
 		for i, v := range fields {
