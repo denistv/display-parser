@@ -5,11 +5,10 @@ import (
 	"reflect"
 	"testing"
 
-	"go.uber.org/zap"
-
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
 	"display_parser/mocks"
+	"display_parser/pkg/logger"
 )
 
 func TestModelParser_parsePPI(t *testing.T) {
@@ -25,7 +24,7 @@ func TestModelParser_parsePPI(t *testing.T) {
 	modelRepo := mocks.NewModelRepository(t)
 
 	type fields struct {
-		logger     *zap.Logger
+		logger     logger.Logger
 		modelsRepo repository.ModelRepository
 	}
 	type args struct {
@@ -41,7 +40,7 @@ func TestModelParser_parsePPI(t *testing.T) {
 		{
 			name: "parse correct PPI",
 			fields: fields{
-				logger:     zap.NewNop(),
+				logger:     logger.NewNopWrapper(),
 				modelsRepo: modelRepo,
 			},
 			args:    args{page: page},
@@ -51,7 +50,7 @@ func TestModelParser_parsePPI(t *testing.T) {
 		{
 			name: "parse incorrect PPI -- want error",
 			fields: fields{
-				logger:     zap.NewNop(),
+				logger:     logger.NewNopWrapper(),
 				modelsRepo: modelRepo,
 			},
 			args:    args{page: domain.PageEntity{Body: ""}},
@@ -91,7 +90,7 @@ func TestModelParser_parse(t *testing.T) {
 	modelRepo := mocks.NewModelRepository(t)
 
 	type fields struct {
-		logger     *zap.Logger
+		logger     logger.Logger
 		modelsRepo repository.ModelRepository
 	}
 	type args struct {
@@ -107,7 +106,7 @@ func TestModelParser_parse(t *testing.T) {
 		{
 			name: "full page parse",
 			fields: fields{
-				logger:     zap.NewNop(),
+				logger:     logger.NewNopWrapper(),
 				modelsRepo: modelRepo,
 			},
 			args: args{page: page},

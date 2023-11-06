@@ -6,14 +6,14 @@ import (
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
-	"go.uber.org/zap"
 
 	"display_parser/internal/iface"
+	"display_parser/pkg/logger"
 )
 
-func NewBrandsCollector(logger *zap.Logger, httpClient iface.HTTPClient, cancel context.CancelFunc) *BrandsCollector {
+func NewBrandsCollector(l logger.Logger, httpClient iface.HTTPClient, cancel context.CancelFunc) *BrandsCollector {
 	return &BrandsCollector{
-		logger:     logger,
+		logger:     l,
 		sourceURL:  "https://www.displayspecifications.com", // TODO вынести в конфиг
 		httpClient: httpClient,
 		cancel:     cancel,
@@ -21,7 +21,7 @@ func NewBrandsCollector(logger *zap.Logger, httpClient iface.HTTPClient, cancel 
 }
 
 type BrandsCollector struct {
-	logger     *zap.Logger
+	logger     logger.Logger
 	sourceURL  string
 	httpClient iface.HTTPClient
 

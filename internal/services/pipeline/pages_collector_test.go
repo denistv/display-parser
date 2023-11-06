@@ -4,19 +4,18 @@ import (
 	"bytes"
 	"context"
 	"display_parser/internal/config"
+	"display_parser/pkg/logger"
 	"io"
 	"net/http"
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"go.uber.org/zap"
-
 	"display_parser/internal/domain"
 	"display_parser/internal/iface"
 	"display_parser/internal/iface/db"
 	"display_parser/mocks"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestPageCollector_Run(t *testing.T) {
@@ -45,7 +44,7 @@ func TestPageCollector_Run(t *testing.T) {
 		Return(nil)
 
 	type fields struct {
-		logger     *zap.Logger
+		logger     logger.Logger
 		pageRepo   db.PageRepository
 		httpClient iface.HTTPClient
 		cfg        config.PagesCollector
@@ -59,7 +58,7 @@ func TestPageCollector_Run(t *testing.T) {
 		{
 			name: "create new page",
 			fields: fields{
-				logger:     zap.NewNop(),
+				logger:     logger.NewNopWrapper(),
 				pageRepo:   pageRepo,
 				httpClient: c,
 				cfg:        config.PagesCollector{},

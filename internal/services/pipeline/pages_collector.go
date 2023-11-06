@@ -7,17 +7,16 @@ import (
 	"io"
 	"net/http"
 
-	"go.uber.org/zap"
-
 	"display_parser/internal/config"
 	"display_parser/internal/domain"
 	"display_parser/internal/iface"
 	"display_parser/internal/iface/db"
+	"display_parser/pkg/logger"
 )
 
-func NewPageCollector(logger *zap.Logger, pageRepo db.PageRepository, httpClient iface.HTTPClient, cfg config.PagesCollector) *PageCollector {
+func NewPageCollector(l logger.Logger, pageRepo db.PageRepository, httpClient iface.HTTPClient, cfg config.PagesCollector) *PageCollector {
 	return &PageCollector{
-		logger:     logger,
+		logger:     l,
 		pageRepo:   pageRepo,
 		httpClient: httpClient,
 		cfg:        cfg,
@@ -26,7 +25,7 @@ func NewPageCollector(logger *zap.Logger, pageRepo db.PageRepository, httpClient
 
 // PageCollector Слушает канал с URL моделей устройств и для каждого URL загружает документ с описанием модели
 type PageCollector struct {
-	logger     *zap.Logger
+	logger     logger.Logger
 	pageRepo   db.PageRepository
 	httpClient iface.HTTPClient
 	cfg        config.PagesCollector

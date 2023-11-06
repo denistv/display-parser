@@ -4,21 +4,20 @@ import (
 	"context"
 	"fmt"
 
-	"go.uber.org/zap"
-
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
+	"display_parser/pkg/logger"
 )
 
-func NewModelPersister(logger *zap.Logger, modelRepo repository.ModelRepository) *ModelPersister {
+func NewModelPersister(l logger.Logger, modelRepo repository.ModelRepository) *ModelPersister {
 	return &ModelPersister{
-		logger:    logger,
+		logger:    l,
 		modelRepo: modelRepo,
 	}
 }
 
 type ModelPersister struct {
-	logger    *zap.Logger
+	logger    logger.Logger
 	modelRepo repository.ModelRepository
 }
 

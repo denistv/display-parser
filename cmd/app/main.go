@@ -14,6 +14,7 @@ import (
 	"display_parser/internal/repository"
 	"display_parser/internal/services"
 	"display_parser/internal/services/pipeline"
+	"display_parser/pkg/logger"
 )
 
 func main() {
@@ -34,11 +35,13 @@ func main() {
 		syscall.SIGTERM, // Общий сигнал завершения работы (посылаемый командой kill)
 	)
 
-	logger, err := zap.NewDevelopment()
+	zapLogger, err := zap.NewDevelopment()
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(config.UNIXDefaultErrCode)
 	}
+
+	wrappedLogger := logger.NewZapWrapper(zapLogger)
 
 	dbpool, err := pgxpool.New(context.Background(), cfg.DB.ConnString())
 	if err != nil {
@@ -55,11 +58,11 @@ func main() {
 	delayedHTTPClient := services.NewDelayedHTTPClient(ctx, cfg.HTTP.DelayPerRequest, httpClient)
 
 	// Collectors
-	brandsCollector := pipeline.NewBrandsCollector(logger, delayedHTTPClient, cancel)
-	modelPagesCollector := pipeline.NewPageCollector(logger, pageRepo, delayedHTTPClient, cfg.Pipeline.PageCollector)
-	modelsURLCollector := pipeline.NewModelsURLCollector(logger, delayedHTTPClient)
-	modelParser := pipeline.NewModelParser(logger, modelsRepo)
-	modelPersister := pipeline.NewModelPersister(logger, modelsRepo)
+	brandsCollector := pipeline.NewBrandsCollector(wrappedLogger, delayedHTTPClient, cancel)
+	modelPagesCollector := pipeline.NewPageCollector(wrappedLogger, pageRepo, delayedHTTPClient, cfg.Pipeline.PageCollector)
+	modelsURLCollector := pipeline.NewModelsURLCollector(wrappedLogger, delayedHTTPClient)
+	modelParser := pipeline.NewModelParser(wrappedLogger, modelsRepo)
+	modelPersister := pipeline.NewModelPersister(wrappedLogger, modelsRepo)
 
 	pp := pipeline.NewPipeline(
 		cfg.Pipeline,
@@ -67,12 +70,12 @@ func main() {
 		modelPagesCollector,
 		modelsURLCollector,
 		modelParser,
-		logger,
+		wrappedLogger,
 		pageRepo,
 		modelPersister,
 	)
 
 	<-pp.Run(ctx)
 
-	logger.Info("exiting")
+	zapLogger.Info("exiting")
 }

@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"sync"
 
-	"go.uber.org/zap"
-
 	"display_parser/internal/config"
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
+	"display_parser/pkg/logger"
 )
 
-func NewPipeline(cfg config.Pipeline, brandsCollector *BrandsCollector, pagesColl *PageCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, logger *zap.Logger, pageRepo *repository.Page, modelPersister *ModelPersister) *Pipeline {
+func NewPipeline(cfg config.Pipeline, brandsCollector *BrandsCollector, pagesColl *PageCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, l logger.Logger, pageRepo *repository.Page, modelPersister *ModelPersister) *Pipeline {
 	return &Pipeline{
 		cfg:            cfg,
-		logger:         logger,
+		logger:         l,
 		brandsColl:     brandsCollector,
 		modelsURLColl:  modelURLColl,
 		pagesColl:      pagesColl,
@@ -27,7 +26,7 @@ func NewPipeline(cfg config.Pipeline, brandsCollector *BrandsCollector, pagesCol
 
 // Pipeline представляет собой сущность, которая связывает шаги пайплайна и централизовано управляет его жизненным циклом.
 type Pipeline struct {
-	logger         *zap.Logger
+	logger         logger.Logger
 	cfg            config.Pipeline
 	brandsColl     *BrandsCollector
 	modelsURLColl  *ModelsURLCollector

@@ -2,12 +2,15 @@ package pipeline
 
 import (
 	"context"
+	"testing"
+
+	"github.com/stretchr/testify/mock"
+	"go.uber.org/zap"
+
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
 	"display_parser/mocks"
-	"github.com/stretchr/testify/mock"
-	"go.uber.org/zap"
-	"testing"
+	"display_parser/pkg/logger"
 )
 
 func TestModelPersister_Run(t *testing.T) {
@@ -85,7 +88,7 @@ func TestModelPersister_Run(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			modelRepo := tt.fields.modelRepo(t)
-			m := NewModelPersister(zap.NewNop(), modelRepo)
+			m := NewModelPersister(logger.NewNopWrapper(), modelRepo)
 			done := m.Run(context.Background(), tt.args.in())
 
 			<-done

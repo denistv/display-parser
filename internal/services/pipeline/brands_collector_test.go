@@ -3,18 +3,17 @@ package pipeline
 import (
 	"bytes"
 	"context"
+	"display_parser/pkg/logger"
 	"io"
 	"net/http"
 	"os"
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"go.uber.org/zap"
-
 	"display_parser/internal/iface"
 	"display_parser/mocks"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestBrandsCollector_Run(t *testing.T) {
@@ -41,7 +40,7 @@ func TestBrandsCollector_Run(t *testing.T) {
 	httpClient.On("Do", mock.AnythingOfType("*http.Request")).Return(&res, nil)
 
 	type fields struct {
-		logger     *zap.Logger
+		logger     logger.Logger
 		sourceURL  string
 		httpClient iface.HTTPClient
 	}
@@ -57,7 +56,7 @@ func TestBrandsCollector_Run(t *testing.T) {
 		{
 			name: "parsing index page for collect brand URLs",
 			fields: fields{
-				logger:     zap.NewNop(),
+				logger:     logger.NewNopWrapper(),
 				httpClient: httpClient,
 			},
 			args: args{ctx: context.Background()},

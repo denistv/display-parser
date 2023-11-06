@@ -7,21 +7,21 @@ import (
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
-	"go.uber.org/zap"
 
 	"display_parser/internal/iface"
+	"display_parser/pkg/logger"
 )
 
-func NewModelsURLCollector(logger *zap.Logger, httpClient iface.HTTPClient) *ModelsURLCollector {
+func NewModelsURLCollector(l logger.Logger, httpClient iface.HTTPClient) *ModelsURLCollector {
 	return &ModelsURLCollector{
-		logger:     logger,
+		logger:     l,
 		httpClient: httpClient,
 	}
 }
 
 // ModelsURLCollector Собирает URL моделей устройств, чтобы затем обойти их и загрузить страницы с описаниями устройств
 type ModelsURLCollector struct {
-	logger     *zap.Logger
+	logger     logger.Logger
 	httpClient iface.HTTPClient
 }
 

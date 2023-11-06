@@ -10,25 +10,25 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"go.uber.org/zap"
 	"gopkg.in/guregu/null.v4"
 
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
+	"display_parser/pkg/logger"
 )
 
 var modelParserPPIRegexp = regexp.MustCompile(`\d+ ppi`)
 
 // NewModelParser Разбирает страницу с описанием монитора, сохраняя его свойства в сущность модели
-func NewModelParser(logger *zap.Logger, modelsRepo repository.ModelRepository) *ModelParser {
+func NewModelParser(l logger.Logger, modelsRepo repository.ModelRepository) *ModelParser {
 	return &ModelParser{
-		logger:     logger,
+		logger:     l,
 		modelsRepo: modelsRepo,
 	}
 }
 
 type ModelParser struct {
-	logger     *zap.Logger
+	logger     logger.Logger
 	modelsRepo repository.ModelRepository
 }
 
