@@ -17,7 +17,7 @@ const (
 	fatalLevel logLevel = "Fatal"
 )
 
-func NewStdWrapper() *STDWrapper {
+func NewSTDWrapper() *STDWrapper {
 	return &STDWrapper{
 		logger: log.Default(),
 	}

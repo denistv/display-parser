@@ -42,3 +42,11 @@ func NewTimeField(key string, value time.Time) Field {
 		Value: value,
 	}
 }
+
+func NewErrorField(key string, value error) Field {
+	return Field{
+		Key:   key,
+		Value: value,
+	}
+}
+
