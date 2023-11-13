@@ -1,16 +1,16 @@
 package controllers
 
 import (
-	"display_parser/pkg/logger"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"display_parser/internal/repository"
+	"display_parser/pkg/logger"
 )
 
-func NewModelsController(logger logger.Logger, repo repository.ModelRepository) *ModelsController {
-	j := newJSONController(logger)
+func NewModelsController(l logger.Logger, repo repository.ModelRepository) *ModelsController {
+	j := newJSONController(l)
 
 	return &ModelsController{
 		jsonController: j,

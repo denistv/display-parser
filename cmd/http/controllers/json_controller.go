@@ -1,14 +1,15 @@
 package controllers
 
 import (
-	"display_parser/pkg/logger"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"display_parser/pkg/logger"
 )
 
-func newJSONController(logger logger.Logger) jsonController {
-	return jsonController{logger: logger}
+func newJSONController(l logger.Logger) jsonController {
+	return jsonController{logger: l}
 }
 
 // jsonController можно встроить в структуру контроллера для придания ему нужного поведения

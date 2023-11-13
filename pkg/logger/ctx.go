@@ -20,13 +20,22 @@ func WithFields(ctx context.Context, fields ...Field) context.Context {
 
 }
 
-func ExtractFields(ctx context.Context) []Field {
+func ExtractFields(ctx context.Context, fields ...Field) []Field {
 	s, ok := ctx.Value(ctxFieldsKey).(*ctxFields)
 	if !ok {
 		return nil
 	}
 
-	return s.All()
+	ctxFieldsAll := s.All()
+
+	if len(fields) != 0 {
+		out := make([]Field, 0, len(fields) + len(ctxFieldsAll))
+		out = append(out, ctxFieldsAll...)
+		out = append(out, fields...)
+		return out
+	}
+
+	return ctxFieldsAll
 }
 
 
