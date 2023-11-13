@@ -3,7 +3,6 @@ package pipeline
 import (
 	"bytes"
 	"context"
-	"display_parser/pkg/logger"
 	"io"
 	"net/http"
 	"os"
@@ -12,6 +11,8 @@ import (
 
 	"display_parser/internal/iface"
 	"display_parser/mocks"
+	"display_parser/pkg/logger"
+	"display_parser/pkg/logger/wrappers/nopwrap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -56,7 +57,7 @@ func TestBrandsCollector_Run(t *testing.T) {
 		{
 			name: "parsing index page for collect brand URLs",
 			fields: fields{
-				logger:     logger.NewNopWrapper(),
+				logger:     nopwrap.NewNopWrapper(),
 				httpClient: httpClient,
 			},
 			args: args{ctx: context.Background()},

@@ -14,7 +14,7 @@ import (
 	"display_parser/internal/repository"
 	"display_parser/internal/services"
 	"display_parser/internal/services/pipeline"
-	"display_parser/pkg/logger"
+	"display_parser/pkg/logger/wrappers/zapwrap"
 )
 
 func main() {
@@ -41,7 +41,7 @@ func main() {
 		os.Exit(config.UNIXDefaultErrCode)
 	}
 
-	wrappedLogger := logger.NewZapWrapper(zapLogger)
+	wrappedLogger := zapwrap.NewZapWrapper(zapLogger)
 
 	dbpool, err := pgxpool.New(context.Background(), cfg.DB.ConnString())
 	if err != nil {

@@ -16,16 +16,19 @@ import (
 	"display_parser/cmd/http/controllers"
 	"display_parser/internal/config"
 	"display_parser/internal/repository"
+	"display_parser/pkg/logger/wrappers/zapwrap"
 )
 
 func main() {
 	cfg := config.NewCmdHTTP()
 
-	logger, err := zap.NewDevelopment()
+	zapLogger, err := zap.NewDevelopment()
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(config.UNIXDefaultErrCode)
 	}
+
+	wrappedLogger := zapwrap.NewZapWrapper(zapLogger)
 
 	rootCmd := newRootCommand(&cfg)
 	if err = rootCmd.Execute(); err != nil {
@@ -33,17 +36,17 @@ func main() {
 	}
 
 	if err = cfg.Validate(); err != nil {
-		logger.Fatal(err.Error())
+		zapLogger.Fatal(err.Error())
 	}
 
 	dbpool, err := pgxpool.New(context.Background(), cfg.DB.ConnString())
 	if err != nil {
-		logger.Fatal(fmt.Errorf("unable to create connection pool: %w", err).Error())
+		zapLogger.Fatal(fmt.Errorf("unable to create connection pool: %w", err).Error())
 	}
 	defer dbpool.Close()
 
 	modelsRepo := repository.NewModel(dbpool)
-	modelsController := controllers.NewModelsController(logger, modelsRepo)
+	modelsController := controllers.NewModelsController(wrappedLogger, modelsRepo)
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)

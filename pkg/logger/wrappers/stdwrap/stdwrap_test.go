@@ -1,12 +1,16 @@
-package logger
+package stdwrap
 
-import "testing"
+import (
+	"testing"
+
+	"display_parser/pkg/logger"
+)
 
 func Test_newMsg(t *testing.T) {
 	type args struct {
 		level  logLevel
 		msg    string
-		fields []Field
+		fields []logger.Field
 	}
 	tests := []struct {
 		name string
@@ -25,10 +29,10 @@ func Test_newMsg(t *testing.T) {
 		{
 			name: "debug message with one field (no comma)",
 			args: args{
-				level:  debugLevel,
-				msg:    "debug message",
-				fields: []Field{
-					NewInt64Field("int64_field", int64(12345)),
+				level: debugLevel,
+				msg:   "debug message",
+				fields: []logger.Field{
+					logger.NewInt64Field("int64_field", int64(12345)),
 				},
 			},
 			want: "[Debug] debug message {int64_field 12345}",
@@ -36,11 +40,11 @@ func Test_newMsg(t *testing.T) {
 		{
 			name: "debug message with two fields (with comma)",
 			args: args{
-				level:  debugLevel,
-				msg:    "debug message",
-				fields: []Field{
-					NewInt64Field("int64_field", int64(12345)),
-					NewStringField("string_field", "string_value"),
+				level: debugLevel,
+				msg:   "debug message",
+				fields: []logger.Field{
+					logger.NewInt64Field("int64_field", int64(12345)),
+					logger.NewStringField("string_field", "string_value"),
 				},
 			},
 			want: "[Debug] debug message {int64_field 12345}, {string_field string_value}",

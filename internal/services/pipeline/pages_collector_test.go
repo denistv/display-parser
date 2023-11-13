@@ -3,17 +3,18 @@ package pipeline
 import (
 	"bytes"
 	"context"
-	"display_parser/internal/config"
-	"display_parser/pkg/logger"
 	"io"
 	"net/http"
 	"os"
 	"testing"
 
+	"display_parser/internal/config"
 	"display_parser/internal/domain"
 	"display_parser/internal/iface"
 	"display_parser/internal/iface/db"
 	"display_parser/mocks"
+	"display_parser/pkg/logger"
+	"display_parser/pkg/logger/wrappers/nopwrap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -58,7 +59,7 @@ func TestPageCollector_Run(t *testing.T) {
 		{
 			name: "create new page",
 			fields: fields{
-				logger:     logger.NewNopWrapper(),
+				logger:     nopwrap.NewNopWrapper(),
 				pageRepo:   pageRepo,
 				httpClient: c,
 				cfg:        config.PagesCollector{},

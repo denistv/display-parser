@@ -9,6 +9,7 @@ import (
 	"display_parser/internal/repository"
 	"display_parser/mocks"
 	"display_parser/pkg/logger"
+	"display_parser/pkg/logger/wrappers/nopwrap"
 )
 
 func TestModelParser_parsePPI(t *testing.T) {
@@ -40,7 +41,7 @@ func TestModelParser_parsePPI(t *testing.T) {
 		{
 			name: "parse correct PPI",
 			fields: fields{
-				logger:     logger.NewNopWrapper(),
+				logger:     nopwrap.NewNopWrapper(),
 				modelsRepo: modelRepo,
 			},
 			args:    args{page: page},
@@ -50,7 +51,7 @@ func TestModelParser_parsePPI(t *testing.T) {
 		{
 			name: "parse incorrect PPI -- want error",
 			fields: fields{
-				logger:     logger.NewNopWrapper(),
+				logger:     nopwrap.NewNopWrapper(),
 				modelsRepo: modelRepo,
 			},
 			args:    args{page: domain.PageEntity{Body: ""}},
@@ -106,7 +107,7 @@ func TestModelParser_parse(t *testing.T) {
 		{
 			name: "full page parse",
 			fields: fields{
-				logger:     logger.NewNopWrapper(),
+				logger:     nopwrap.NewNopWrapper(),
 				modelsRepo: modelRepo,
 			},
 			args: args{page: page},

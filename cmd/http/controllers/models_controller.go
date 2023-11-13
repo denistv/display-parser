@@ -1,16 +1,15 @@
 package controllers
 
 import (
+	"display_parser/pkg/logger"
 	"fmt"
 	"net/http"
 	"strconv"
 
-	"go.uber.org/zap"
-
 	"display_parser/internal/repository"
 )
 
-func NewModelsController(logger *zap.Logger, repo repository.ModelRepository) *ModelsController {
+func NewModelsController(logger logger.Logger, repo repository.ModelRepository) *ModelsController {
 	j := newJSONController(logger)
 
 	return &ModelsController{

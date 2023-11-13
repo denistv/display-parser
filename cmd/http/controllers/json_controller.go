@@ -1,20 +1,19 @@
 package controllers
 
 import (
+	"display_parser/pkg/logger"
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"go.uber.org/zap"
 )
 
-func newJSONController(logger *zap.Logger) jsonController {
+func newJSONController(logger logger.Logger) jsonController {
 	return jsonController{logger: logger}
 }
 
 // jsonController можно встроить в структуру контроллера для придания ему нужного поведения
 type jsonController struct {
-	logger *zap.Logger
+	logger logger.Logger
 }
 
 func (j *jsonController) writeHeaders(w http.ResponseWriter) {

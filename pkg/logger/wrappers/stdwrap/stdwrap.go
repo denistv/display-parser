@@ -1,9 +1,11 @@
-package logger
+package stdwrap
 
 import (
 	"fmt"
 	"log"
 	"strings"
+
+	"display_parser/pkg/logger"
 )
 
 type logLevel string
@@ -28,31 +30,31 @@ type STDWrapper struct {
 	logger *log.Logger
 }
 
-func (s *STDWrapper) Debug(msg string, fields ...Field) {
+func (s *STDWrapper) Debug(msg string, fields ...logger.Field) {
 	s.logger.Printf(newMsg(debugLevel, msg, fields...))
 }
 
-func (s *STDWrapper) Info(msg string, fields ...Field) {
+func (s *STDWrapper) Info(msg string, fields ...logger.Field) {
 	s.logger.Printf(newMsg(infoLevel, msg, fields...))
 }
 
-func (s *STDWrapper) Warn(msg string, fields ...Field) {
+func (s *STDWrapper) Warn(msg string, fields ...logger.Field) {
 	s.logger.Printf(newMsg(warnLevel, msg, fields...))
 }
 
-func (s *STDWrapper) Error(msg string, fields ...Field) {
+func (s *STDWrapper) Error(msg string, fields ...logger.Field) {
 	s.logger.Printf(newMsg(errorLevel, msg, fields...))
 }
 
-func (s *STDWrapper) Panic(msg string, fields ...Field) {
+func (s *STDWrapper) Panic(msg string, fields ...logger.Field) {
 	s.logger.Panic(newMsg(panicLevel, msg, fields...))
 }
 
-func (s *STDWrapper) Fatal(msg string, fields ...Field) {
+func (s *STDWrapper) Fatal(msg string, fields ...logger.Field) {
 	s.logger.Fatal(newMsg(fatalLevel, msg, fields...))
 }
 
-func newMsg(level logLevel, msg string, fields ...Field) string {
+func newMsg(level logLevel, msg string, fields ...logger.Field) string {
 	sb := strings.Builder{}
 
 	sb.WriteString(fmt.Sprintf("[%s] %s", level, msg))
