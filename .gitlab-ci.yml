@@ -1,0 +1,29 @@
+default:
+  image: golang:1.20
+
+stages:
+  - test
+  - build
+  - deploy
+
+build-job:
+  image: golang:1.20
+  stage: build
+  script:
+    - make build
+
+lint-test-job:
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  stage: test
+  script:
+    - pwd
+    - ls -la
+    - docker run --rm -v $(pwd):/app -v ~/.cache/golangci-lint/v1.53.3:/root/.cache -w /app golangci/golangci-lint:v1.53.3 golangci-lint run -v
+
+unit-test-job:
+  image: golang:1.20
+  stage: test
+  script:
+    - make test
