@@ -6,11 +6,23 @@ stages:
   - build
   - deploy
 
-build-job:
+build-binaries-job:
   image: golang:1.20
   stage: build
   script:
     - make build
+
+build-docker-images-job:
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  stage: build
+  environment:
+    DOCKER_BUILDKIT: 1
+    NAME: display-parser
+  script:
+    - docker build -t ${NAME}-app:latest --target=app-image -f Dockerfile .
+    - docker build -t ${NAME}-http:latest --target=http-image -f Dockerfile .
 
 lint-test-job:
   image: docker:24.0.5
