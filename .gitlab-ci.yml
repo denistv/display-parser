@@ -17,12 +17,9 @@ build-docker-images-job:
   services:
     - docker:24.0.5-dind
   stage: build
-  environment:
-    DOCKER_BUILDKIT: 1
-    NAME: display-parser
   script:
-    - docker build -t ${NAME}-app:latest --target=app-image -f Dockerfile .
-    - docker build -t ${NAME}-http:latest --target=http-image -f Dockerfile .
+    - DOCKER_BUILDKIT=1 docker build -t display-parser-app:latest --target=app-image -f Dockerfile .
+    - DOCKER_BUILDKIT=1 docker build -t display-parser-http:latest --target=http-image -f Dockerfile .
 
 lint-test-job:
   image: docker:24.0.5
