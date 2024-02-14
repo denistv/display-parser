@@ -30,7 +30,8 @@ build-binaries-job:
 build-docker-images-job:
   image: docker:24.0.5
   services:
-    - docker:24.0.5-dind
+    - name: docker:24.0.5-dind
+      command: ["--insecure-registry","192.168.1.47:5000"]
   stage: build
   script:
     - DOCKER_BUILDKIT=1 docker build -t display-parser-app:latest --target=app-image -f Dockerfile .
