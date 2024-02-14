@@ -35,14 +35,7 @@ build-docker-images-job:
   script:
     - DOCKER_BUILDKIT=1 docker build -t display-parser-app:latest --target=app-image -f Dockerfile .
     - DOCKER_BUILDKIT=1 docker build -t display-parser-http:latest --target=http-image -f Dockerfile .
-
-push-docker-images-job:
-  image: docker:24.0.5
-  services:
-    - docker:24.0.5-dind
-  stage: build
-  script:
-    # APP
+        # APP
     - docker tag display-parser-app 192.168.1.47:5000/display-parser-app
     - docker push 192.168.1.47:5000/display-parser-app
     # HTTP
