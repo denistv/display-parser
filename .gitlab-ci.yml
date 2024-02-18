@@ -1,5 +1,8 @@
 default:
-  image: golang:1.20
+  image: 192.168.1.5:5000/docker:24.0.5
+  services:
+    - name: docker:24.0.5-dind
+      command: ["--insecure-registry","192.168.1.5:5000"]
 variables:
   # When you use the dind service, you must instruct Docker to talk with
   # the daemon started inside of the service. The daemon is available
@@ -21,40 +24,35 @@ stages:
   - build
   - deploy
 
-build-binaries-job:
-  image: golang:1.20
+build-binaries:
+  image: 192.168.1.5:5000/golang:1.20
   stage: build
   script:
     - make build
 
-build-docker-images-job:
-  image: docker:24.0.5
-  services:
-    - name: docker:24.0.5-dind
-      command: ["--insecure-registry","192.168.1.47:5000"]
+build-docker-images:
+  image: 192.168.1.5:5000/docker:24.0.5
   stage: build
   script:
     - DOCKER_BUILDKIT=1 docker build -t display-parser-app:latest --target=app-image -f Dockerfile .
     - DOCKER_BUILDKIT=1 docker build -t display-parser-http:latest --target=http-image -f Dockerfile .
         # APP
-    - docker tag display-parser-app 192.168.1.47:5000/display-parser-app
-    - docker push 192.168.1.47:5000/display-parser-app
+    - docker tag display-parser-app 192.168.1.5:5000/display-parser-app
+    - docker push 192.168.1.5:5000/display-parser-app
     # HTTP
-    - docker tag display-parser-http 192.168.1.47:5000/display-parser-http
-    - docker push 192.168.1.47:5000/display-parser-http
+    - docker tag display-parser-http 192.168.1.5:5000/display-parser-http
+    - docker push 192.168.1.5:5000/display-parser-http
 
-lint-test-job:
-  image: docker:24.0.5
-  services:
-    - docker:24.0.5-dind
+lint:
+  image: 192.168.1.5:5000/docker:24.0.5
   stage: test
+  tags:
+    - dind
   script:
-    - pwd
-    - ls -la
-    - docker run --rm -v $(pwd):/app -v ~/.cache/golangci-lint/v1.53.3:/root/.cache -w /app golangci/golangci-lint:v1.53.3 golangci-lint run -v
+    - docker run --rm -v $(pwd):/app -v ~/.cache/golangci-lint/v1.53.3:/root/.cache -w /app 192.168.1.5:5000/golangci/golangci-lint:v1.53.3 golangci-lint run -v
 
-unit-test-job:
-  image: golang:1.20
+test:
+  image: 192.168.1.5:5000/golang:1.20
   stage: test
   script:
     - make test
