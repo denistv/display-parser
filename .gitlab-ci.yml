@@ -47,8 +47,6 @@ lint:
   image: 192.168.1.5:5000/docker:24.0.5
   stage: test
   script:
-    - pwd
-    - ls -la
     - docker run --rm -v $(pwd):/app -v ~/.cache/golangci-lint/v1.53.3:/root/.cache -w /app 192.168.1.5:5000/golangci/golangci-lint:v1.53.3 golangci-lint run -v
 
 test:
