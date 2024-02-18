@@ -34,14 +34,14 @@ build-docker-images:
   image: 192.168.1.5:5000/docker:24.0.5
   stage: build
   script:
-    - DOCKER_BUILDKIT=1 docker build -t display-parser-app:latest --target=app-image -f Dockerfile .
-    - DOCKER_BUILDKIT=1 docker build -t display-parser-http:latest --target=http-image -f Dockerfile .
-        # APP
-    - docker tag display-parser-app 192.168.1.5:5000/display-parser-app
-    - docker push 192.168.1.5:5000/display-parser-app
+    # APP
+    - DOCKER_BUILDKIT=1 docker build -t display-parser/app:latest --target=app-image -f Dockerfile .
+    - docker tag display-parser/app 192.168.1.5:5000/display-parser/app
+    - docker push 192.168.1.5:5000/display-parser/app
     # HTTP
-    - docker tag display-parser-http 192.168.1.5:5000/display-parser-http
-    - docker push 192.168.1.5:5000/display-parser-http
+    - DOCKER_BUILDKIT=1 docker build -t display-parser/http:latest --target=http-image -f Dockerfile .
+    - docker tag display-parser/http 192.168.1.5:5000/display-parser/http
+    - docker push 192.168.1.5:5000/display-parser/http
 
 lint:
   image: 192.168.1.5:5000/docker:24.0.5
