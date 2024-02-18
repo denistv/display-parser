@@ -46,8 +46,6 @@ build-docker-images:
 lint:
   image: 192.168.1.5:5000/docker:24.0.5
   stage: test
-  tags:
-    - dind
   script:
     - pwd
     - ls -la
