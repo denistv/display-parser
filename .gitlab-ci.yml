@@ -1,5 +1,5 @@
 default:
-  image: 192.168.1.5:5000/docker:24.0.5
+  image: registry.denistv777.ru/docker:24.0.5
   services:
     - name: docker:24.0.5-dind
       command: ["--insecure-registry","192.168.1.5:5000"]
@@ -25,32 +25,32 @@ stages:
   - deploy
 
 build-binaries:
-  image: 192.168.1.5:5000/golang:1.20
+  image: registry.denistv777.ru/golang:1.20
   stage: build
   script:
     - make build
 
 build-docker-images:
-  image: 192.168.1.5:5000/docker:24.0.5
+  image: registry.denistv777.ru/docker:24.0.5
   stage: build
   script:
     # APP
     - DOCKER_BUILDKIT=1 docker build -t display-parser/app:latest --target=app-image -f Dockerfile .
-    - docker tag display-parser/app 192.168.1.5:5000/display-parser/app
-    - docker push 192.168.1.5:5000/display-parser/app
+    - docker tag display-parser/app registry.denistv777.ru/display-parser/app
+    - docker push registry.denistv777.ru/display-parser/app
     # HTTP
     - DOCKER_BUILDKIT=1 docker build -t display-parser/http:latest --target=http-image -f Dockerfile .
-    - docker tag display-parser/http 192.168.1.5:5000/display-parser/http
-    - docker push 192.168.1.5:5000/display-parser/http
+    - docker tag display-parser/http registry.denistv777.ru/display-parser/http
+    - docker push registry.denistv777.ru/display-parser/http
 
 lint:
-  image: 192.168.1.5:5000/docker:24.0.5
+  image: registry.denistv777.ru/docker:24.0.5
   stage: test
   script:
-    - docker run --rm -v $(pwd):/app -v ~/.cache/golangci-lint/v1.53.3:/root/.cache -w /app 192.168.1.5:5000/golangci/golangci-lint:v1.53.3 golangci-lint run -v
+    - docker run --rm -v $(pwd):/app -v ~/.cache/golangci-lint/v1.53.3:/root/.cache -w /app registry.denistv777.ru/golangci/golangci-lint:v1.53.3 golangci-lint run -v
 
 test:
-  image: 192.168.1.5:5000/golang:1.20
+  image: registry.denistv777.ru/golang:1.20
   stage: test
   script:
     - make test
