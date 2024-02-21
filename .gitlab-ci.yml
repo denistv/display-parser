@@ -35,12 +35,10 @@ build-docker-images:
   stage: build
   script:
     # APP
-    - DOCKER_BUILDKIT=1 docker build -t display-parser/app:latest --target=app-image -f Dockerfile .
-    - docker tag display-parser/app registry.denistv777.ru/display-parser/app
+    - DOCKER_BUILDKIT=1 docker build -t registry.denistv777.ru/display-parser/app:latest --target=app-image -f Dockerfile .
     - docker push registry.denistv777.ru/display-parser/app
     # HTTP
-    - DOCKER_BUILDKIT=1 docker build -t display-parser/http:latest --target=http-image -f Dockerfile .
-    - docker tag display-parser/http registry.denistv777.ru/display-parser/http
+    - DOCKER_BUILDKIT=1 docker build -t registry.denistv777.ru/display-parser/http:latest --target=http-image -f Dockerfile .
     - docker push registry.denistv777.ru/display-parser/http
 
 lint:
