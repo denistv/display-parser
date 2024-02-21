@@ -19,6 +19,7 @@ variables:
   # `/certs/client` to share between the service and job
   # container, thanks to volume mount from config.toml
   DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_BUILDKIT: "1"
 stages:
   - test
   - build
@@ -35,10 +36,10 @@ build-docker-images:
   stage: build
   script:
     # APP
-    - DOCKER_BUILDKIT=1 docker build -t registry.denistv777.ru/display-parser/app:latest --target=app-image -f Dockerfile .
+    - docker build -t registry.denistv777.ru/display-parser/app:latest --target=app-image -f Dockerfile .
     - docker push registry.denistv777.ru/display-parser/app
     # HTTP
-    - DOCKER_BUILDKIT=1 docker build -t registry.denistv777.ru/display-parser/http:latest --target=http-image -f Dockerfile .
+    - docker build -t registry.denistv777.ru/display-parser/http:latest --target=http-image -f Dockerfile .
     - docker push registry.denistv777.ru/display-parser/http
 
 lint:
