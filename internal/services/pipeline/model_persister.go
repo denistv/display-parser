@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/denistv/wdlogger"
+
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
-	"display_parser/pkg/logger"
 )
 
 func NewModelPersister(l logger.Logger, modelRepo repository.ModelRepository) *ModelPersister {

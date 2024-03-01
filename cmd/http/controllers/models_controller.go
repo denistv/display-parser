@@ -5,8 +5,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/denistv/wdlogger"
+
 	"display_parser/internal/repository"
-	"display_parser/pkg/logger"
 )
 
 func NewModelsController(l logger.Logger, repo repository.ModelRepository) *ModelsController {

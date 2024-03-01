@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/denistv/wdlogger"
+
 	"display_parser/internal/config"
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
-	"display_parser/pkg/logger"
 )
 
 func NewPipeline(cfg config.Pipeline, brandsCollector *BrandsCollector, pagesColl *PageCollector, modelURLColl *ModelsURLCollector, modelParser *ModelParser, l logger.Logger, pageRepo *repository.Page, modelPersister *ModelPersister) *Pipeline {

@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/denistv/wdlogger/wrappers/zapwrap"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"go.uber.org/zap"
 
@@ -14,7 +15,6 @@ import (
 	"display_parser/internal/repository"
 	"display_parser/internal/services"
 	"display_parser/internal/services/pipeline"
-	"display_parser/pkg/logger/wrappers/zapwrap"
 )
 
 func main() {

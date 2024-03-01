@@ -7,9 +7,9 @@ import (
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/denistv/wdlogger"
 
 	"display_parser/internal/iface"
-	"display_parser/pkg/logger"
 )
 
 func NewModelsURLCollector(l logger.Logger, httpClient iface.HTTPClient) *ModelsURLCollector {

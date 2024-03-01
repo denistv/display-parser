@@ -9,12 +9,13 @@ import (
 	"strings"
 	"testing"
 
-	"display_parser/internal/iface"
-	"display_parser/mocks"
-	"display_parser/pkg/logger"
-	"display_parser/pkg/logger/wrappers/nopwrap"
+	"github.com/denistv/wdlogger"
+	"github.com/denistv/wdlogger/wrappers/nopwrap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"display_parser/internal/iface"
+	"display_parser/mocks"
 )
 
 func TestBrandsCollector_Run(t *testing.T) {

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/denistv/wdlogger/wrappers/zapwrap"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -16,7 +17,6 @@ import (
 	"display_parser/cmd/http/controllers"
 	"display_parser/internal/config"
 	"display_parser/internal/repository"
-	"display_parser/pkg/logger/wrappers/zapwrap"
 )
 
 func main() {

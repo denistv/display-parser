@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/denistv/wdlogger/wrappers/nopwrap"
 	"github.com/stretchr/testify/mock"
 	"go.uber.org/zap"
 
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
 	"display_parser/mocks"
-	"display_parser/pkg/logger/wrappers/nopwrap"
 )
 
 func TestModelPersister_Run(t *testing.T) {

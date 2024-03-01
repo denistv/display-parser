@@ -8,13 +8,14 @@ import (
 	"os"
 	"testing"
 
+	"github.com/denistv/wdlogger"
+	"github.com/denistv/wdlogger/wrappers/nopwrap"
+
 	"display_parser/internal/config"
 	"display_parser/internal/domain"
 	"display_parser/internal/iface"
 	"display_parser/internal/iface/db"
 	"display_parser/mocks"
-	"display_parser/pkg/logger"
-	"display_parser/pkg/logger/wrappers/nopwrap"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

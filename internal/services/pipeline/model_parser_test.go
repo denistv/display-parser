@@ -5,11 +5,12 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/denistv/wdlogger"
+	"github.com/denistv/wdlogger/wrappers/nopwrap"
+
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
 	"display_parser/mocks"
-	"display_parser/pkg/logger"
-	"display_parser/pkg/logger/wrappers/nopwrap"
 )
 
 func TestModelParser_parsePPI(t *testing.T) {

@@ -7,11 +7,12 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/denistv/wdlogger"
+
 	"display_parser/internal/config"
 	"display_parser/internal/domain"
 	"display_parser/internal/iface"
 	"display_parser/internal/iface/db"
-	"display_parser/pkg/logger"
 )
 
 func NewPageCollector(l logger.Logger, pageRepo db.PageRepository, httpClient iface.HTTPClient, cfg config.PagesCollector) *PageCollector {

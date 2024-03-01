@@ -6,9 +6,9 @@ import (
 	"net/http"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/denistv/wdlogger"
 
 	"display_parser/internal/iface"
-	"display_parser/pkg/logger"
 )
 
 func NewBrandsCollector(l logger.Logger, httpClient iface.HTTPClient, cancel context.CancelFunc) *BrandsCollector {

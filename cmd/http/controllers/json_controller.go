@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"display_parser/pkg/logger"
+	"github.com/denistv/wdlogger"
 )
 
 func newJSONController(l logger.Logger) jsonController {

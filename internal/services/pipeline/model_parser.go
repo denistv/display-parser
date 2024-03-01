@@ -10,11 +10,11 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/denistv/wdlogger"
 	"gopkg.in/guregu/null.v4"
 
 	"display_parser/internal/domain"
 	"display_parser/internal/repository"
-	"display_parser/pkg/logger"
 )
 
 var modelParserPPIRegexp = regexp.MustCompile(`\d+ ppi`)
