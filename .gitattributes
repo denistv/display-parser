@@ -1,1 +1,3 @@
 internal/services/pipeline/test_data/* linguist-vendored
+internal/services/pipeline/test_data/html/index.html linguist-vendored
+internal/services/pipeline/test_data/html/en/model/4e4a322f.html linguist-vendored
